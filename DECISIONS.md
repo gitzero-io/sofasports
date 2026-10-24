@@ -19,3 +19,7 @@ One line per judgment call, with the reason.
 - ESPN `broadcasts` differ between scoreboard (`names[]`) and summary (`media.shortName`) → DTO accepts both; found by testing against real fixtures.
 - Sentry auto-init disabled in the manifest → with no DSN it crashed on launch (caught on the emulator); SofaApp inits it by hand only when a DSN is set.
 - Emulator: dismissed the Google TV setup prompt and set user_setup_complete/device_provisioned on the local AVD → otherwise the setup wizard sits on top of every app.
+- Fixture mode replays last week's HOU@JAX (from late Q3) and LAC@KC (from kickoff) play-by-play, 1 play / 4 s, and shifts week 7's schedule to start 3 min after launch → lets live-only features (close badge, pulse, polling, countdown) be tested offline.
+- Fixture Sleeper: any username maps to roster 1's owner in the example league; a 2nd league is synthesised from the same data as roster 5's owner → exercises the league switcher; points scale with replay progress so the overlay pulse fires.
+- Data-mode toggle is ignored in release builds (`BuildConfig.DEBUG`) → release can never accidentally show fake data.
+- Ktor `expectSuccess = false`; providers parse the body and let parse errors surface → one error path (repository catches and keeps last good data).
