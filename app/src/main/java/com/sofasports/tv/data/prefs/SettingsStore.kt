@@ -18,6 +18,9 @@ enum class OverlayCorner { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT }
 
 enum class DataMode { LIVE, FIXTURES }
 
+/** News ticker over other apps: a line in the corner card, a full-width bottom bar, both, or neither. */
+enum class OverlayTicker(val label: String) { OFF("Off"), CORNER("Corner card line"), BAR("Bottom bar"), BOTH("Both") }
+
 data class UserSettings(
     val onboardingDone: Boolean = false,
     /** Favorite team abbreviations in the order the user picked them. */
@@ -32,6 +35,8 @@ data class UserSettings(
     /** User chose "Skip for now" on the Home link prompt; linking is still available in Settings. */
     val fantasyPromptSkipped: Boolean = false,
     val showOdds: Boolean = true,
+    val tickerInApp: Boolean = true,
+    val overlayTicker: OverlayTicker = OverlayTicker.CORNER,
     val dataMode: DataMode = DataMode.LIVE,
 )
 
@@ -53,6 +58,8 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
         val usageOptOut = booleanPreferencesKey("usage_events_opt_out")
         val fantasySkipped = booleanPreferencesKey("fantasy_prompt_skipped")
         val showOdds = booleanPreferencesKey("show_odds")
+        val tickerInApp = booleanPreferencesKey("ticker_in_app")
+        val overlayTicker = stringPreferencesKey("overlay_ticker")
         val dataMode = stringPreferencesKey("data_mode")
     }
 
@@ -69,6 +76,8 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
             usageEventsOptOut = p[Keys.usageOptOut] ?: false,
             fantasyPromptSkipped = p[Keys.fantasySkipped] ?: false,
             showOdds = p[Keys.showOdds] ?: true,
+            tickerInApp = p[Keys.tickerInApp] ?: true,
+            overlayTicker = p[Keys.overlayTicker]?.let { runCatching { OverlayTicker.valueOf(it) }.getOrNull() } ?: OverlayTicker.CORNER,
             dataMode = p[Keys.dataMode]?.let { runCatching { DataMode.valueOf(it) }.getOrNull() } ?: DataMode.LIVE,
         )
     }
@@ -102,5 +111,7 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
     suspend fun setUsageEventsOptOut(optOut: Boolean) = store.edit { it[Keys.usageOptOut] = optOut }
     suspend fun setFantasyPromptSkipped(skipped: Boolean) = store.edit { it[Keys.fantasySkipped] = skipped }
     suspend fun setShowOdds(show: Boolean) = store.edit { it[Keys.showOdds] = show }
+    suspend fun setTickerInApp(on: Boolean) = store.edit { it[Keys.tickerInApp] = on }
+    suspend fun setOverlayTicker(mode: OverlayTicker) = store.edit { it[Keys.overlayTicker] = mode.name }
     suspend fun setDataMode(mode: DataMode) = store.edit { it[Keys.dataMode] = mode.name }
 }

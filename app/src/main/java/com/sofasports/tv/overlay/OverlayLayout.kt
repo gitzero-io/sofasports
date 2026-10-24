@@ -14,4 +14,7 @@ object OverlayLayout {
 
     /** Inset from the screen edge, in px, inside the TV overscan-safe area (~5%). */
     fun marginPx(screenWidthPx: Int): Int = (screenWidthPx * 0.03f).toInt().coerceAtLeast(24)
+
+    /** Height reserved for the bottom ticker bar when lifting a bottom-corner card above it. */
+    fun barHeightPx(density: Float): Int = (56 * density).toInt()
 }

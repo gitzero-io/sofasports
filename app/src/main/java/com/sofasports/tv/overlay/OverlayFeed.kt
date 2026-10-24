@@ -3,7 +3,10 @@ package com.sofasports.tv.overlay
 import com.sofasports.tv.data.config.CloseGameRule
 import com.sofasports.tv.data.config.ConfigRepository
 import com.sofasports.tv.data.picks.PicksRepository
+import com.sofasports.tv.data.prefs.OverlayTicker
 import com.sofasports.tv.data.prefs.SettingsStore
+import com.sofasports.tv.data.repo.TickerRepository
+import com.sofasports.tv.domain.TickerItem
 import com.sofasports.tv.domain.PickProgress
 import com.sofasports.tv.data.repo.FantasyRepository
 import com.sofasports.tv.data.repo.ScoresRepository
@@ -17,6 +20,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,7 +38,12 @@ data class OverlayState(
     val closeRule: CloseGameRule = CloseGameRule(),
     val showOdds: Boolean = false,
     val picks: List<PickProgress> = emptyList(),
-)
+    val tickerMode: OverlayTicker = OverlayTicker.OFF,
+    val ticker: List<TickerItem> = emptyList(),
+) {
+    val cornerTicker get() = (tickerMode == OverlayTicker.CORNER || tickerMode == OverlayTicker.BOTH) && ticker.isNotEmpty()
+    val barTicker get() = (tickerMode == OverlayTicker.BAR || tickerMode == OverlayTicker.BOTH) && ticker.isNotEmpty()
+}
 
 /** What the corner overlay shows: the selected Sleeper matchup and one game. */
 @Singleton
@@ -41,16 +53,24 @@ class OverlayFeed @Inject constructor(
     private val settings: SettingsStore,
     private val config: ConfigRepository,
     private val picks: PicksRepository,
+    private val ticker: TickerRepository,
 ) {
     private val _state = MutableStateFlow(OverlayState())
     val state: StateFlow<OverlayState> = _state.asStateFlow()
     private var job: Job? = null
 
     /** Collecting here also keeps the shared pollers running while the overlay is up. */
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     fun start(scope: CoroutineScope) {
         job?.cancel()
         job = scope.launch {
-            combine(fantasy.state, scores.state, settings.settings, config.config, picks.progress) { f, s, prefs, cfg, pk ->
+            val tickerMode = combine(settings.settings, config.config) { s, c -> if (c.features.ticker) s.overlayTicker else OverlayTicker.OFF }
+                .distinctUntilChanged()
+            // Only subscribe to headlines when the overlay actually shows them.
+            val tickerFeed = tickerMode.flatMapLatest { m ->
+                if (m == OverlayTicker.OFF) flowOf(m to emptyList()) else ticker.items.map { m to it }
+            }
+            combine(fantasy.state, scores.state, settings.settings, config.config, combine(picks.progress, tickerFeed) { a, b -> a to b }) { f, s, prefs, cfg, (pk, tk) ->
                 val games = s.scoreboard?.games.orEmpty()
                 val pinned = prefs.pinnedGameId?.let { id -> games.firstOrNull { it.id == id } }
                 OverlayState(
@@ -61,6 +81,8 @@ class OverlayFeed @Inject constructor(
                     closeRule = cfg.closeGame,
                     showOdds = cfg.features.odds && prefs.showOdds,
                     picks = if (cfg.features.picks) pk else emptyList(),
+                    tickerMode = tk.first,
+                    ticker = tk.second,
                 )
             }.collect { _state.value = it }
         }

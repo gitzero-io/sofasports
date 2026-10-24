@@ -72,6 +72,8 @@ data class Features(
     val odds: Boolean = true,
     /** Manual PrizePicks / DraftKings pick tracker. */
     val picks: Boolean = true,
+    /** Headline / score ticker, in the app and over video. */
+    val ticker: Boolean = true,
 )
 
 @Serializable

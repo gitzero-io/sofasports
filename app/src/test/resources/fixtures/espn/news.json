@@ -1,0 +1,823 @@
+{
+ "articles": [
+  {
+   "id": 50269752,
+   "type": "HeadlineNews",
+   "headline": "Eagles' DeVonta Smith, Dontayvion Wicks out vs. Cowboys",
+   "description": "The Eagles' top two receivers -- DeVonta Smith and Dontayvion Wicks -- have been ruled out of Monday night's game against the Cowboys.",
+   "published": "2026-10-24T21:03:26Z",
+   "categories": [
+    {
+     "type": "athlete",
+     "description": "DeVonta Smith",
+     "athleteId": 4241478
+    },
+    {
+     "type": "athlete",
+     "description": "Dontayvion Wicks",
+     "athleteId": 4428850
+    },
+    {
+     "type": "team",
+     "description": "Philadelphia Eagles",
+     "teamId": 21,
+     "team": {
+      "abbreviation": "PHI"
+     }
+    }
+   ]
+  },
+  {
+   "id": 50269656,
+   "type": "HeadlineNews",
+   "headline": "Vikings activate RB Jordan Mason off injured reserve",
+   "description": "The Vikings activated running back Jordan Mason from injured reserve Saturday, completing his recovery from a fractured thumb that required surgery last month.",
+   "published": "2026-10-24T20:49:35Z",
+   "categories": [
+    {
+     "type": "athlete",
+     "description": "Jordan Mason",
+     "athleteId": 4360569
+    },
+    {
+     "type": "team",
+     "description": "Minnesota Vikings",
+     "teamId": 16,
+     "team": {
+      "abbreviation": "MIN"
+     }
+    },
+    {
+     "type": "athlete",
+     "description": "Aaron Jones Sr",
+     "athleteId": 3042519
+    }
+   ]
+  },
+  {
+   "id": 50269266,
+   "type": "HeadlineNews",
+   "headline": "Packers activate RB Josh Jacobs for 2026 debut",
+   "description": "Packers running back Josh Jacobs will make his 2026 season debut against the Lions after spending the first six weeks on the NFL's commissioner exempt list.",
+   "published": "2026-10-24T21:01:12Z",
+   "categories": [
+    {
+     "type": "athlete",
+     "description": "Josh Jacobs",
+     "athleteId": 4047365
+    },
+    {
+     "type": "team",
+     "description": "Green Bay Packers",
+     "teamId": 9,
+     "team": {
+      "abbreviation": "GB"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Detroit Lions",
+     "teamId": 8,
+     "team": {
+      "abbreviation": "DET"
+     }
+    },
+    {
+     "type": "athlete",
+     "description": "Coleman Owen",
+     "athleteId": 4578436
+    },
+    {
+     "type": "athlete",
+     "description": "Arron Mosby",
+     "athleteId": 4242996
+    },
+    {
+     "type": "athlete",
+     "description": "Jordon Riley",
+     "athleteId": 4240677
+    }
+   ]
+  },
+  {
+   "id": 50268816,
+   "type": "HeadlineNews",
+   "headline": "Ravens rule out Lamar Jackson (ankle) vs. Bengals; Tyler 'Snoop' Huntley to start",
+   "description": "The Baltimore Ravens have ruled QB Lamar Jackson out of Sundays game vs. the Cincinnati Bengals as he continues to deal with a high ankle sprain. Tyler \"Snoop\" Huntley will get the start.",
+   "published": "2026-10-24T20:41:27Z",
+   "categories": [
+    {
+     "type": "team",
+     "description": "Baltimore Ravens",
+     "teamId": 33,
+     "team": {
+      "abbreviation": "BAL"
+     }
+    },
+    {
+     "type": "athlete",
+     "description": "Lamar Jackson",
+     "athleteId": 3916387
+    },
+    {
+     "type": "athlete",
+     "description": "Tyler Huntley",
+     "athleteId": 4035671
+    }
+   ]
+  },
+  {
+   "id": 50240486,
+   "type": "Story",
+   "headline": "NFL Week 7 uniforms: Alternates galore as Texans go battle red, Lions all-black",
+   "description": "Here's a look at what each NFL team is wearing in Week 7, led by alternate looks from Houston, Detroit and Dallas.",
+   "published": "2026-10-24T17:02:08Z",
+   "categories": [
+    {
+     "type": "team",
+     "description": "Arizona Cardinals",
+     "teamId": 22,
+     "team": {
+      "abbreviation": "ARI"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Atlanta Falcons",
+     "teamId": 1,
+     "team": {
+      "abbreviation": "ATL"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Baltimore Ravens",
+     "teamId": 33,
+     "team": {
+      "abbreviation": "BAL"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Buffalo Bills",
+     "teamId": 2,
+     "team": {
+      "abbreviation": "BUF"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Carolina Panthers",
+     "teamId": 29,
+     "team": {
+      "abbreviation": "CAR"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Chicago Bears",
+     "teamId": 3,
+     "team": {
+      "abbreviation": "CHI"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Cincinnati Bengals",
+     "teamId": 4,
+     "team": {
+      "abbreviation": "CIN"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Cleveland Browns",
+     "teamId": 5,
+     "team": {
+      "abbreviation": "CLE"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Dallas Cowboys",
+     "teamId": 6,
+     "team": {
+      "abbreviation": "DAL"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Denver Broncos",
+     "teamId": 7,
+     "team": {
+      "abbreviation": "DEN"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Detroit Lions",
+     "teamId": 8,
+     "team": {
+      "abbreviation": "DET"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Green Bay Packers",
+     "teamId": 9,
+     "team": {
+      "abbreviation": "GB"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Houston Texans",
+     "teamId": 34,
+     "team": {
+      "abbreviation": "HOU"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Indianapolis Colts",
+     "teamId": 11,
+     "team": {
+      "abbreviation": "IND"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Jacksonville Jaguars",
+     "teamId": 30,
+     "team": {
+      "abbreviation": "JAX"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Kansas City Chiefs",
+     "teamId": 12,
+     "team": {
+      "abbreviation": "KC"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Las Vegas Raiders",
+     "teamId": 13,
+     "team": {
+      "abbreviation": "LV"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Los Angeles Chargers",
+     "teamId": 24,
+     "team": {
+      "abbreviation": "LAC"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Los Angeles Rams",
+     "teamId": 14,
+     "team": {
+      "abbreviation": "LAR"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Miami Dolphins",
+     "teamId": 15,
+     "team": {
+      "abbreviation": "MIA"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Minnesota Vikings",
+     "teamId": 16,
+     "team": {
+      "abbreviation": "MIN"
+     }
+    },
+    {
+     "type": "team",
+     "description": "New England Patriots",
+     "teamId": 17,
+     "team": {
+      "abbreviation": "NE"
+     }
+    },
+    {
+     "type": "team",
+     "description": "New Orleans Saints",
+     "teamId": 18,
+     "team": {
+      "abbreviation": "NO"
+     }
+    },
+    {
+     "type": "team",
+     "description": "New York Giants",
+     "teamId": 19,
+     "team": {
+      "abbreviation": "NYG"
+     }
+    },
+    {
+     "type": "team",
+     "description": "New York Jets",
+     "teamId": 20,
+     "team": {
+      "abbreviation": "NYJ"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Philadelphia Eagles",
+     "teamId": 21,
+     "team": {
+      "abbreviation": "PHI"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Pittsburgh Steelers",
+     "teamId": 23,
+     "team": {
+      "abbreviation": "PIT"
+     }
+    },
+    {
+     "type": "team",
+     "description": "San Francisco 49ers",
+     "teamId": 25,
+     "team": {
+      "abbreviation": "SF"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Seattle Seahawks",
+     "teamId": 26,
+     "team": {
+      "abbreviation": "SEA"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Tampa Bay Buccaneers",
+     "teamId": 27,
+     "team": {
+      "abbreviation": "TB"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Tennessee Titans",
+     "teamId": 10,
+     "team": {
+      "abbreviation": "TEN"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Washington Commanders",
+     "teamId": 28,
+     "team": {
+      "abbreviation": "WSH"
+     }
+    }
+   ]
+  },
+  {
+   "id": 50228155,
+   "type": "Story",
+   "headline": "Fantasy playbook: NFL Week 7 Shadow Reports, lineup locks and projected scores",
+   "description": "An all-encompassing look at the matchups to exploit or avoid and lineup locks in fantasy, as well as projected scores for all NFL games.",
+   "published": "2026-10-24T15:54:31Z",
+   "categories": []
+  },
+  {
+   "id": 49803708,
+   "type": "Story",
+   "headline": "Fantasy football flex and superflex rankings for Week 7",
+   "description": "Trying to decide between a couple of closely ranked players this week? Eric Karabell's rankings are here to help.",
+   "published": "2026-10-24T15:36:57Z",
+   "categories": []
+  },
+  {
+   "id": 49797082,
+   "type": "Story",
+   "headline": "Fantasy football rankings Week 7: PPR and superflex",
+   "description": "Weekly composite ranks for each position in PPR and IDP formats, as well as Eric Karabell's superflex ranks.",
+   "published": "2026-10-24T15:35:23Z",
+   "categories": []
+  },
+  {
+   "id": 49804149,
+   "type": "Story",
+   "headline": "Fantasy football rankings for Week 7: Wide receiver",
+   "description": "Fantasy football rankings from Matt Bowen, Mike Clay, Tristan H. Cockcroft, Daniel Dopp, Eric Karabell, Liz Loza, Eric Moody and Field Yates.",
+   "published": "2026-10-24T15:34:59Z",
+   "categories": []
+  },
+  {
+   "id": 49804273,
+   "type": "Story",
+   "headline": "Fantasy football rankings for Week 7: D/ST",
+   "description": "Fantasy football rankings from Matt Bowen, Mike Clay, Tristan H. Cockcroft, Daniel Dopp, Eric Karabell, Liz Loza, Eric Moody and Field Yates.",
+   "published": "2026-10-24T15:34:10Z",
+   "categories": []
+  },
+  {
+   "id": 49804068,
+   "type": "Story",
+   "headline": "Fantasy football rankings for Week 7: Running back",
+   "description": "Fantasy football rankings from Matt Bowen, Mike Clay, Tristan H. Cockcroft, Daniel Dopp, Eric Karabell, Liz Loza, Eric Moody and Field Yates.",
+   "published": "2026-10-24T15:34:34Z",
+   "categories": []
+  },
+  {
+   "id": 49804164,
+   "type": "Story",
+   "headline": "Fantasy football rankings for Week 7: Tight end",
+   "description": "Fantasy football rankings from Matt Bowen, Mike Clay, Tristan H. Cockcroft, Daniel Dopp, Eric Karabell, Liz Loza, Eric Moody and Field Yates.",
+   "published": "2026-10-24T15:33:27Z",
+   "categories": []
+  },
+  {
+   "id": 49804022,
+   "type": "Story",
+   "headline": "Fantasy football rankings for Week 7: Quarterback",
+   "description": "Fantasy football rankings from Matt Bowen, Mike Clay, Tristan H. Cockcroft, Daniel Dopp, Eric Karabell, Liz Loza, Eric Moody and Field Yates.",
+   "published": "2026-10-24T15:33:45Z",
+   "categories": []
+  },
+  {
+   "id": 49804233,
+   "type": "Story",
+   "headline": "Fantasy football rankings for Week 7: Kicker",
+   "description": "Fantasy football rankings from Matt Bowen, Mike Clay, Tristan H. Cockcroft, Daniel Dopp, Eric Karabell, Liz Loza, Eric Moody and Field Yates.",
+   "published": "2026-10-24T15:33:05Z",
+   "categories": []
+  },
+  {
+   "id": 49804332,
+   "type": "Story",
+   "headline": "Fantasy football rankings for Week 7: IDP",
+   "description": "Weekly fantasy football draft rankings for IDP leagues from Mike Clay, Tristan H. Cockcroft and Eric Moody.",
+   "published": "2026-10-24T15:32:18Z",
+   "categories": []
+  },
+  {
+   "id": 50262387,
+   "type": "Story",
+   "headline": "Patriots must improve turnover differential if they want to win, other notes",
+   "description": "It's one of Mike Vrabel's four pillars of the team identity -- and New England is struggling with it after losing to the Bears on Thursday.",
+   "published": "2026-10-24T15:32:24Z",
+   "categories": [
+    {
+     "type": "team",
+     "description": "New England Patriots",
+     "teamId": 17,
+     "team": {
+      "abbreviation": "NE"
+     }
+    },
+    {
+     "type": "athlete",
+     "description": "AJ Brown",
+     "athleteId": 4047646
+    },
+    {
+     "type": "athlete",
+     "description": "Drake Maye",
+     "athleteId": 4431452
+    }
+   ]
+  },
+  {
+   "id": 50264705,
+   "type": "HeadlineNews",
+   "headline": "NFL House in Paris closes ahead of street protests in French capital",
+   "description": "The NFL closed its \"NFL House\" in Paris as the city braced for street protests with a heavy police presence and storefronts boarded up.",
+   "published": "2026-10-24T12:21:04Z",
+   "categories": [
+    {
+     "type": "team",
+     "description": "Pittsburgh Steelers",
+     "teamId": 23,
+     "team": {
+      "abbreviation": "PIT"
+     }
+    },
+    {
+     "type": "team",
+     "description": "New Orleans Saints",
+     "teamId": 18,
+     "team": {
+      "abbreviation": "NO"
+     }
+    }
+   ]
+  },
+  {
+   "id": 50249972,
+   "type": "Story",
+   "headline": "NFL Week 7 predictions: Upsets, fantasy sleepers, stat lines, TD scorers, more",
+   "description": "Touchdowns for Tucker Kraft and Germie Bernard? Cardinals pull another upset? Revenge game for Trey Hendrickson? Let's predict 15 things for Week 7.",
+   "published": "2026-10-24T10:00:03Z",
+   "categories": [
+    {
+     "type": "team",
+     "description": "Arizona Cardinals",
+     "teamId": 22,
+     "team": {
+      "abbreviation": "ARI"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Kansas City Chiefs",
+     "teamId": 12,
+     "team": {
+      "abbreviation": "KC"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Detroit Lions",
+     "teamId": 8,
+     "team": {
+      "abbreviation": "DET"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Pittsburgh Steelers",
+     "teamId": 23,
+     "team": {
+      "abbreviation": "PIT"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Minnesota Vikings",
+     "teamId": 16,
+     "team": {
+      "abbreviation": "MIN"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Indianapolis Colts",
+     "teamId": 11,
+     "team": {
+      "abbreviation": "IND"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Philadelphia Eagles",
+     "teamId": 21,
+     "team": {
+      "abbreviation": "PHI"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Miami Dolphins",
+     "teamId": 15,
+     "team": {
+      "abbreviation": "MIA"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Green Bay Packers",
+     "teamId": 9,
+     "team": {
+      "abbreviation": "GB"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Tampa Bay Buccaneers",
+     "teamId": 27,
+     "team": {
+      "abbreviation": "TB"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Denver Broncos",
+     "teamId": 7,
+     "team": {
+      "abbreviation": "DEN"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Cincinnati Bengals",
+     "teamId": 4,
+     "team": {
+      "abbreviation": "CIN"
+     }
+    },
+    {
+     "type": "team",
+     "description": "New York Jets",
+     "teamId": 20,
+     "team": {
+      "abbreviation": "NYJ"
+     }
+    }
+   ]
+  },
+  {
+   "id": 50253343,
+   "type": "Story",
+   "headline": "Will Niners have edge with ex-Falcons coach facing Penix?",
+   "description": "With all of the familiarity between Morris and the Falcons, Sunday's game should come down to execution.",
+   "published": "2026-10-24T10:00:21Z",
+   "categories": [
+    {
+     "type": "team",
+     "description": "Atlanta Falcons",
+     "teamId": 1,
+     "team": {
+      "abbreviation": "ATL"
+     }
+    },
+    {
+     "type": "athlete",
+     "description": "Michael Penix Jr",
+     "athleteId": 4360423
+    },
+    {
+     "type": "athlete",
+     "description": "Bijan Robinson",
+     "athleteId": 4430807
+    }
+   ]
+  },
+  {
+   "id": 50253768,
+   "type": "Story",
+   "headline": "Fernando Mendoza is embracing being Raiders' latest Hispanic QB",
+   "description": "The rookie's next chapter is inspired by the legacies of a Hispanic coach, QB and a Raiders' fan base embracing the culture.",
+   "published": "2026-10-24T10:00:13Z",
+   "categories": [
+    {
+     "type": "team",
+     "description": "Las Vegas Raiders",
+     "teamId": 13,
+     "team": {
+      "abbreviation": "LV"
+     }
+    },
+    {
+     "type": "athlete",
+     "description": "Fernando Mendoza",
+     "athleteId": 4837248
+    },
+    {
+     "type": "athlete",
+     "description": "Alberto Mendoza",
+     "athleteId": 5191162
+    },
+    {
+     "type": "team",
+     "description": "Georgia Tech Yellow Jackets",
+     "teamId": 59,
+     "team": {
+      "abbreviation": "GT"
+     }
+    },
+    {
+     "type": "team",
+     "description": "Georgia Tech",
+     "teamId": 59,
+     "team": {
+      "abbreviation": "Georgia Tech"
+     }
+    }
+   ]
+  },
+  {
+   "id": 50258881,
+   "type": "Story",
+   "headline": "Inside the silent messages Boye Mafe sends every game day",
+   "description": "The Bengals defensive end uses sign language to say \"I love you\" to his mother, Bola, who died of pancreatic cancer in 2018.",
+   "published": "2026-10-24T10:00:12Z",
+   "categories": [
+    {
+     "type": "team",
+     "description": "Cincinnati Bengals",
+     "teamId": 4,
+     "team": {
+      "abbreviation": "CIN"
+     }
+    },
+    {
+     "type": "athlete",
+     "description": "Boye Mafe",
+     "athleteId": 4240754
+    }
+   ]
+  },
+  {
+   "id": 50257261,
+   "type": "Story",
+   "headline": "David Andrews' blood clot diagnosis illuminates what's going on with Jalen Hurts",
+   "description": "The former NFL center tells ESPN about his experience as it might provide a window into the Eagles QB's situation.",
+   "published": "2026-10-23T17:41:35Z",
+   "categories": [
+    {
+     "type": "team",
+     "description": "Philadelphia Eagles",
+     "teamId": 21,
+     "team": {
+      "abbreviation": "PHI"
+     }
+    },
+    {
+     "type": "athlete",
+     "description": "Jalen Hurts",
+     "athleteId": 4040715
+    },
+    {
+     "type": "team",
+     "description": "New England Patriots",
+     "teamId": 17,
+     "team": {
+      "abbreviation": "NE"
+     }
+    },
+    {
+     "type": "athlete",
+     "description": "David Andrews",
+     "athleteId": 2578529
+    }
+   ]
+  },
+  {
+   "id": 50261735,
+   "type": "HeadlineNews",
+   "headline": "Lawrence McCutcheon, 5-time Pro Bowl RB for Rams, dies at 76",
+   "description": "Lawrence McCutcheon, a five-time Pro Bowl running back for the Los Angeles Rams who went on to a long career in the team's front office, died Friday. He was 76.",
+   "published": "2026-10-24T02:03:23Z",
+   "categories": [
+    {
+     "type": "team",
+     "description": "Los Angeles Rams",
+     "teamId": 14,
+     "team": {
+      "abbreviation": "LAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": 50261478,
+   "type": "Media",
+   "headline": "Boye Mafe's proud of his culture",
+   "description": "Ben Baby details how Boye Mafe honors his culture when he's on the field.",
+   "published": "2026-10-23T23:33:53Z",
+   "categories": [
+    {
+     "type": "athlete",
+     "description": "Boye Mafe",
+     "athleteId": 4240754
+    },
+    {
+     "type": "team",
+     "description": "Cincinnati Bengals",
+     "teamId": 4,
+     "team": {
+      "abbreviation": "CIN"
+     }
+    }
+   ]
+  },
+  {
+   "id": 50261267,
+   "type": "HeadlineNews",
+   "headline": "Dallas Cowboys cheerleaders unionize, will begin collective bargaining",
+   "description": "The Dallas Cowboys have agreed to recognize the Dallas Cowboys Cheerleaders Association as the collective bargaining representative for the team's cheer squad.",
+   "published": "2026-10-24T01:24:21Z",
+   "categories": [
+    {
+     "type": "team",
+     "description": "Dallas Cowboys",
+     "teamId": 6,
+     "team": {
+      "abbreviation": "DAL"
+     }
+    }
+   ]
+  }
+ ]
+}

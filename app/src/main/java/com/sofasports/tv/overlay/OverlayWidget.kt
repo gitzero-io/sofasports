@@ -36,6 +36,8 @@ import com.sofasports.tv.ui.picks.bookColor
 import com.sofasports.tv.ui.picks.sortForDisplay
 import com.sofasports.tv.ui.picks.statusColor
 import com.sofasports.tv.ui.components.Badge
+import com.sofasports.tv.ui.components.TickerBar
+import com.sofasports.tv.ui.components.TickerCrawl
 import com.sofasports.tv.ui.components.rememberNowMs
 import com.sofasports.tv.ui.components.scorePulse
 import com.sofasports.tv.ui.fantasy.formatPoints
@@ -55,7 +57,7 @@ fun OverlayWidget(state: OverlayState) {
         val m = state.matchup
         val g = state.game
         val picks = state.picks
-        if (m == null && g == null && picks.isEmpty()) {
+        if (m == null && g == null && picks.isEmpty() && !state.cornerTicker) {
             Text("SOFA SPORTS", style = MaterialTheme.typography.labelLarge, color = SofaColors.TextSecondary)
             Text("Pin a game or link Sleeper", style = MaterialTheme.typography.bodySmall, color = SofaColors.TextMuted)
             return@Column
@@ -66,6 +68,10 @@ fun OverlayWidget(state: OverlayState) {
         if (picks.isNotEmpty()) {
             if (m != null || g != null) Box(Modifier.fillMaxWidth().height(1.dp).background(SofaColors.Outline))
             PicksRows(picks)
+        }
+        if (state.cornerTicker) {
+            if (m != null || g != null || picks.isNotEmpty()) Box(Modifier.fillMaxWidth().height(1.dp).background(SofaColors.Outline))
+            TickerCrawl(state.ticker, textStyle = MaterialTheme.typography.labelLarge, velocity = 45.dp)
         }
     }
 }
@@ -164,4 +170,10 @@ private fun PicksRows(picks: List<PickProgress>) {
             )
         }
     }
+}
+
+/** Full-width headline bar along the bottom of the screen, over the video. */
+@Composable
+fun OverlayTickerBar(state: OverlayState) {
+    if (state.barTicker) TickerBar(state.ticker, Modifier.background(SofaColors.Background))
 }

@@ -19,7 +19,8 @@
     "updateCheck": true,
     "usageEvents": true,
     "odds": true,
-    "picks": true
+    "picks": true,
+    "ticker": true
   },
   "endpoints": {
     "espnNflBase": "https://site.api.espn.com/apis/site/v2/sports/football/nfl",

@@ -26,6 +26,7 @@ import androidx.tv.material3.Text
 import com.sofasports.tv.BuildConfig
 import com.sofasports.tv.data.prefs.DataMode
 import com.sofasports.tv.data.prefs.OverlayCorner
+import com.sofasports.tv.data.prefs.OverlayTicker
 import com.sofasports.tv.domain.NflTeams
 import com.sofasports.tv.ui.components.QrCode
 import com.sofasports.tv.ui.components.SofaButton
@@ -111,6 +112,25 @@ fun SettingsScreen(
                     }
                 } else {
                     Text("Tip: open a game and choose \"Pin to overlay\". Otherwise it shows your team's game.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted)
+                }
+            }
+        }
+        item(key = "ticker") {
+            SettingsSection("News ticker") {
+                Text(
+                    "ESPN headlines, scoring plays and live scores. Anything about your teams, fantasy players or picks comes first (★).",
+                    style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary,
+                )
+                Text("In the app", style = MaterialTheme.typography.titleSmall, color = SofaColors.TextSecondary)
+                SpacedRow {
+                    SofaButton("On", onClick = { vm.setTickerInApp(true) }, selected = settings.tickerInApp)
+                    SofaButton("Off", onClick = { vm.setTickerInApp(false) }, selected = !settings.tickerInApp)
+                }
+                Text("Over video (needs the score overlay on)", style = MaterialTheme.typography.titleSmall, color = SofaColors.TextSecondary)
+                SpacedRow {
+                    OverlayTicker.entries.forEach { m ->
+                        SofaButton(m.label, onClick = { vm.setOverlayTicker(m) }, selected = settings.overlayTicker == m)
+                    }
                 }
             }
         }

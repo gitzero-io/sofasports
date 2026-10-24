@@ -86,3 +86,8 @@ One line per judgment call, with the reason.
 - Player list = ESPN team roster, offense QB/RB/WR/TE only, ESPN's order (backups can appear before starters).
 - Fixture mode scales end-of-game player stats by replay progress → props visibly move in a test; live mode uses ESPN's real live box score.
 - Book badge colours: DraftKings green, PrizePicks violet → never red/blue, which stay reserved for me/opponent.
+- News ticker source: ESPN's public NFL news feed (`/news`), headlines only, refreshed every 5 min; "Headlines: ESPN" shown in the crawl. Articles are tagged with team abbreviations and ESPN athlete ids, so "mine" matches favorites/pick players by id and fantasy starters by name.
+- Scoring plays for the ticker are inferred by diffing consecutive scoreboard polls (6–8 pts = TD, 3 = FG, 2 = 2 PTS, 1 = XP) with ESPN's last-play text trimmed to one sentence; they expire after 15 min.
+- Over-video ticker is a setting with Off / Corner card line / Bottom bar / Both; default Corner card line (adds no screen area beyond the existing card). The bottom bar is a second NOT_FOCUSABLE overlay window; a bottom-corner card is lifted above it.
+- Ticker bars keep their text inside the TV overscan-safe area (48dp sides, extra bottom inset in-app); the background runs edge to edge.
+- The ticker's "NFL" label is neutral grey, not blue → blue stays reserved for "me".

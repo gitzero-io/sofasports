@@ -7,6 +7,7 @@ import com.sofasports.tv.data.espnff.EspnLeagueStore
 import com.sofasports.tv.data.picks.PicksStore
 import com.sofasports.tv.data.prefs.DataMode
 import com.sofasports.tv.data.prefs.OverlayCorner
+import com.sofasports.tv.data.prefs.OverlayTicker
 import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.data.prefs.UserSettings
 import com.sofasports.tv.data.repo.FantasyRepository
@@ -75,6 +76,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setShowOdds(show: Boolean) = viewModelScope.launch { store.setShowOdds(show) }
+    fun setTickerInApp(on: Boolean) = viewModelScope.launch { store.setTickerInApp(on) }
+    fun setOverlayTicker(mode: OverlayTicker) = viewModelScope.launch { store.setOverlayTicker(mode) }
 
     fun setUsageOptOut(optOut: Boolean) = viewModelScope.launch { store.setUsageEventsOptOut(optOut) }
 

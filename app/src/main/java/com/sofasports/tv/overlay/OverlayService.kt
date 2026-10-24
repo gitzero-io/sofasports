@@ -9,6 +9,7 @@ import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.view.Gravity
 import android.view.WindowManager
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
@@ -51,6 +52,7 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
     override val savedStateRegistry: SavedStateRegistry get() = savedStateController.savedStateRegistry
 
     private var view: ComposeView? = null
+    private var barView: ComposeView? = null
     private val windowManager by lazy { getSystemService(WINDOW_SERVICE) as WindowManager }
 
     override fun onCreate() {
@@ -58,10 +60,16 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
         savedStateController.performRestore(null)
         super.onCreate()
         startAsForeground()
+        val barShown = feed.state.map { it.barTicker }.distinctUntilChanged()
         lifecycleScope.launch {
-            combine(settings.settings.map { it.overlayCorner }, appVisibility.inForeground) { corner, appShown -> corner to appShown }
+            combine(settings.settings.map { it.overlayCorner }, appVisibility.inForeground, barShown) { corner, appShown, bar -> Triple(corner, appShown, bar) }
                 .distinctUntilChanged()
-                .collect { (corner, appShown) -> if (appShown) removeView() else show(corner) }
+                .collect { (corner, appShown, bar) -> if (appShown) removeView() else show(corner, liftAboveBar = bar) }
+        }
+        lifecycleScope.launch {
+            combine(appVisibility.inForeground, barShown) { appShown, bar -> !appShown && bar }
+                .distinctUntilChanged()
+                .collect { visible -> if (visible) showBar() else removeBar() }
         }
         feed.start(lifecycleScope)
         // Remote config can switch the overlay off (feature flag) or kill the whole app.
@@ -84,10 +92,11 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
 
     override fun onDestroy() {
         removeView()
+        removeBar()
         super.onDestroy()
     }
 
-    private fun show(corner: OverlayCorner) {
+    private fun show(corner: OverlayCorner, liftAboveBar: Boolean) {
         removeView()
         val margin = OverlayLayout.marginPx(resources.displayMetrics.widthPixels)
         val params = WindowManager.LayoutParams(
@@ -102,7 +111,9 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
         ).apply {
             gravity = OverlayLayout.gravityFor(corner)
             x = margin
-            y = margin
+            // A bottom-corner card sits above the full-width ticker bar instead of covering it.
+            val bottom = corner == OverlayCorner.BOTTOM_LEFT || corner == OverlayCorner.BOTTOM_RIGHT
+            y = margin + if (bottom && liftAboveBar) OverlayLayout.barHeightPx(resources.displayMetrics.density) else 0
         }
         val compose = ComposeView(this).apply {
             setViewTreeLifecycleOwner(this@OverlayService)
@@ -127,6 +138,43 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
     private fun removeView() {
         view?.let { runCatching { windowManager.removeView(it) } }
         view = null
+    }
+
+    /** Full-width headline bar along the bottom (Settings → News ticker → Bottom bar / Both). */
+    private fun showBar() {
+        removeBar()
+        val params = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            PixelFormat.TRANSLUCENT,
+        ).apply {
+            gravity = Gravity.BOTTOM
+            // Inside the overscan-safe area so cheap TVs don't crop it.
+            y = OverlayLayout.marginPx(resources.displayMetrics.widthPixels) / 2
+        }
+        val compose = ComposeView(this).apply {
+            setViewTreeLifecycleOwner(this@OverlayService)
+            setViewTreeSavedStateRegistryOwner(this@OverlayService)
+            setContent {
+                SofaSportsTheme {
+                    val state by feed.state.collectAsStateWithLifecycle()
+                    OverlayTickerBar(state)
+                }
+            }
+        }
+        try {
+            windowManager.addView(compose, params)
+            barView = compose
+        } catch (e: Exception) {
+            Log.w(TAG, "ticker bar addView failed", e)
+        }
+    }
+
+    private fun removeBar() {
+        barView?.let { runCatching { windowManager.removeView(it) } }
+        barView = null
     }
 
     private fun startAsForeground() {
