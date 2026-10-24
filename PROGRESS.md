@@ -7,8 +7,10 @@
 
 - [x] 3. ScoresProvider / GameStatsProvider / FantasyProvider + ESPN, Sleeper, fixture-replay impls, switched by a debug data-mode toggle
 
+- [x] 4. Remote config: cached in filesDir, safe defaults, clamped values, kill switch screen, hourly refresh; sample at release-assets/config.json
+
 ## In progress
-- [ ] 4. Remote config
+- [ ] 5. Overlay service
 
 ## Blocked
 - (none)

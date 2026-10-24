@@ -23,3 +23,7 @@ One line per judgment call, with the reason.
 - Fixture Sleeper: any username maps to roster 1's owner in the example league; a 2nd league is synthesised from the same data as roster 5's owner → exercises the league switcher; points scale with replay progress so the overlay pulse fires.
 - Data-mode toggle is ignored in release builds (`BuildConfig.DEBUG`) → release can never accidentally show fake data.
 - Ktor `expectSuccess = false`; providers parse the body and let parse errors surface → one error path (repository catches and keeps last good data).
+- Remote config URL is a build-time value (`sofa.configUrl` in local.properties, placeholder GitHub raw URL otherwise) → no backend; a static file on GitHub is enough for v0.1.
+- Bad config never replaces good: unparseable/wrong-typed JSON is ignored, poll intervals clamped (live ≥15 s), endpoint overrides must be https → a typo in config.json can't brick or DDoS anything.
+- Kill switch supports `maxVersionCode` → can kill one broken build without killing a fixed one.
+- Unit test reads `/release-assets/config.json` directly → the shipped sample can't drift from the parser.

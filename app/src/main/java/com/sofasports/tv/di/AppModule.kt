@@ -2,6 +2,7 @@ package com.sofasports.tv.di
 
 import com.sofasports.tv.BuildConfig
 import com.sofasports.tv.data.SofaJson
+import com.sofasports.tv.data.config.ConfigRepository
 import com.sofasports.tv.data.fixture.AssetFixtureSource
 import com.sofasports.tv.data.fixture.FixtureSource
 import com.sofasports.tv.data.provider.ApiBases
@@ -35,6 +36,7 @@ abstract class ProviderModule {
     @Binds abstract fun fantasy(impl: SwitchingFantasyProvider): FantasyProvider
     @Binds abstract fun players(impl: SleeperPlayerCache): PlayerDirectory
     @Binds abstract fun fixtures(impl: AssetFixtureSource): FixtureSource
+    @Binds abstract fun apiBases(impl: ConfigRepository): ApiBases
 }
 
 @Module
@@ -51,7 +53,4 @@ object NetworkModule {
         defaultRequest { header("User-Agent", "SofaSports/${BuildConfig.VERSION_NAME} (Android TV)") }
         expectSuccess = false
     }
-
-    @Provides @Singleton
-    fun apiBases(): ApiBases = ApiBases.Default
 }

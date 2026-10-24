@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "killSwitch": {
+    "enabled": false,
+    "message": "Sofa Sports is taking a short break. Please check back soon.",
+    "maxVersionCode": 0
+  },
+  "pollIntervalLiveSec": 30,
+  "pollIntervalIdleSec": 300,
+  "closeGame": {
+    "maxPointDiff": 8,
+    "minPeriod": 4
+  },
+  "features": {
+    "overlay": true,
+    "fantasy": true,
+    "gameCenter": true,
+    "winProbability": true,
+    "updateCheck": true,
+    "usageEvents": true
+  },
+  "endpoints": {
+    "espnNflBase": "https://site.api.espn.com/apis/site/v2/sports/football/nfl",
+    "sleeperBase": "https://api.sleeper.app/v1"
+  },
+  "announcement": null
+}
