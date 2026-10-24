@@ -32,6 +32,7 @@ data class HomeUi(
     val announcement: String? = null,
     val scoresLoading: Boolean = true,
     val gameCenterEnabled: Boolean = true,
+    val showOdds: Boolean = false,
 )
 
 @HiltViewModel
@@ -56,6 +57,7 @@ class HomeViewModel @Inject constructor(
             announcement = cfg.announcement,
             scoresLoading = s.loading,
             gameCenterEnabled = cfg.features.gameCenter,
+            showOdds = cfg.features.odds && prefs.showOdds,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUi())
 

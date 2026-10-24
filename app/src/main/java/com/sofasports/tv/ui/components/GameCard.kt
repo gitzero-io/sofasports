@@ -20,9 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.sofasports.tv.data.config.CloseGameRule
+import com.sofasports.tv.domain.Betting
 import com.sofasports.tv.domain.CloseGame
 import com.sofasports.tv.domain.Countdown
 import com.sofasports.tv.domain.Game
+import com.sofasports.tv.domain.GameOdds
 import com.sofasports.tv.domain.GameState
 import com.sofasports.tv.domain.Perspective
 import com.sofasports.tv.domain.TeamSide
@@ -40,6 +42,7 @@ fun GameCard(
     nowMs: Long,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    showOdds: Boolean = false,
 ) {
     val isClose = CloseGame.isClose(game, closeRule)
     SofaCard(onClick = onClick, modifier = modifier, containerColor = if (isClose) SofaColors.SurfaceRaised else SofaColors.Surface) {
@@ -51,6 +54,7 @@ fun GameCard(
             if (game.state == GameState.LIVE && !last.isNullOrBlank()) {
                 Text(last, style = MaterialTheme.typography.bodySmall, color = SofaColors.TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
+            if (showOdds && game.state != GameState.FINAL) game.odds?.let { OddsLine(it) }
         }
     }
 }
@@ -113,5 +117,14 @@ private fun TeamRow(team: TeamSide, game: Game, favorites: List<String>) {
             color = if (dim) SofaColors.TextMuted else SofaColors.TextPrimary,
             modifier = Modifier.padding(start = 8.dp).scorePulse(team.score?.toDouble(), color).padding(horizontal = 6.dp),
         )
+    }
+}
+
+/** "DK  PIT -3 · O/U 44.5" */
+@Composable
+fun OddsLine(odds: GameOdds, modifier: Modifier = Modifier) {
+    SpacedRow(modifier, gap = 8) {
+        Badge(Betting.providerTag(odds.provider), SofaColors.Positive)
+        Text(Betting.summary(odds), style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }

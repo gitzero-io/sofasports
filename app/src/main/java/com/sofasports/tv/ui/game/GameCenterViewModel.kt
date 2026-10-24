@@ -16,6 +16,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,6 +27,7 @@ data class GameCenterUi(
     val favorites: List<String> = emptyList(),
     val pinnedGameId: String? = null,
     val showWinProbability: Boolean = true,
+    val showOdds: Boolean = false,
 ) {
     val loading get() = summary == null && error == null
 }
@@ -45,7 +47,9 @@ class GameCenterViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            settings.settings.collect { s -> _ui.update { it.copy(favorites = s.favoriteTeams, pinnedGameId = s.pinnedGameId) } }
+            combine(settings.settings, config.config) { s, c -> s to c }.collect { (s, c) ->
+                _ui.update { it.copy(favorites = s.favoriteTeams, pinnedGameId = s.pinnedGameId, showOdds = c.features.odds && s.showOdds) }
+            }
         }
         viewModelScope.launch {
             config.config.collect { c -> _ui.update { it.copy(showWinProbability = c.features.winProbability) } }

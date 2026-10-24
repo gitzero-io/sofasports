@@ -129,6 +129,7 @@ private fun GameRow(title: String, games: List<Game>, empty: String, ui: HomeUi,
                         g, ui.favorites, ui.closeRule, if (g.state == GameState.PRE) now else 0L,
                         onClick = { if (ui.gameCenterEnabled) onOpenGame(g.id) },
                         modifier = Modifier.width(420.dp),
+                        showOdds = ui.showOdds,
                     )
                 }
             }

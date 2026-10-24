@@ -21,6 +21,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.sofasports.tv.domain.BetStatus
+import com.sofasports.tv.domain.Betting
 import com.sofasports.tv.domain.CloseGame
 import com.sofasports.tv.domain.Countdown
 import com.sofasports.tv.domain.FantasyMatchup
@@ -83,6 +85,14 @@ private fun GameRows(g: Game, state: OverlayState) {
             else -> Text(g.shortDetail.ifBlank { "Final" }, style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1)
         }
     }
+    if (state.showOdds) g.odds?.let { o ->
+        val spread = Betting.spreadFor(o, g, me.abbr)
+        val status = spread?.let { Betting.status(Betting.coverMargin(g, me.abbr, it), g.state) }
+        Text(
+            listOfNotNull("DK ${Betting.summary(o)}", status?.let { coverLabel(it) }).joinToString(" · "),
+            style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis,
+        )
+    }
     g.teams.forEach { t ->
         val other = if (t.id == g.home.id) g.away else g.home
         OverlayScoreRow(
@@ -114,4 +124,15 @@ internal fun OverlayScoreRow(
             modifier = Modifier.padding(start = 8.dp).scorePulse(pulseValue, sideColor, onlyIncrease).padding(horizontal = 4.dp),
         )
     }
+}
+
+/** Short cover label for my side, for the overlay. */
+internal fun coverLabel(s: BetStatus): String? = when (s) {
+    BetStatus.WINNING -> "covering"
+    BetStatus.LOSING -> "not covering"
+    BetStatus.PUSHING -> "on the number"
+    BetStatus.WON -> "covered"
+    BetStatus.LOST -> "didn't cover"
+    BetStatus.PUSH -> "push"
+    BetStatus.PENDING -> null
 }

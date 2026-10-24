@@ -31,6 +31,7 @@ data class UserSettings(
     val usageEventsOptOut: Boolean = false,
     /** User chose "Skip for now" on the Home link prompt; linking is still available in Settings. */
     val fantasyPromptSkipped: Boolean = false,
+    val showOdds: Boolean = true,
     val dataMode: DataMode = DataMode.LIVE,
 )
 
@@ -51,6 +52,7 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
         val pinnedGame = stringPreferencesKey("pinned_game_id")
         val usageOptOut = booleanPreferencesKey("usage_events_opt_out")
         val fantasySkipped = booleanPreferencesKey("fantasy_prompt_skipped")
+        val showOdds = booleanPreferencesKey("show_odds")
         val dataMode = stringPreferencesKey("data_mode")
     }
 
@@ -66,6 +68,7 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
             pinnedGameId = p[Keys.pinnedGame],
             usageEventsOptOut = p[Keys.usageOptOut] ?: false,
             fantasyPromptSkipped = p[Keys.fantasySkipped] ?: false,
+            showOdds = p[Keys.showOdds] ?: true,
             dataMode = p[Keys.dataMode]?.let { runCatching { DataMode.valueOf(it) }.getOrNull() } ?: DataMode.LIVE,
         )
     }
@@ -98,5 +101,6 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
     }
     suspend fun setUsageEventsOptOut(optOut: Boolean) = store.edit { it[Keys.usageOptOut] = optOut }
     suspend fun setFantasyPromptSkipped(skipped: Boolean) = store.edit { it[Keys.fantasySkipped] = skipped }
+    suspend fun setShowOdds(show: Boolean) = store.edit { it[Keys.showOdds] = show }
     suspend fun setDataMode(mode: DataMode) = store.edit { it[Keys.dataMode] = mode.name }
 }

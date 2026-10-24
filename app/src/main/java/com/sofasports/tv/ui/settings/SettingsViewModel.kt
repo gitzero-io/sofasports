@@ -53,6 +53,8 @@ class SettingsViewModel @Inject constructor(
 
     fun setDataMode(mode: DataMode) = viewModelScope.launch { store.setDataMode(mode) }
 
+    fun setShowOdds(show: Boolean) = viewModelScope.launch { store.setShowOdds(show) }
+
     fun setUsageOptOut(optOut: Boolean) = viewModelScope.launch { store.setUsageEventsOptOut(optOut) }
 
     suspend fun linkSleeper(username: String): LinkResult = fantasy.link(username)

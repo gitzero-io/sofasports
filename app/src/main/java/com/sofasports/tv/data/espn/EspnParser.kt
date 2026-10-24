@@ -3,6 +3,7 @@ package com.sofasports.tv.data.espn
 import com.sofasports.tv.data.SofaJson
 import com.sofasports.tv.domain.Drive
 import com.sofasports.tv.domain.Game
+import com.sofasports.tv.domain.GameOdds
 import com.sofasports.tv.domain.GameState
 import com.sofasports.tv.domain.GameSummary
 import com.sofasports.tv.domain.Play
@@ -36,8 +37,9 @@ object EspnParser {
         val dto = SofaJson.decodeFromString(EspnSummaryDto.serializer(), json)
         val comp = dto.header.competitions.firstOrNull()
             ?: error("summary ${dto.header.id} has no competition")
-        val game = toGame(dto.header.id, comp.date, comp, comp.status, dto.header.week)
+        val parsed = toGame(dto.header.id, comp.date, comp, comp.status, dto.header.week)
             ?: error("summary ${dto.header.id} is missing teams")
+        val game = if (parsed.odds == null) parsed.copy(odds = toOdds(dto.pickcenter, parsed)) else parsed
 
         val teamStats = parseTeamStats(dto.boxscore, game)
         val playerStats = dto.boxscore?.players.orEmpty().flatMap { team ->
@@ -50,7 +52,7 @@ object EspnParser {
                         category = cat.text ?: cat.name.orEmpty().replaceFirstChar { it.uppercase() },
                         labels = cat.labels,
                         rows = cat.athletes.map { a ->
-                            PlayerStatRow(a.athlete?.displayName ?: a.athlete?.shortName ?: "—", a.stats)
+                            PlayerStatRow(a.athlete?.displayName ?: a.athlete?.shortName ?: "—", a.stats, a.athlete?.id)
                         },
                     )
                 }
@@ -111,7 +113,7 @@ object EspnParser {
         val awayDto = comp.competitors.firstOrNull { it.homeAway == "away" } ?: return null
         val state = stateOf(status)
         val sit = comp.situation
-        return Game(
+        val base = Game(
             id = id,
             startEpochMs = parseDate(date),
             state = state,
@@ -132,6 +134,37 @@ object EspnParser {
             },
             week = week,
         )
+        return base.copy(odds = toOdds(comp.odds, base))
+    }
+
+    /** First line, preferring DraftKings. Spread is reported from the home team's side. */
+    internal fun toOdds(list: List<EspnOddsDto>, game: Game): GameOdds? {
+        val o = list.firstOrNull { it.provider?.name?.contains("Draft", ignoreCase = true) == true } ?: list.firstOrNull() ?: return null
+        if (o.details.isNullOrBlank() && o.overUnder == null) return null
+        fun ml(side: EspnMoneylineSideDto?, team: EspnTeamOddsDto?): String? =
+            side?.current?.odds ?: side?.close?.odds ?: team?.moneyLine?.let { v -> (if (v > 0) "+" else "") + v.toInt() }
+        return GameOdds(
+            provider = (o.provider?.displayName ?: o.provider?.name ?: "Sportsbook").replace("Draft Kings", "DraftKings"),
+            details = o.details,
+            overUnder = o.overUnder,
+            homeSpread = homeSpread(o.details, game),
+            homeMoneyline = ml(o.moneyline?.home, o.homeTeamOdds),
+            awayMoneyline = ml(o.moneyline?.away, o.awayTeamOdds),
+        )
+    }
+
+    /** "PIT -3" with PIT away → home spread +3. "EVEN" → 0. ESPN's numeric `spread` sign varies by endpoint, so parse the text. */
+    internal fun homeSpread(details: String?, game: Game): Double? {
+        val d = details?.trim() ?: return null
+        if (d.equals("EVEN", ignoreCase = true) || d.equals("PK", ignoreCase = true)) return 0.0
+        val parts = d.split(" ")
+        if (parts.size != 2) return null
+        val n = parts[1].toDoubleOrNull() ?: return null
+        return when (parts[0]) {
+            game.home.abbr -> n
+            game.away.abbr -> -n
+            else -> null
+        }
     }
 
     private fun toSide(c: EspnCompetitorDto, isHome: Boolean, state: GameState, timeouts: Int?): TeamSide {

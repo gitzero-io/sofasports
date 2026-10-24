@@ -35,11 +35,24 @@ data class Game(
     val broadcast: String?,
     val situation: Situation? = null,
     val week: Int? = null,
+    val odds: GameOdds? = null,
 ) {
     val teams get() = listOf(away, home)
     fun involves(teamAbbr: String) = home.abbr == teamAbbr || away.abbr == teamAbbr
     fun side(teamAbbr: String): TeamSide? = teams.firstOrNull { it.abbr == teamAbbr }
 }
+
+/** Pre-game betting line (ESPN's odds provider is DraftKings). */
+data class GameOdds(
+    val provider: String,
+    /** e.g. "PIT -3" */
+    val details: String?,
+    val overUnder: Double?,
+    /** Home spread from the home team's view, e.g. -2.5 when home is favored. */
+    val homeSpread: Double?,
+    val homeMoneyline: String?,
+    val awayMoneyline: String?,
+)
 
 data class Scoreboard(val season: Int?, val week: Int?, val games: List<Game>)
 
@@ -54,7 +67,7 @@ data class PlayerStatTable(
     val rows: List<PlayerStatRow>,
 )
 
-data class PlayerStatRow(val name: String, val stats: List<String>)
+data class PlayerStatRow(val name: String, val stats: List<String>, val athleteId: String? = null)
 
 data class Play(
     val id: String,

@@ -27,6 +27,7 @@ data class OverlayState(
     /** Favorite teams, so the game is coloured from "my" side. */
     val favorites: List<String> = emptyList(),
     val closeRule: CloseGameRule = CloseGameRule(),
+    val showOdds: Boolean = false,
 )
 
 /** What the corner overlay shows: the selected Sleeper matchup and one game. */
@@ -54,6 +55,7 @@ class OverlayFeed @Inject constructor(
                     gamePinned = pinned != null,
                     favorites = prefs.favoriteTeams,
                     closeRule = cfg.closeGame,
+                    showOdds = cfg.features.odds && prefs.showOdds,
                 )
             }.collect { _state.value = it }
         }

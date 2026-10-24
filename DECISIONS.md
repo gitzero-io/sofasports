@@ -70,3 +70,5 @@ One line per judgment call, with the reason.
 - Home Sleeper prompt has "Skip for now"; skipping hides the Fantasy section on Home until an account is linked (Settings → Sleeper always has the link form) → user feedback: linking must be optional.
 - Username box is a button until OK is pressed, then becomes an editable field → on a remote, a focused text field popped the keyboard and trapped D-pad focus just from scrolling Home.
 - Pressing Link with an empty box says "Type your Sleeper username first" instead of looking up "".
+- DraftKings "overlay" = DraftKings lines (spread, total, moneyline) that ESPN already publishes from DraftKings, shown on cards, Game Center (with live cover / over-under status) and the overlay. No DraftKings API or account involved. Toggle in Settings; remote kill via `features.odds`.
+- Spread is parsed from ESPN's text ("PIT -3") rather than its numeric `spread`, whose sign differs between scoreboard and summary.

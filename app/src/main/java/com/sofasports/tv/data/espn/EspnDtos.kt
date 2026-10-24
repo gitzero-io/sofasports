@@ -36,7 +36,29 @@ data class EspnCompetitionDto(
     val broadcast: String? = null,
     val situation: EspnSituationDto? = null,
     val venue: EspnVenueDto? = null,
+    val odds: List<EspnOddsDto> = emptyList(),
 )
+
+/**
+ * Betting line. ESPN's provider is DraftKings. Scoreboard shape: moneyline.home.close.odds ("+140").
+ * Summary (pickcenter) shape: homeTeamOdds.moneyLine (140).
+ */
+@Serializable
+data class EspnOddsDto(
+    val provider: EspnOddsProviderDto? = null,
+    val details: String? = null,
+    val overUnder: Double? = null,
+    val spread: Double? = null,
+    val moneyline: EspnMoneylineDto? = null,
+    val homeTeamOdds: EspnTeamOddsDto? = null,
+    val awayTeamOdds: EspnTeamOddsDto? = null,
+)
+
+@Serializable data class EspnOddsProviderDto(val name: String? = null, val displayName: String? = null)
+@Serializable data class EspnMoneylineDto(val home: EspnMoneylineSideDto? = null, val away: EspnMoneylineSideDto? = null)
+@Serializable data class EspnMoneylineSideDto(val close: EspnOddsValueDto? = null, val current: EspnOddsValueDto? = null)
+@Serializable data class EspnOddsValueDto(val odds: String? = null)
+@Serializable data class EspnTeamOddsDto(val moneyLine: Double? = null)
 
 @Serializable
 data class EspnCompetitorDto(
@@ -109,6 +131,7 @@ data class EspnSummaryDto(
     val winprobability: List<EspnWinProbDto> = emptyList(),
     val scoringPlays: List<EspnPlayDto> = emptyList(),
     val gameInfo: EspnGameInfoDto? = null,
+    val pickcenter: List<EspnOddsDto> = emptyList(),
 )
 
 @Serializable
@@ -167,7 +190,7 @@ data class EspnAthleteStatDto(
     val stats: List<String> = emptyList(),
 )
 
-@Serializable data class EspnAthleteDto(val displayName: String? = null, val shortName: String? = null)
+@Serializable data class EspnAthleteDto(val id: String? = null, val displayName: String? = null, val shortName: String? = null)
 
 @Serializable
 data class EspnDrivesDto(

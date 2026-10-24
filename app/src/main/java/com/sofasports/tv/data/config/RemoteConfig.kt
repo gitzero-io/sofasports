@@ -67,6 +67,10 @@ data class Features(
     val winProbability: Boolean = true,
     val updateCheck: Boolean = true,
     val usageEvents: Boolean = true,
+    /** DraftKings lines on cards/overlay. Remote off-switch for betting content. */
+    val odds: Boolean = true,
+    /** Manual PrizePicks / DraftKings pick tracker. */
+    val picks: Boolean = true,
 )
 
 @Serializable

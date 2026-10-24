@@ -29,7 +29,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.sofasports.tv.domain.BetStatus
+import com.sofasports.tv.domain.Betting
 import com.sofasports.tv.domain.Game
+import com.sofasports.tv.domain.GameOdds
 import com.sofasports.tv.domain.GameState
 import com.sofasports.tv.domain.GameSummary
 import com.sofasports.tv.domain.Play
@@ -73,7 +76,7 @@ fun GameCenterScreen(vm: GameCenterViewModel = hiltViewModel()) {
         }
         LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             when (tab) {
-                GameTab.SUMMARY -> summaryTab(summary, ui.favorites, ui.showWinProbability)
+                GameTab.SUMMARY -> summaryTab(summary, ui.favorites, ui.showWinProbability, ui.showOdds)
                 GameTab.BOX -> boxTab(summary)
                 GameTab.PLAYS -> playsTab(summary)
             }
@@ -125,7 +128,8 @@ private fun HeaderTeam(team: TeamSide, game: Game, favorites: List<String>, modi
     }
 }
 
-private fun LazyListScope.summaryTab(s: GameSummary, favorites: List<String>, showWp: Boolean) {
+private fun LazyListScope.summaryTab(s: GameSummary, favorites: List<String>, showWp: Boolean, showOdds: Boolean) {
+    if (showOdds) s.game.odds?.let { o -> item(key = "odds") { LineCard(o, s.game) } }
     val wp = if (showWp) WinProbability.display(s.game, s.winProbability, favorites) else null
     if (wp != null) {
         item(key = "wp") {
@@ -225,4 +229,48 @@ private fun StatLine(name: String, values: List<String>, header: Boolean = false
         Text(name, style = MaterialTheme.typography.bodyMedium, color = color, modifier = Modifier.weight(2.5f), maxLines = 1, overflow = TextOverflow.Ellipsis)
         values.forEach { v -> Text(v, style = MaterialTheme.typography.bodyMedium, color = color, modifier = Modifier.weight(1f), textAlign = TextAlign.End) }
     }
+}
+
+/** DraftKings line plus how each side and the total are doing against it right now. */
+@Composable
+private fun LineCard(o: GameOdds, game: Game) {
+    Column(Modifier.fillMaxWidth().focusableRow().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        SpacedRow {
+            Badge(Betting.providerTag(o.provider), SofaColors.Positive)
+            Text("${o.provider} line", style = MaterialTheme.typography.titleMedium, color = SofaColors.TextSecondary)
+        }
+        game.teams.forEach { t ->
+            val spread = Betting.spreadFor(o, game, t.abbr)
+            val ml = if (t.isHome) o.homeMoneyline else o.awayMoneyline
+            val status = spread?.let { Betting.status(Betting.coverMargin(game, t.abbr, it), game.state) }
+            Text(
+                listOfNotNull(
+                    t.abbr,
+                    spread?.let { Betting.formatLine(it) },
+                    ml?.let { "ML $it" },
+                    status?.let { statusWord(it) },
+                ).joinToString("   "),
+                style = MaterialTheme.typography.titleMedium, color = SofaColors.TextPrimary,
+            )
+        }
+        o.overUnder?.let { ou ->
+            val total = Betting.total(game)
+            val word = if (total == null || game.state == GameState.PRE) null else when {
+                total > ou -> if (game.state == GameState.FINAL) "went OVER ($total)" else "already OVER ($total)"
+                total < ou -> if (game.state == GameState.FINAL) "stayed UNDER ($total)" else "$total so far, ${Betting.formatNumber(ou - total)} to go for the over"
+                else -> "on the number"
+            }
+            Text(listOfNotNull("Total ${Betting.formatNumber(ou)}", word).joinToString("   "), style = MaterialTheme.typography.titleMedium, color = SofaColors.TextPrimary)
+        }
+    }
+}
+
+private fun statusWord(s: BetStatus) = when (s) {
+    BetStatus.WINNING -> "covering"
+    BetStatus.LOSING -> "not covering"
+    BetStatus.PUSHING -> "on the number"
+    BetStatus.WON -> "covered"
+    BetStatus.LOST -> "didn't cover"
+    BetStatus.PUSH -> "push"
+    BetStatus.PENDING -> null
 }

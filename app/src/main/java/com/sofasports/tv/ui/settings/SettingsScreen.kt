@@ -97,6 +97,18 @@ fun SettingsScreen(
                 }
             }
         }
+        item(key = "odds") {
+            SettingsSection("DraftKings lines") {
+                Text(
+                    "Spread, total and moneyline from DraftKings (via ESPN) on game cards, Game Center and the overlay.",
+                    style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary,
+                )
+                SpacedRow {
+                    SofaButton("Show", onClick = { vm.setShowOdds(true) }, selected = settings.showOdds)
+                    SofaButton("Hide", onClick = { vm.setShowOdds(false) }, selected = !settings.showOdds)
+                }
+            }
+        }
         item(key = "privacy") {
             SettingsSection("Anonymous usage events") {
                 Text(

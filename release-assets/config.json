@@ -17,7 +17,9 @@
     "gameCenter": true,
     "winProbability": true,
     "updateCheck": true,
-    "usageEvents": true
+    "usageEvents": true,
+    "odds": true,
+    "picks": true
   },
   "endpoints": {
     "espnNflBase": "https://site.api.espn.com/apis/site/v2/sports/football/nfl",
