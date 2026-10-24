@@ -36,6 +36,20 @@ android {
         buildConfigField("String", "FEEDBACK_URL", "\"${localProp("sofa.feedbackUrl").ifEmpty { "https://example.com/sofasports-feedback" }}\"")
     }
 
+    // Release signing is opt-in: add these four keys to local.properties once you've created a keystore.
+    // Without them, assembleRelease produces an unsigned APK (nothing is signed or created automatically).
+    val releaseStore = localProp("release.storeFile")
+    if (releaseStore.isNotEmpty()) {
+        signingConfigs {
+            create("release") {
+                storeFile = file(releaseStore)
+                storePassword = localProp("release.storePassword")
+                keyAlias = localProp("release.keyAlias")
+                keyPassword = localProp("release.keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -46,7 +60,7 @@ android {
                 enable = true
             }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // No signing config on purpose: release APKs come out unsigned until a key is created by hand.
+            if (releaseStore.isNotEmpty()) signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

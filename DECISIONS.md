@@ -63,3 +63,7 @@ One line per judgment call, with the reason.
 - No Sentry Gradle plugin (no mapping upload) → it needs an auth token and network at build time; release stack traces will be obfuscated until that's added.
 - Usage events are a sealed class, not `track(String, Map)` → impossible to accidentally send a username, league id or free text.
 - Events fired before the opt-out preference loads are held (max 20) and then sent or dropped → found on the emulator that `app_open` was being lost.
+- Release signing is opt-in through four `release.*` keys in local.properties → brief says don't create a key; without them assembleRelease gives an unsigned APK.
+- To check R8 didn't break serialization/Hilt, a scratch copy of the release APK was signed with the existing ~/.android/debug.keystore, run on the emulator, then uninstalled → no new key, nothing kept.
+- APKs are git-ignored; the debug APK is copied to release-assets/ for convenience only.
+- Lint's 12 warnings (Compose modifier-param order, newer Gradle/BOM available, unused template colors) left as is → cosmetic; upgrading dependencies overnight is risk without benefit.

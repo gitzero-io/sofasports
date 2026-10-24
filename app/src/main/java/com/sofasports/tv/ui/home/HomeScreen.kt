@@ -84,7 +84,7 @@ private fun FantasySection(ui: HomeUi, vm: HomeViewModel) {
                 when {
                     f.loading -> "Loading ${f.username ?: "Sleeper"}…"
                     f.error != null -> "Couldn't load Sleeper leagues: ${f.error}"
-                    else -> "${f.username} has no NFL leagues this season."
+                    else -> "${f.username} has no NFL leagues this season. You can change the username in Settings."
                 },
                 style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary,
             )

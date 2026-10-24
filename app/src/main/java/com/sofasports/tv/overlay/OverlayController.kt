@@ -29,9 +29,4 @@ class OverlayController @Inject constructor(@ApplicationContext private val cont
     fun stop() {
         context.stopService(Intent(context, OverlayService::class.java))
     }
-
-    /** Opens the system permission screen where one exists (phones, some TVs). */
-    fun permissionSettingsIntent(): Intent =
-        Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:${context.packageName}"))
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 }

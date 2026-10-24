@@ -31,8 +31,10 @@
 
 - [x] 15. Usage events: closed `UsageEvent` set (no user data), `UsageEvents` interface, logcat sink (`adb logcat -s SofaUsage`), gated by Settings opt-out + remote flag, events held until the opt-out is loaded
 
+- [x] 16. Release: R8 on, keep rules for kotlinx.serialization/Ktor, unsigned by default, opt-in signing via local.properties (no key created). Verified a throwaway debug-key-signed copy of the R8 release runs live ESPN + Sleeper on the emulator. Debug APK copied to release-assets/sofasports-0.1.0-debug.apk (git-ignored). Lint: 0 errors, 12 cosmetic warnings.
+
 ## In progress
-- [ ] 16. Release build + debug APK
+- (none)
 
 ## Blocked
 - (none)
