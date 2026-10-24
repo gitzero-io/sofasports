@@ -14,6 +14,10 @@ import com.sofasports.tv.data.provider.SleeperPlayerCache
 import com.sofasports.tv.data.provider.SwitchingFantasyProvider
 import com.sofasports.tv.data.provider.SwitchingGameStatsProvider
 import com.sofasports.tv.data.provider.SwitchingScoresProvider
+import com.sofasports.tv.telemetry.AppUsageEvents
+import com.sofasports.tv.telemetry.LogcatUsageSink
+import com.sofasports.tv.telemetry.UsageEvents
+import com.sofasports.tv.telemetry.UsageSink
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -37,6 +41,8 @@ abstract class ProviderModule {
     @Binds abstract fun players(impl: SleeperPlayerCache): PlayerDirectory
     @Binds abstract fun fixtures(impl: AssetFixtureSource): FixtureSource
     @Binds abstract fun apiBases(impl: ConfigRepository): ApiBases
+    @Binds abstract fun usageSink(impl: LogcatUsageSink): UsageSink
+    @Binds abstract fun usageEvents(impl: AppUsageEvents): UsageEvents
 }
 
 @Module

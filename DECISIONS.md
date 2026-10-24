@@ -61,3 +61,5 @@ One line per judgment call, with the reason.
 - version.json URL is `sofa.versionUrl` in local.properties, placeholder GitHub raw URL otherwise; apkUrl must be https.
 - Sentry: no PII, no performance tracing (sample rate 0), release tag `sofasports@<versionName>+<code>`; crash reports are not tied to the usage-events opt-out → crashes are needed to keep the app working, and nothing personal is sent. Revisit if you disagree.
 - No Sentry Gradle plugin (no mapping upload) → it needs an auth token and network at build time; release stack traces will be obfuscated until that's added.
+- Usage events are a sealed class, not `track(String, Map)` → impossible to accidentally send a username, league id or free text.
+- Events fired before the opt-out preference loads are held (max 20) and then sent or dropped → found on the emulator that `app_open` was being lost.

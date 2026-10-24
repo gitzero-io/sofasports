@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +27,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.sofasports.tv.data.prefs.SettingsStore
+import com.sofasports.tv.telemetry.UsageEvent
+import com.sofasports.tv.telemetry.UsageEvents
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.components.SpacedRow
 import com.sofasports.tv.ui.game.GameCenterScreen
@@ -62,7 +65,13 @@ private val tabs = listOf(
 )
 
 @HiltViewModel
-class RootViewModel @Inject constructor(store: SettingsStore) : ViewModel() {
+class RootViewModel @Inject constructor(store: SettingsStore, private val usage: UsageEvents) : ViewModel() {
+    fun screenView(route: String) {
+        // Only the route pattern ("game/{gameId}"), never the id.
+        usage.track(UsageEvent.ScreenView(route.substringBefore('/')))
+        if (route == Routes.GAME) usage.track(UsageEvent.GameOpened)
+    }
+
     /** Null until DataStore has been read, so we never flash the wrong start screen. */
     val onboardingDone: StateFlow<Boolean?> =
         store.settings.map { it.onboardingDone }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
@@ -77,6 +86,7 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
     }
     val backStack by nav.currentBackStackEntryAsState()
     val current = backStack?.destination?.route
+    LaunchedEffect(current) { current?.let(vm::screenView) }
     val showChrome = current != Routes.ONBOARDING
 
     Column(

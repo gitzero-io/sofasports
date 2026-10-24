@@ -9,6 +9,8 @@ import com.sofasports.tv.data.prefs.UserSettings
 import com.sofasports.tv.data.repo.FantasyRepository
 import com.sofasports.tv.data.repo.LinkResult
 import com.sofasports.tv.overlay.OverlayController
+import com.sofasports.tv.telemetry.UsageEvent
+import com.sofasports.tv.telemetry.UsageEvents
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,6 +25,7 @@ class SettingsViewModel @Inject constructor(
     private val store: SettingsStore,
     private val overlay: OverlayController,
     private val fantasy: FantasyRepository,
+    private val usage: UsageEvents,
 ) : ViewModel() {
 
     val settings: StateFlow<UserSettings> =
@@ -43,6 +46,7 @@ class SettingsViewModel @Inject constructor(
         if (enabled && !overlay.start()) return@launch
         if (!enabled) overlay.stop()
         store.setOverlayEnabled(enabled)
+        usage.track(UsageEvent.OverlayToggled(enabled))
     }
 
     fun setOverlayCorner(corner: OverlayCorner) = viewModelScope.launch { store.setOverlayCorner(corner) }

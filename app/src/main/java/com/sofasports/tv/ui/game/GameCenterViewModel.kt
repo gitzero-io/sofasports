@@ -9,6 +9,8 @@ import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.data.provider.GameStatsProvider
 import com.sofasports.tv.domain.GameState
 import com.sofasports.tv.domain.GameSummary
+import com.sofasports.tv.telemetry.UsageEvent
+import com.sofasports.tv.telemetry.UsageEvents
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +36,7 @@ class GameCenterViewModel @Inject constructor(
     private val stats: GameStatsProvider,
     private val settings: SettingsStore,
     private val config: ConfigRepository,
+    private val usage: UsageEvents,
 ) : ViewModel() {
 
     val gameId: String = checkNotNull(savedState["gameId"])
@@ -66,6 +69,8 @@ class GameCenterViewModel @Inject constructor(
     }
 
     fun togglePin() = viewModelScope.launch {
-        settings.setPinnedGame(if (_ui.value.pinnedGameId == gameId) null else gameId)
+        val pin = _ui.value.pinnedGameId != gameId
+        settings.setPinnedGame(if (pin) gameId else null)
+        if (pin) usage.track(UsageEvent.GamePinned)
     }
 }

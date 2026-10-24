@@ -23,6 +23,8 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.domain.NflTeams
+import com.sofasports.tv.telemetry.UsageEvent
+import com.sofasports.tv.telemetry.UsageEvents
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.theme.SofaColors
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,9 +32,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OnboardingViewModel @Inject constructor(private val store: SettingsStore) : ViewModel() {
+class OnboardingViewModel @Inject constructor(private val store: SettingsStore, private val usage: UsageEvents) : ViewModel() {
     fun finish(favorites: List<String>, then: () -> Unit) = viewModelScope.launch {
         store.setFavorites(favorites)
+        usage.track(UsageEvent.FavoritesSaved(favorites.size))
         then()
     }
 }

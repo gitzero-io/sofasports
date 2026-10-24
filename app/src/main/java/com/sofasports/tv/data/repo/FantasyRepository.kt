@@ -7,6 +7,8 @@ import com.sofasports.tv.di.AppScope
 import com.sofasports.tv.domain.FantasyLeague
 import com.sofasports.tv.domain.FantasyMatchup
 import com.sofasports.tv.domain.GameState
+import com.sofasports.tv.telemetry.UsageEvent
+import com.sofasports.tv.telemetry.UsageEvents
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -50,6 +52,7 @@ class FantasyRepository @Inject constructor(
     private val settings: SettingsStore,
     private val config: ConfigRepository,
     private val scores: ScoresRepository,
+    private val usage: UsageEvents,
     @AppScope scope: CoroutineScope,
 ) {
     private val refreshSignal = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
@@ -71,7 +74,7 @@ class FantasyRepository @Inject constructor(
         return runCatching { provider.findUser(name) }.fold(
             onSuccess = { user ->
                 if (user == null) LinkResult.NotFound
-                else { settings.setSleeper(name, user.userId); LinkResult.Ok }
+                else { settings.setSleeper(name, user.userId); usage.track(UsageEvent.SleeperLinked); LinkResult.Ok }
             },
             onFailure = { LinkResult.Failed(it.message ?: "Network error") },
         )
@@ -92,7 +95,10 @@ class FantasyRepository @Inject constructor(
             val now = System.currentTimeMillis()
             if (state.leagues.isEmpty() || now - leaguesFetchedAt > LEAGUES_TTL_MS) {
                 runCatching { provider.leagues(userId) }
-                    .onSuccess { leaguesFetchedAt = now; cachedLeagues = userId to it; state = state.copy(leagues = it, error = null) }
+                    .onSuccess {
+                        if (cachedLeagues?.first != userId) usage.track(UsageEvent.LeagueCount(it.size))
+                        leaguesFetchedAt = now; cachedLeagues = userId to it; state = state.copy(leagues = it, error = null)
+                    }
                     .onFailure { state = state.copy(error = it.message ?: "Couldn't load leagues") }
             }
             val leagueId = state.selectedLeagueId?.takeIf { id -> state.leagues.any { it.id == id } }

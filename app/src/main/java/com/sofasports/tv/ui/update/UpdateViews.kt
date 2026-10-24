@@ -25,14 +25,19 @@ import com.sofasports.tv.ui.components.SpacedRow
 import com.sofasports.tv.ui.theme.SofaColors
 import com.sofasports.tv.ui.theme.SofaShape
 import com.sofasports.tv.ui.theme.focusableRow
+import com.sofasports.tv.telemetry.UsageEvent
+import com.sofasports.tv.telemetry.UsageEvents
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UpdateViewModel @Inject constructor(private val checker: UpdateChecker) : ViewModel() {
+class UpdateViewModel @Inject constructor(private val checker: UpdateChecker, private val usage: UsageEvents) : ViewModel() {
     val status = checker.status
-    fun check() = viewModelScope.launch { checker.check() }
+    fun check() = viewModelScope.launch {
+        usage.track(UsageEvent.UpdateChecked)
+        checker.check()
+    }
 }
 
 /** Settings → About: manual check + result. */

@@ -29,8 +29,10 @@
 
 - [x] 14. Sentry: manual init only with a valid `sentry.dsn` in local.properties; verified the app launches with no DSN ("crash reporting off" in logcat)
 
+- [x] 15. Usage events: closed `UsageEvent` set (no user data), `UsageEvents` interface, logcat sink (`adb logcat -s SofaUsage`), gated by Settings opt-out + remote flag, events held until the opt-out is loaded
+
 ## In progress
-- [ ] 15. Anonymous usage events
+- [ ] 16. Release build + debug APK
 
 ## Blocked
 - (none)
