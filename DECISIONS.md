@@ -67,3 +67,6 @@ One line per judgment call, with the reason.
 - To check R8 didn't break serialization/Hilt, a scratch copy of the release APK was signed with the existing ~/.android/debug.keystore, run on the emulator, then uninstalled → no new key, nothing kept.
 - APKs are git-ignored; the debug APK is copied to release-assets/ for convenience only.
 - Lint's 12 warnings (Compose modifier-param order, newer Gradle/BOM available, unused template colors) left as is → cosmetic; upgrading dependencies overnight is risk without benefit.
+- Home Sleeper prompt has "Skip for now"; skipping hides the Fantasy section on Home until an account is linked (Settings → Sleeper always has the link form) → user feedback: linking must be optional.
+- Username box is a button until OK is pressed, then becomes an editable field → on a remote, a focused text field popped the keyboard and trapped D-pad focus just from scrolling Home.
+- Pressing Link with an empty box says "Type your Sleeper username first" instead of looking up "".

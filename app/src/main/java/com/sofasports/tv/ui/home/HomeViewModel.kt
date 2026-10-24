@@ -24,6 +24,7 @@ import javax.inject.Inject
 data class HomeUi(
     val fantasyEnabled: Boolean = true,
     val fantasy: FantasyState = FantasyState(),
+    val fantasyPromptSkipped: Boolean = false,
     val myGames: List<Game> = emptyList(),
     val closeGames: List<Game> = emptyList(),
     val favorites: List<String> = emptyList(),
@@ -37,7 +38,7 @@ data class HomeUi(
 class HomeViewModel @Inject constructor(
     private val fantasy: FantasyRepository,
     scores: ScoresRepository,
-    settings: SettingsStore,
+    private val settings: SettingsStore,
     config: ConfigRepository,
 ) : ViewModel() {
 
@@ -47,6 +48,7 @@ class HomeViewModel @Inject constructor(
         HomeUi(
             fantasyEnabled = cfg.features.fantasy,
             fantasy = f,
+            fantasyPromptSkipped = prefs.fantasyPromptSkipped,
             myGames = mine,
             closeGames = games.filter { CloseGame.isClose(it, cfg.closeGame) && it !in mine },
             favorites = prefs.favoriteTeams,
@@ -60,4 +62,6 @@ class HomeViewModel @Inject constructor(
     suspend fun link(username: String): LinkResult = fantasy.link(username)
 
     fun selectLeague(id: String) = viewModelScope.launch { fantasy.selectLeague(id) }
+
+    fun skipFantasyPrompt() = viewModelScope.launch { settings.setFantasyPromptSkipped(true) }
 }

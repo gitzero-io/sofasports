@@ -23,6 +23,7 @@ import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameState
 import com.sofasports.tv.ui.components.GameCard
 import com.sofasports.tv.ui.components.SofaButton
+import com.sofasports.tv.ui.components.SpacedRow
 import com.sofasports.tv.ui.components.rememberNowMs
 import com.sofasports.tv.ui.fantasy.MatchupCard
 import com.sofasports.tv.ui.fantasy.SleeperLinkForm
@@ -45,7 +46,8 @@ fun HomeScreen(onOpenGame: (String) -> Unit, onOpenScores: () -> Unit, vm: HomeV
             }
         }
         item(key = "update") { UpdateBanner() }
-        if (ui.fantasyEnabled) {
+        // Hidden entirely once skipped (until linked from Settings), so Home is just scores.
+        if (ui.fantasyEnabled && (ui.fantasy.linked || !ui.fantasyPromptSkipped)) {
             item(key = "fantasy") { FantasySection(ui, vm) }
         }
         item(key = "mine") {
@@ -79,6 +81,10 @@ private fun FantasySection(ui: HomeUi, vm: HomeViewModel) {
             ) {
                 Text("Link Sleeper to see your matchup live, here and in the overlay.", style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary)
                 SleeperLinkForm(onLink = vm::link)
+                SpacedRow {
+                    SofaButton("Skip for now", onClick = vm::skipFantasyPrompt)
+                    Text("You can link Sleeper any time in Settings.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted)
+                }
             }
             f.leagues.isEmpty() -> Text(
                 when {
