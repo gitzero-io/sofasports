@@ -49,6 +49,7 @@ object EspnParser {
                 .map { cat ->
                     PlayerStatTable(
                         teamAbbr = team.team.abbreviation,
+                        key = cat.name.orEmpty(),
                         category = cat.text ?: cat.name.orEmpty().replaceFirstChar { it.uppercase() },
                         labels = cat.labels,
                         rows = cat.athletes.map { a ->

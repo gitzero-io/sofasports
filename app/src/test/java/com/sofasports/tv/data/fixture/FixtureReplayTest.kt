@@ -61,4 +61,13 @@ class FixtureReplayTest {
         assertTrue(m1.me.teamName != m2.me.teamName)
         assertTrue(replay.progress(t0) < replay.progress(t0 + 60_000))
     }
+
+    @Test fun `fixture box score stats grow with the replay`() {
+        fun stroudYds(t: Long) = replay.summary("401872996", t)!!.playerStats
+            .first { it.key == "passing" && it.teamAbbr == "HOU" }.rows.first().stats[1].toInt()
+        val early = stroudYds(t0)
+        val later = stroudYds(t0 + 200_000)
+        assertTrue(early in 1 until 312)
+        assertTrue(later >= early)
+    }
 }

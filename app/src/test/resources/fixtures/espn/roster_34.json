@@ -1,0 +1,238 @@
+{
+ "team": {
+  "id": "34",
+  "abbreviation": "HOU",
+  "displayName": "Houston Texans"
+ },
+ "athletes": [
+  {
+   "position": "offense",
+   "items": [
+    {
+     "id": "4362732",
+     "displayName": "Jake Andrews",
+     "jersey": "60",
+     "position": {
+      "abbreviation": "C"
+     }
+    },
+    {
+     "id": "4683159",
+     "displayName": "Lewis Bond",
+     "jersey": "82",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4429022",
+     "displayName": "Kayshon Boutte",
+     "jersey": "14",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "3128412",
+     "displayName": "Evan Brown",
+     "jersey": "63",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "3043109",
+     "displayName": "Trent Brown",
+     "jersey": "77",
+     "position": {
+      "abbreviation": "OT"
+     }
+    },
+    {
+     "id": "4258173",
+     "displayName": "Nico Collins",
+     "jersey": "12",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4429693",
+     "displayName": "Aireontae Ersery",
+     "jersey": "79",
+     "position": {
+      "abbreviation": "OT"
+     }
+    },
+    {
+     "id": "4432699",
+     "displayName": "Blake Fisher",
+     "jersey": "57",
+     "position": {
+      "abbreviation": "OT"
+     }
+    },
+    {
+     "id": "4432708",
+     "displayName": "Marvin Harrison Jr.",
+     "jersey": "18",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4686422",
+     "displayName": "Xavier Hutchinson",
+     "jersey": "19",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4242227",
+     "displayName": "Ed Ingram",
+     "jersey": "69",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4362504",
+     "displayName": "Brevin Jordan",
+     "jersey": "9",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4429939",
+     "displayName": "Jawhar Jordan",
+     "jersey": "25",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "4695705",
+     "displayName": "Marlin Klein",
+     "jersey": "83",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4429059",
+     "displayName": "Woody Marks",
+     "jersey": "4",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "4242546",
+     "displayName": "Davis Mills",
+     "jersey": "10",
+     "position": {
+      "abbreviation": "QB"
+     }
+    },
+    {
+     "id": "4035538",
+     "displayName": "David Montgomery",
+     "jersey": "32",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "3843945",
+     "displayName": "Foster Moreau",
+     "jersey": "87",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4586312",
+     "displayName": "Jaylin Noel",
+     "jersey": "13",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4880873",
+     "displayName": "Febechi Nwaiwu",
+     "jersey": "64",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "2983509",
+     "displayName": "Dare Ogunbowale",
+     "jersey": "23",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "4839498",
+     "displayName": "Keylan Rutledge",
+     "jersey": "66",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "3117256",
+     "displayName": "Dalton Schultz",
+     "jersey": "86",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "3121595",
+     "displayName": "Braden Smith",
+     "jersey": "71",
+     "position": {
+      "abbreviation": "OT"
+     }
+    },
+    {
+     "id": "4426496",
+     "displayName": "Cade Stover",
+     "jersey": "8",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4432577",
+     "displayName": "C.J. Stroud",
+     "jersey": "7",
+     "position": {
+      "abbreviation": "QB"
+     }
+    },
+    {
+     "id": "3045474",
+     "displayName": "Wyatt Teller",
+     "jersey": "75",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4428656",
+     "displayName": "Nate Thomas",
+     "jersey": "78",
+     "position": {
+      "abbreviation": "OT"
+     }
+    }
+   ]
+  }
+ ]
+}

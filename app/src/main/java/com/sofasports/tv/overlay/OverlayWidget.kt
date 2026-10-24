@@ -29,6 +29,12 @@ import com.sofasports.tv.domain.FantasyMatchup
 import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameState
 import com.sofasports.tv.domain.Perspective
+import com.sofasports.tv.domain.PickEvaluator
+import com.sofasports.tv.domain.PickProgress
+import com.sofasports.tv.domain.PickType
+import com.sofasports.tv.ui.picks.bookColor
+import com.sofasports.tv.ui.picks.sortForDisplay
+import com.sofasports.tv.ui.picks.statusColor
 import com.sofasports.tv.ui.components.Badge
 import com.sofasports.tv.ui.components.rememberNowMs
 import com.sofasports.tv.ui.components.scorePulse
@@ -48,7 +54,8 @@ fun OverlayWidget(state: OverlayState) {
     ) {
         val m = state.matchup
         val g = state.game
-        if (m == null && g == null) {
+        val picks = state.picks
+        if (m == null && g == null && picks.isEmpty()) {
             Text("SOFA SPORTS", style = MaterialTheme.typography.labelLarge, color = SofaColors.TextSecondary)
             Text("Pin a game or link Sleeper", style = MaterialTheme.typography.bodySmall, color = SofaColors.TextMuted)
             return@Column
@@ -56,6 +63,10 @@ fun OverlayWidget(state: OverlayState) {
         if (m != null) MatchupRows(m)
         if (m != null && g != null) Box(Modifier.fillMaxWidth().height(1.dp).background(SofaColors.Outline))
         if (g != null) GameRows(g, state)
+        if (picks.isNotEmpty()) {
+            if (m != null || g != null) Box(Modifier.fillMaxWidth().height(1.dp).background(SofaColors.Outline))
+            PicksRows(picks)
+        }
     }
 }
 
@@ -135,4 +146,22 @@ internal fun coverLabel(s: BetStatus): String? = when (s) {
     BetStatus.LOST -> "didn't cover"
     BetStatus.PUSH -> "push"
     BetStatus.PENDING -> null
+}
+
+/** "PICKS 3/5 hitting" + up to 3 picks that are live (or next up). */
+@Composable
+private fun PicksRows(picks: List<PickProgress>) {
+    Text("PICKS ${PickEvaluator.hitting(picks)}/${picks.size} HITTING", style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted)
+    sortForDisplay(picks).filterNot { it.settled }.take(3).forEach { p ->
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.width(4.dp).height(18.dp).background(bookColor(p.pick.book), RoundedCornerShape(2.dp)))
+            Spacer(Modifier.width(8.dp))
+            Text(p.pick.describe(p.game), style = MaterialTheme.typography.labelMedium, color = SofaColors.TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            Text(
+                p.current?.let { if (p.pick.type == PickType.SPREAD || p.pick.type == PickType.MONEYLINE) Betting.formatLine(it) else Betting.formatNumber(it) } ?: "–",
+                style = MaterialTheme.typography.labelLarge, color = statusColor(p.status),
+                modifier = Modifier.padding(start = 6.dp).scorePulse(p.current, statusColor(p.status), onlyIncrease = false).padding(horizontal = 4.dp),
+            )
+        }
+    }
 }

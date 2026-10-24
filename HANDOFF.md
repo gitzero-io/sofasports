@@ -36,6 +36,17 @@ Swapping in the real tokens should be a one-file change. Please also check the v
 
 Every judgment call is in `DECISIONS.md`; per-step status is in `PROGRESS.md`.
 
+## Added after v0.1 (your requests)
+
+- **Sleeper is optional**: "Skip for now" on Home; link any time in Settings. Text boxes only open the keyboard when you press OK, so the remote can't get stuck in them.
+- **ESPN Fantasy** (Settings → ESPN Fantasy → Add, or from Home): public leagues need only the league ID; private leagues also need the `espn_s2` and `SWID` cookies (instructions on screen; paste them with the Google TV phone app's keyboard). Then pick your team. ESPN and Sleeper leagues share one switcher and both feed the overlay. Uses ESPN's unofficial fantasy API.
+- **DraftKings lines**: spread / total / moneyline from DraftKings (ESPN's odds provider) on game cards, in Game Center (with live "covering / already over" status) and in the overlay. Toggle: Settings → DraftKings lines.
+- **Picks tab (PrizePicks + DraftKings)**: add picks on the TV (book → bet type → team → player → stat → line → over/under). Props, spreads, totals and moneylines are tracked live from ESPN box scores on the Picks tab, on Home and in the overlay ("PICKS 2/3 HITTING").
+- **Not built: logging in to DraftKings or PrizePicks.** Neither has a public API for your bets/entries; importing them would mean storing your sportsbook password and calling their private endpoints (against their terms, and DraftKings holds real money). Picks are entered by hand instead.
+- Remote kill switches for the new pieces: `features.odds`, `features.picks` in config.json.
+
+Test it in fixture mode (Settings → Data source → Fixtures): add a PrizePicks prop on a HOU/JAX/LAC/KC player and a DraftKings spread on HOU; they move as the replay runs. Switching data mode clears fantasy links, picks and the pinned game.
+
 ## 2. Blocked or unfinished, and why
 
 Nothing is hard-blocked. Not done or not verified:

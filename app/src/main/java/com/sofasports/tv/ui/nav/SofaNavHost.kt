@@ -26,6 +26,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.sofasports.tv.data.config.ConfigRepository
 import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.telemetry.UsageEvent
 import com.sofasports.tv.telemetry.UsageEvents
@@ -35,6 +36,8 @@ import com.sofasports.tv.ui.fantasy.AddEspnLeagueScreen
 import com.sofasports.tv.ui.game.GameCenterScreen
 import com.sofasports.tv.ui.home.HomeScreen
 import com.sofasports.tv.ui.onboarding.OnboardingScreen
+import com.sofasports.tv.ui.picks.AddPickScreen
+import com.sofasports.tv.ui.picks.PicksScreen
 import com.sofasports.tv.ui.scores.ScoresScreen
 import com.sofasports.tv.ui.settings.EditFavoritesScreen
 import com.sofasports.tv.ui.settings.SettingsScreen
@@ -55,19 +58,25 @@ object Routes {
     const val GAME = "game/{gameId}"
     const val EDIT_FAVORITES = "favorites"
     const val ADD_ESPN = "espn-add"
+    const val PICKS = "picks"
+    const val ADD_PICK = "picks-add"
     fun game(id: String) = "game/$id"
 }
 
 private data class Tab(val route: String, val label: String)
 
-private val tabs = listOf(
+private fun tabs(picks: Boolean) = listOfNotNull(
     Tab(Routes.HOME, "Home"),
     Tab(Routes.SCORES, "Scores"),
+    Tab(Routes.PICKS, "Picks").takeIf { picks },
     Tab(Routes.SETTINGS, "Settings"),
 )
 
 @HiltViewModel
-class RootViewModel @Inject constructor(store: SettingsStore, private val usage: UsageEvents) : ViewModel() {
+class RootViewModel @Inject constructor(store: SettingsStore, private val usage: UsageEvents, config: ConfigRepository) : ViewModel() {
+    val picksEnabled: StateFlow<Boolean> =
+        config.config.map { it.features.picks }.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
     fun screenView(route: String) {
         // Only the route pattern ("game/{gameId}"), never the id.
         usage.track(UsageEvent.ScreenView(route.substringBefore('/')))
@@ -82,6 +91,7 @@ class RootViewModel @Inject constructor(store: SettingsStore, private val usage:
 @Composable
 fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewModel = hiltViewModel()) {
     val onboardingDone by vm.onboardingDone.collectAsStateWithLifecycle()
+    val picksEnabled by vm.picksEnabled.collectAsStateWithLifecycle()
     val done = onboardingDone ?: run {
         Box(Modifier.fillMaxSize().background(SofaColors.Background))
         return
@@ -98,7 +108,7 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
             .padding(horizontal = 48.dp, vertical = 24.dp),
     ) {
         if (showChrome) {
-            TopBar(current = current, onSelect = { route ->
+            TopBar(current = current, tabs = tabs(picksEnabled), onSelect = { route ->
                 nav.navigate(route) {
                     popUpTo(Routes.HOME) { saveState = true }
                     launchSingleTop = true
@@ -118,8 +128,11 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
                         onOpenGame = { nav.navigate(Routes.game(it)) },
                         onOpenScores = { nav.navigate(Routes.SCORES) { launchSingleTop = true } },
                         onAddEspnLeague = { nav.navigate(Routes.ADD_ESPN) },
+                        onOpenPicks = { nav.navigate(Routes.PICKS) { launchSingleTop = true } },
                     )
                 }
+                composable(Routes.PICKS) { PicksScreen(onAddPick = { nav.navigate(Routes.ADD_PICK) }) }
+                composable(Routes.ADD_PICK) { AddPickScreen(onDone = { nav.popBackStack() }) }
                 composable(Routes.SCORES) { ScoresScreen(onOpenGame = { nav.navigate(Routes.game(it)) }) }
                 composable(Routes.GAME) { GameCenterScreen() }
                 composable(Routes.SETTINGS) { SettingsScreen(
@@ -135,7 +148,7 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
 }
 
 @Composable
-private fun TopBar(current: String?, onSelect: (String) -> Unit) {
+private fun TopBar(current: String?, tabs: List<Tab>, onSelect: (String) -> Unit) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text("SOFA", style = MaterialTheme.typography.headlineLarge, color = SofaColors.Blue)
         Text("SPORTS", style = MaterialTheme.typography.headlineLarge, color = SofaColors.Red)

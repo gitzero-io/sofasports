@@ -6,6 +6,8 @@ import com.sofasports.tv.data.config.ConfigRepository
 import com.sofasports.tv.data.espnff.EspnFantasyProvider
 import com.sofasports.tv.data.espnff.SwitchingEspnFantasyProvider
 import com.sofasports.tv.data.fixture.AssetFixtureSource
+import com.sofasports.tv.data.picks.RosterProvider
+import com.sofasports.tv.data.picks.SwitchingRosterProvider
 import com.sofasports.tv.data.fixture.FixtureSource
 import com.sofasports.tv.data.provider.ApiBases
 import com.sofasports.tv.data.provider.FantasyProvider
@@ -44,6 +46,7 @@ abstract class ProviderModule {
     @Binds abstract fun fixtures(impl: AssetFixtureSource): FixtureSource
     @Binds abstract fun apiBases(impl: ConfigRepository): ApiBases
     @Binds abstract fun espnFantasy(impl: SwitchingEspnFantasyProvider): EspnFantasyProvider
+    @Binds abstract fun rosters(impl: SwitchingRosterProvider): RosterProvider
     @Binds abstract fun usageSink(impl: LogcatUsageSink): UsageSink
     @Binds abstract fun usageEvents(impl: AppUsageEvents): UsageEvents
 }

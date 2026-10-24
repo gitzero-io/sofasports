@@ -1,0 +1,230 @@
+{
+ "team": {
+  "id": "12",
+  "abbreviation": "KC",
+  "displayName": "Kansas City Chiefs"
+ },
+ "athletes": [
+  {
+   "position": "offense",
+   "items": [
+    {
+     "id": "4912218",
+     "displayName": "Cyrus Allen",
+     "jersey": "13",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "5093923",
+     "displayName": "Andrew Armstrong",
+     "jersey": "85",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4566190",
+     "displayName": "Kahlil Benson",
+     "jersey": "70",
+     "position": {
+      "abbreviation": "OT"
+     }
+    },
+    {
+     "id": "4431196",
+     "displayName": "Jake Briningstool",
+     "jersey": "88",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4043039",
+     "displayName": "Mike Caliendo",
+     "jersey": "66",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4373280",
+     "displayName": "Joshua Ezeudu",
+     "jersey": "73",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4362887",
+     "displayName": "Justin Fields",
+     "jersey": "6",
+     "position": {
+      "abbreviation": "QB"
+     }
+    },
+    {
+     "id": "4240472",
+     "displayName": "Noah Gray",
+     "jersey": "83",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4241385",
+     "displayName": "Creed Humphrey",
+     "jersey": "52",
+     "position": {
+      "abbreviation": "C"
+     }
+    },
+    {
+     "id": "4832955",
+     "displayName": "Emmett Johnson",
+     "jersey": "10",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "15847",
+     "displayName": "Travis Kelce",
+     "jersey": "87",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "3139477",
+     "displayName": "Patrick Mahomes",
+     "jersey": "15",
+     "position": {
+      "abbreviation": "QB"
+     }
+    },
+    {
+     "id": "4043041",
+     "displayName": "Jaylon Moore",
+     "jersey": "77",
+     "position": {
+      "abbreviation": "OT"
+     }
+    },
+    {
+     "id": "4367645",
+     "displayName": "Hunter Nourzad",
+     "jersey": "64",
+     "position": {
+      "abbreviation": "C"
+     }
+    },
+    {
+     "id": "4567747",
+     "displayName": "Garrett Nussmeier",
+     "jersey": "14",
+     "position": {
+      "abbreviation": "QB"
+     }
+    },
+    {
+     "id": "4602984",
+     "displayName": "Diego Pounds",
+     "jersey": "61",
+     "position": {
+      "abbreviation": "OT"
+     }
+    },
+    {
+     "id": "4372716",
+     "displayName": "Nikko Remigio",
+     "jersey": "81",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4428331",
+     "displayName": "Rashee Rice",
+     "jersey": "4",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "5082630",
+     "displayName": "Jalen Royals",
+     "jersey": "11",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4596602",
+     "displayName": "Brashard Smith",
+     "jersey": "24",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "4242459",
+     "displayName": "Trey Smith",
+     "jersey": "65",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4431595",
+     "displayName": "Kingsley Suamataia",
+     "jersey": "76",
+     "position": {
+      "abbreviation": "OT"
+     }
+    },
+    {
+     "id": "4372070",
+     "displayName": "Ben VanSumeren",
+     "jersey": "47",
+     "position": {
+      "abbreviation": "FB"
+     }
+    },
+    {
+     "id": "4567048",
+     "displayName": "Kenneth Walker III",
+     "jersey": "9",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "3118892",
+     "displayName": "Justin Watson",
+     "jersey": null,
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4430723",
+     "displayName": "Jared Wiley",
+     "jersey": "12",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4683062",
+     "displayName": "Xavier Worthy",
+     "jersey": "1",
+     "position": {
+      "abbreviation": "WR"
+     }
+    }
+   ]
+  }
+ ]
+}

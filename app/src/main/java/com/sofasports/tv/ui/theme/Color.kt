@@ -39,6 +39,10 @@ object SofaColors {
     val Close = Color(0xFFFFB020)
     val Positive = Color(0xFF34D399)
 
+    // Books (badges only; never used for teams, so red/blue keep their meaning)
+    val DraftKings = Color(0xFF53D337)
+    val PrizePicks = Color(0xFFA78BFA)
+
     // Focus ring
     val Focus = Color(0xFFFFFFFF)
 }

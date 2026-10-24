@@ -2,7 +2,9 @@ package com.sofasports.tv.overlay
 
 import com.sofasports.tv.data.config.CloseGameRule
 import com.sofasports.tv.data.config.ConfigRepository
+import com.sofasports.tv.data.picks.PicksRepository
 import com.sofasports.tv.data.prefs.SettingsStore
+import com.sofasports.tv.domain.PickProgress
 import com.sofasports.tv.data.repo.FantasyRepository
 import com.sofasports.tv.data.repo.ScoresRepository
 import com.sofasports.tv.domain.FantasyMatchup
@@ -28,6 +30,7 @@ data class OverlayState(
     val favorites: List<String> = emptyList(),
     val closeRule: CloseGameRule = CloseGameRule(),
     val showOdds: Boolean = false,
+    val picks: List<PickProgress> = emptyList(),
 )
 
 /** What the corner overlay shows: the selected Sleeper matchup and one game. */
@@ -37,6 +40,7 @@ class OverlayFeed @Inject constructor(
     private val scores: ScoresRepository,
     private val settings: SettingsStore,
     private val config: ConfigRepository,
+    private val picks: PicksRepository,
 ) {
     private val _state = MutableStateFlow(OverlayState())
     val state: StateFlow<OverlayState> = _state.asStateFlow()
@@ -46,7 +50,7 @@ class OverlayFeed @Inject constructor(
     fun start(scope: CoroutineScope) {
         job?.cancel()
         job = scope.launch {
-            combine(fantasy.state, scores.state, settings.settings, config.config) { f, s, prefs, cfg ->
+            combine(fantasy.state, scores.state, settings.settings, config.config, picks.progress) { f, s, prefs, cfg, pk ->
                 val games = s.scoreboard?.games.orEmpty()
                 val pinned = prefs.pinnedGameId?.let { id -> games.firstOrNull { it.id == id } }
                 OverlayState(
@@ -56,6 +60,7 @@ class OverlayFeed @Inject constructor(
                     favorites = prefs.favoriteTeams,
                     closeRule = cfg.closeGame,
                     showOdds = cfg.features.odds && prefs.showOdds,
+                    picks = if (cfg.features.picks) pk else emptyList(),
                 )
             }.collect { _state.value = it }
         }

@@ -62,6 +62,8 @@ data class TeamStatRow(val label: String, val away: String, val home: String)
 
 data class PlayerStatTable(
     val teamAbbr: String,
+    /** "passing" | "rushing" | "receiving" */
+    val key: String = "",
     val category: String,
     val labels: List<String>,
     val rows: List<PlayerStatRow>,

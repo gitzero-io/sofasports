@@ -162,7 +162,7 @@ fun SettingsScreen(
             item(key = "debug") {
                 SettingsSection("Data source (debug builds only)") {
                     Text(
-                        "Fixtures replay last week's games as if live, with fake Sleeper and ESPN leagues. No network needed. Switching clears linked fantasy accounts and the pinned game.",
+                        "Fixtures replay last week's games as if live, with fake Sleeper and ESPN leagues. No network needed. Switching clears linked fantasy accounts, tracked picks and the pinned game.",
                         style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary,
                     )
                     SpacedRow {

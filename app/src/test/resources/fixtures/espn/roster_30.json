@@ -1,0 +1,214 @@
+{
+ "team": {
+  "id": "30",
+  "abbreviation": "JAX",
+  "displayName": "Jacksonville Jaguars"
+ },
+ "athletes": [
+  {
+   "position": "offense",
+   "items": [
+    {
+     "id": "2576336",
+     "displayName": "Ameer Abdullah",
+     "jersey": "20",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "4911851",
+     "displayName": "LeQuint Allen Jr.",
+     "jersey": "5",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "4686248",
+     "displayName": "Nate Boerkircher",
+     "jersey": "87",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4879194",
+     "displayName": "Josh Cameron",
+     "jersey": "19",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4048231",
+     "displayName": "Ezra Cleveland",
+     "jersey": "76",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4889929",
+     "displayName": "Quinn Ewers",
+     "jersey": "10",
+     "position": {
+      "abbreviation": "QB"
+     }
+    },
+    {
+     "id": "4360964",
+     "displayName": "Daniel Faalele",
+     "jersey": "68",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4242391",
+     "displayName": "Robert Hainsey",
+     "jersey": "73",
+     "position": {
+      "abbreviation": "C"
+     }
+    },
+    {
+     "id": "4685415",
+     "displayName": "Travis Hunter",
+     "jersey": "12",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4917427",
+     "displayName": "Tanner Koziol",
+     "jersey": "88",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4360310",
+     "displayName": "Trevor Lawrence",
+     "jersey": "16",
+     "position": {
+      "abbreviation": "QB"
+     }
+    },
+    {
+     "id": "4242554",
+     "displayName": "Walker Little",
+     "jersey": "72",
+     "position": {
+      "abbreviation": "OT"
+     }
+    },
+    {
+     "id": "3916433",
+     "displayName": "Jakobi Meyers",
+     "jersey": "3",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4431463",
+     "displayName": "Wyatt Milum",
+     "jersey": "64",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4430481",
+     "displayName": "Jonah Monheim",
+     "jersey": "60",
+     "position": {
+      "abbreviation": "C"
+     }
+    },
+    {
+     "id": "4244049",
+     "displayName": "Quintin Morris",
+     "jersey": "80",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "3059989",
+     "displayName": "Nick Mullens",
+     "jersey": "14",
+     "position": {
+      "abbreviation": "QB"
+     }
+    },
+    {
+     "id": "4608929",
+     "displayName": "Emmanuel Pregnon",
+     "jersey": "75",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4362619",
+     "displayName": "Chris Rodriguez Jr.",
+     "jersey": "24",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "4430539",
+     "displayName": "Brenton Strange",
+     "jersey": "85",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4432773",
+     "displayName": "Brian Thomas Jr.",
+     "jersey": "7",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4882093",
+     "displayName": "Bhayshul Tuten",
+     "jersey": "33",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "4035791",
+     "displayName": "Cole Van Lanen",
+     "jersey": "70",
+     "position": {
+      "abbreviation": "OT"
+     }
+    },
+    {
+     "id": "4432620",
+     "displayName": "Parker Washington",
+     "jersey": "11",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "5085024",
+     "displayName": "CJ Williams",
+     "jersey": "18",
+     "position": {
+      "abbreviation": "WR"
+     }
+    }
+   ]
+  }
+ ]
+}

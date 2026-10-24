@@ -1,0 +1,238 @@
+{
+ "team": {
+  "id": "24",
+  "abbreviation": "LAC",
+  "displayName": "Los Angeles Chargers"
+ },
+ "athletes": [
+  {
+   "position": "offense",
+   "items": [
+    {
+     "id": "4683487",
+     "displayName": "Joe Alt",
+     "jersey": "76",
+     "position": {
+      "abbreviation": "OT"
+     }
+    },
+    {
+     "id": "4040842",
+     "displayName": "Kayode Awosika",
+     "jersey": "74",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4035788",
+     "displayName": "Tyler Biadasz",
+     "jersey": "63",
+     "position": {
+      "abbreviation": "C"
+     }
+    },
+    {
+     "id": "2976117",
+     "displayName": "Daniel Brunskill",
+     "jersey": "61",
+     "position": {
+      "abbreviation": "C"
+     }
+    },
+    {
+     "id": "4876658",
+     "displayName": "Travis Burke",
+     "jersey": "77",
+     "position": {
+      "abbreviation": "OT"
+     }
+    },
+    {
+     "id": "4362477",
+     "displayName": "Derius Davis",
+     "jersey": "12",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4595342",
+     "displayName": "Oronde Gadsden",
+     "jersey": "86",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4685382",
+     "displayName": "Omarion Hampton",
+     "jersey": "8",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "5082660",
+     "displayName": "Alex Harkey",
+     "jersey": "73",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4686612",
+     "displayName": "Tre' Harris",
+     "jersey": "9",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4038941",
+     "displayName": "Justin Herbert",
+     "jersey": "10",
+     "position": {
+      "abbreviation": "QB"
+     }
+    },
+    {
+     "id": "4429811",
+     "displayName": "Patrick Herbert",
+     "jersey": "81",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4429025",
+     "displayName": "Quentin Johnston",
+     "jersey": "1",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4241263",
+     "displayName": "Charlie Kolar",
+     "jersey": "88",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4430870",
+     "displayName": "KeAndre Lambert-Smith",
+     "jersey": "84",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4373684",
+     "displayName": "Scott Matlock",
+     "jersey": "44",
+     "position": {
+      "abbreviation": "FB"
+     }
+    },
+    {
+     "id": "4612826",
+     "displayName": "Ladd McConkey",
+     "jersey": "15",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4596334",
+     "displayName": "Keaton Mitchell",
+     "jersey": "34",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "4428396",
+     "displayName": "Hayden Rucci",
+     "jersey": "40",
+     "position": {
+      "abbreviation": "TE"
+     }
+    },
+    {
+     "id": "4682506",
+     "displayName": "Jake Slaughter",
+     "jersey": "66",
+     "position": {
+      "abbreviation": "C"
+     }
+    },
+    {
+     "id": "5082312",
+     "displayName": "Jacob Spomer",
+     "jersey": "60",
+     "position": {
+      "abbreviation": "C"
+     }
+    },
+    {
+     "id": "4051001",
+     "displayName": "Cole Strange",
+     "jersey": "69",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4433914",
+     "displayName": "Branson Taylor",
+     "jersey": "71",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4682789",
+     "displayName": "Logan Taylor",
+     "jersey": "65",
+     "position": {
+      "abbreviation": "G"
+     }
+    },
+    {
+     "id": "4685553",
+     "displayName": "Brenen Thompson",
+     "jersey": "89",
+     "position": {
+      "abbreviation": "WR"
+     }
+    },
+    {
+     "id": "4429020",
+     "displayName": "DJ Uiagalelei",
+     "jersey": "7",
+     "position": {
+      "abbreviation": "QB"
+     }
+    },
+    {
+     "id": "4430968",
+     "displayName": "Kimani Vidal",
+     "jersey": "28",
+     "position": {
+      "abbreviation": "RB"
+     }
+    },
+    {
+     "id": "4426535",
+     "displayName": "Theo Wease Jr.",
+     "jersey": "82",
+     "position": {
+      "abbreviation": "WR"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -53,13 +53,21 @@ class FixtureReplay @Inject constructor(private val source: FixtureSource) {
         if (idx >= plays.size) return full
         val shown = plays.take(idx + 1).map { it.second.id }.toSet()
         val last = plays[idx].second
+        val fraction = (idx + 1).toDouble() / plays.size
         return full.copy(
             game = liveGame(gameId, nowMs) ?: full.game,
+            // The fixture only has end-of-game player stats; scale them so props move during a replay.
+            playerStats = full.playerStats.map { t -> t.copy(rows = t.rows.map { r -> r.copy(stats = r.stats.map { scaleStat(it, fraction) }) }) },
             winProbability = full.winProbability.filter { it.playId in shown },
             drives = full.drives.mapNotNull { d -> d.copy(plays = d.plays.filter { it.id in shown }).takeIf { it.plays.isNotEmpty() } },
             scoringPlays = full.scoringPlays.filter { it.awayScore + it.homeScore <= last.awayScore + last.homeScore },
         )
     }
+
+    /** "312" → "143", "24/34" → "11/16"; non-numbers unchanged. Fixture-only approximation. */
+    private fun scaleStat(v: String, f: Double): String =
+        if (v.contains('/')) v.split('/').joinToString("/") { scaleStat(it, f) }
+        else v.toIntOrNull()?.let { Math.round(it * f).toInt().toString() } ?: v
 
     private fun playIndex(gameId: String, nowMs: Long): Int {
         val elapsedPlays = ((nowMs - startMs) / 1000 / SECONDS_PER_PLAY).toInt()

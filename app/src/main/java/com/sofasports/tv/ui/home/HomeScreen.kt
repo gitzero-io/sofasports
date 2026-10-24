@@ -31,9 +31,18 @@ import com.sofasports.tv.ui.theme.SofaColors
 import com.sofasports.tv.ui.theme.SofaShape
 import com.sofasports.tv.ui.theme.focusableRow
 import com.sofasports.tv.ui.update.UpdateBanner
+import com.sofasports.tv.domain.PickEvaluator
+import com.sofasports.tv.ui.picks.PickRow
+import com.sofasports.tv.ui.picks.sortForDisplay
 
 @Composable
-fun HomeScreen(onOpenGame: (String) -> Unit, onOpenScores: () -> Unit, onAddEspnLeague: () -> Unit, vm: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(
+    onOpenGame: (String) -> Unit,
+    onOpenScores: () -> Unit,
+    onAddEspnLeague: () -> Unit,
+    onOpenPicks: () -> Unit,
+    vm: HomeViewModel = hiltViewModel(),
+) {
     val ui by vm.ui.collectAsStateWithLifecycle()
     val now = rememberNowMs(1_000)
     LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(20.dp), contentPadding = PaddingValues(bottom = 48.dp)) {
@@ -49,6 +58,20 @@ fun HomeScreen(onOpenGame: (String) -> Unit, onOpenScores: () -> Unit, onAddEspn
         // Hidden entirely once skipped (until linked from Settings), so Home is just scores.
         if (ui.fantasyEnabled && (ui.fantasy.linked || !ui.fantasyPromptSkipped)) {
             item(key = "fantasy") { FantasySection(ui, vm, onAddEspnLeague) }
+        }
+        if (ui.picks.isNotEmpty()) {
+            item(key = "picks") {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "Picks · ${PickEvaluator.hitting(ui.picks)} of ${ui.picks.size} hitting",
+                        style = MaterialTheme.typography.headlineSmall, color = SofaColors.TextPrimary,
+                    )
+                    Column(Modifier.fillMaxWidth().background(SofaColors.Surface, SofaShape)) {
+                        sortForDisplay(ui.picks).take(5).forEach { PickRow(it, Modifier.focusableRow(SofaShape)) }
+                    }
+                    SofaButton("All picks", onClick = onOpenPicks)
+                }
+            }
         }
         item(key = "mine") {
             GameRow(

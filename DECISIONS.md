@@ -79,3 +79,10 @@ One line per judgment call, with the reason.
 - Matchup period = league's `currentMatchupPeriod`, also used as scoringPeriodId → correct for standard weekly leagues; multi-week playoff matchups will show only the current week.
 - Switching the debug data mode clears Sleeper/ESPN links and the pinned game → the fixture Sleeper owner id is a real Sleeper account and leaked into live mode during testing.
 - Sleeper and ESPN leagues share one switcher, labelled "Sleeper · …" / "ESPN · …".
+- PrizePicks / DraftKings: manual pick tracker instead of account connection → no public APIs for user entries; connecting would require storing sportsbook credentials and using private endpoints (ToS, real-money accounts). Picks live in `files/picks.json` on the TV only.
+- Picks are matched to "this week's game for the pick's team" and props to ESPN athlete ids (roster ids == box-score ids, verified 34/34) → no game ids stored, so picks keep working across scoreboard refreshes.
+- Monotonic prop stats (TDs, receptions, completions, attempts, INTs, rush attempts) settle early once an over is cleared (or an under is broken); yardage can go down, so it stays "hitting" until final. A live game total over is won once past the number.
+- Box scores are fetched only for games that have prop picks: every 30 s while live, once after the final.
+- Player list = ESPN team roster, offense QB/RB/WR/TE only, ESPN's order (backups can appear before starters).
+- Fixture mode scales end-of-game player stats by replay progress → props visibly move in a test; live mode uses ESPN's real live box score.
+- Book badge colours: DraftKings green, PrizePicks violet → never red/blue, which stay reserved for me/opponent.

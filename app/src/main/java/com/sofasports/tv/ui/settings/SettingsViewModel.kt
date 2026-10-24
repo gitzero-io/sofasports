@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofasports.tv.data.espnff.EspnLeagueLink
 import com.sofasports.tv.data.espnff.EspnLeagueStore
+import com.sofasports.tv.data.picks.PicksStore
 import com.sofasports.tv.data.prefs.DataMode
 import com.sofasports.tv.data.prefs.OverlayCorner
 import com.sofasports.tv.data.prefs.SettingsStore
@@ -29,6 +30,7 @@ class SettingsViewModel @Inject constructor(
     private val fantasy: FantasyRepository,
     private val usage: UsageEvents,
     private val espnLeagues: EspnLeagueStore,
+    private val picks: PicksStore,
 ) : ViewModel() {
 
     val espnLinks: StateFlow<List<EspnLeagueLink>> = espnLeagues.links
@@ -68,6 +70,7 @@ class SettingsViewModel @Inject constructor(
         store.setSleeper(null, null)
         store.setPinnedGame(null)
         espnLeagues.clear()
+        picks.clear()
         store.setDataMode(mode)
     }
 
