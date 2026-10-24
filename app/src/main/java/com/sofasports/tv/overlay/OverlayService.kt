@@ -22,11 +22,14 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.sofasports.tv.BuildConfig
 import com.sofasports.tv.R
+import com.sofasports.tv.data.config.ConfigRepository
 import com.sofasports.tv.data.prefs.OverlayCorner
 import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.ui.theme.SofaSportsTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -41,6 +44,8 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
 
     @Inject lateinit var settings: SettingsStore
     @Inject lateinit var feed: OverlayFeed
+    @Inject lateinit var config: ConfigRepository
+    @Inject lateinit var appVisibility: AppVisibility
 
     private val savedStateController = SavedStateRegistryController.create(this)
     override val savedStateRegistry: SavedStateRegistry get() = savedStateController.savedStateRegistry
@@ -54,9 +59,17 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
         super.onCreate()
         startAsForeground()
         lifecycleScope.launch {
-            settings.settings.map { it.overlayCorner }.distinctUntilChanged().collect { corner -> show(corner) }
+            combine(settings.settings.map { it.overlayCorner }, appVisibility.inForeground) { corner, appShown -> corner to appShown }
+                .distinctUntilChanged()
+                .collect { (corner, appShown) -> if (appShown) removeView() else show(corner) }
         }
         feed.start(lifecycleScope)
+        // Remote config can switch the overlay off (feature flag) or kill the whole app.
+        lifecycleScope.launch {
+            config.config.collect { cfg ->
+                if (!cfg.features.overlay || cfg.killSwitch.appliesTo(BuildConfig.VERSION_CODE)) stopSelf()
+            }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

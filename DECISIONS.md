@@ -50,3 +50,6 @@ One line per judgment call, with the reason.
 - First league is auto-selected and the choice persisted; leagues refetched hourly, matchup every 30 s while any NFL game is live (5 min otherwise).
 - Matchup week = Sleeper `state/nfl` `display_week` → matches what the Sleeper app shows.
 - Testing Sleeper username in the brief was the unfilled placeholder `[YOUR SLEEPER USERNAME]` → live Sleeper verified only via unit tests against real response shapes and fixture mode; you need to enter your username on the box.
+- Overlay game = pinned game if it's in this week's scoreboard, else my top favorite's game if live / kicking off within 12 h / finished within 6 h, else none → overlay is useful even before anything is pinned, and stays small otherwise.
+- Overlay hides while Sofa Sports is in the foreground (activity onStart/onStop) → it otherwise covered the app's own header and Pin button.
+- Overlay card is fully opaque → any translucency let bright UI behind it bleed through on the emulator.

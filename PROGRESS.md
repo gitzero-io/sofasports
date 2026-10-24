@@ -19,8 +19,10 @@
 
 - [x] 9. Sleeper: username entry on Home (no password), all of the user's NFL leagues for the current season with a switcher, live matchup card (me blue / opponent red, starters + points), refreshes at 30 s while NFL games are live
 
+- [x] 10. Overlay shows the selected Sleeper matchup + the pinned game (falls back to my favorite's game today); hides while Sofa Sports itself is on screen; stops on remote `features.overlay=false` or kill switch
+
 ## In progress
-- [ ] 10. Overlay wiring
+- [ ] 11. Kickoff countdown + score-change pulse
 
 ## Blocked
 - (none)
