@@ -17,3 +17,5 @@ One line per judgment call, with the reason.
 - Sleeper `players/nfl` is 14 MB → fixture is trimmed to the 189 players in the fixture matchups; at runtime the app caches a trimmed copy and refreshes at most once a day (Sleeper's guidance).
 - Fixture JSON lives once, in `app/src/test/resources/fixtures`, and is added to debug assets via sourceSets → one copy for tests and the debug "Fixtures" data mode; release APK excludes it.
 - ESPN `broadcasts` differ between scoreboard (`names[]`) and summary (`media.shortName`) → DTO accepts both; found by testing against real fixtures.
+- Sentry auto-init disabled in the manifest → with no DSN it crashed on launch (caught on the emulator); SofaApp inits it by hand only when a DSN is set.
+- Emulator: dismissed the Google TV setup prompt and set user_setup_complete/device_provisioned on the local AVD → otherwise the setup wizard sits on top of every app.
