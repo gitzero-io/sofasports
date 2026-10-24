@@ -2,6 +2,7 @@ package com.sofasports.tv.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sofasports.tv.data.prefs.DataMode
 import com.sofasports.tv.data.prefs.OverlayCorner
 import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.data.prefs.UserSettings
@@ -42,4 +43,6 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setOverlayCorner(corner: OverlayCorner) = viewModelScope.launch { store.setOverlayCorner(corner) }
+
+    fun setDataMode(mode: DataMode) = viewModelScope.launch { store.setDataMode(mode) }
 }

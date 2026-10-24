@@ -34,3 +34,10 @@ One line per judgment call, with the reason.
 - Briefly disabled then re-enabled the emulator's Google TV launcher while testing → its setup popups kept covering the app; state restored.
 - Max 4 favorite teams, pick order = priority → "favorites first" stays meaningful and the first favorite decides which side is blue when two favorites meet.
 - Team logos load from ESPN's public CDN via Coil → no bundled NFL marks in the APK.
+- Close game = live, 4th quarter or later, within 8 points (one score); overtime always close; both numbers in remote config → standard "one-score game late" definition, tunable without a release.
+- Neutral games (no favorite playing): home = blue, away = red → brief says "Blue = me/home/favorite".
+- Two favorites meeting: the one picked first is blue.
+- Win-probability label shows the leader's chance (mine when level), capped at 1–99% while live and 100% only for the final winner → avoids a premature "100%" on TV.
+- Polling: 30 s while any game is live or a fetch failed; otherwise sleep until the next kickoff (min 30 s, max 5 min) → near-zero traffic on weekdays, instant pickup at kickoff.
+- One app-wide scoreboard poller (shared StateFlow, stops 5 s after the last screen/overlay unsubscribes) → screens and overlay never double-poll ESPN.
+- Countdown: hidden beyond 24 h (date shown), "in 5h 07m" under 24 h, "in 42:05" in the last hour, "Kickoff soon" if ESPN hasn't flipped to live yet.

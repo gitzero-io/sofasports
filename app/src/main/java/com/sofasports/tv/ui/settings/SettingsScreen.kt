@@ -19,6 +19,8 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.sofasports.tv.BuildConfig
+import com.sofasports.tv.data.prefs.DataMode
 import com.sofasports.tv.data.prefs.OverlayCorner
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.components.SpacedRow
@@ -41,6 +43,20 @@ fun SettingsScreen(vm: SettingsViewModel = hiltViewModel()) {
                     onEnabled = vm::setOverlayEnabled,
                     onCorner = vm::setOverlayCorner,
                 )
+            }
+        }
+        if (BuildConfig.DEBUG) {
+            item {
+                SettingsSection("Data source (debug builds only)") {
+                    Text(
+                        "Fixtures replay last week's games as if live, with a fake Sleeper league. No network needed.",
+                        style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary,
+                    )
+                    SpacedRow {
+                        SofaButton("Live ESPN + Sleeper", onClick = { vm.setDataMode(DataMode.LIVE) }, selected = settings.dataMode == DataMode.LIVE)
+                        SofaButton("Fixtures", onClick = { vm.setDataMode(DataMode.FIXTURES) }, selected = settings.dataMode == DataMode.FIXTURES)
+                    }
+                }
             }
         }
     }

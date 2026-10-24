@@ -13,8 +13,10 @@
 
 - [x] 6. First-run favorites picker (32 teams by division, up to 4, pick order kept, skippable)
 
+- [x] 7. Scores: favorites first then live/upcoming/final, close-game badge (rule from remote config), 30 s polling while live (smart idle/kickoff wake-up), countdown on upcoming cards, last-good data kept when offline
+
 ## In progress
-- [ ] 7. Scores screen
+- [ ] 8. Game Center
 
 ## Blocked
 - (none)

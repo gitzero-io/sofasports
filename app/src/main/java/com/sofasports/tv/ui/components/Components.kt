@@ -2,6 +2,7 @@ package com.sofasports.tv.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
@@ -80,15 +81,16 @@ fun SofaButton(
     }
 }
 
-/** Small coloured tag: LIVE, CLOSE, FINAL. */
+/** Small coloured tag: LIVE (filled), CLOSE (outlined). */
 @Composable
-fun Badge(text: String, color: Color, modifier: Modifier = Modifier, textColor: Color = SofaColors.Background) {
+fun Badge(text: String, color: Color, modifier: Modifier = Modifier, outlined: Boolean = false) {
+    val shape = RoundedCornerShape(6.dp)
     Box(
         modifier
-            .background(color, RoundedCornerShape(6.dp))
+            .then(if (outlined) Modifier.border(2.dp, color, shape) else Modifier.background(color, shape))
             .padding(horizontal = 8.dp, vertical = 2.dp),
     ) {
-        Text(text, style = MaterialTheme.typography.labelMedium, color = textColor)
+        Text(text, style = MaterialTheme.typography.labelMedium, color = if (outlined) color else SofaColors.Background)
     }
 }
 

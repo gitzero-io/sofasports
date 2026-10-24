@@ -30,6 +30,7 @@ import com.sofasports.tv.ui.components.MessageBox
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.components.SpacedRow
 import com.sofasports.tv.ui.onboarding.OnboardingScreen
+import com.sofasports.tv.ui.scores.ScoresScreen
 import com.sofasports.tv.ui.settings.SettingsScreen
 import com.sofasports.tv.ui.theme.SofaColors
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -95,7 +96,7 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
                     })
                 }
                 composable(Routes.HOME) { MessageBox("Home") }
-                composable(Routes.SCORES) { MessageBox("Scores") }
+                composable(Routes.SCORES) { ScoresScreen(onOpenGame = { /* Game Center lands in step 8 */ }) }
                 composable(Routes.SETTINGS) { SettingsScreen() }
             }
         }
