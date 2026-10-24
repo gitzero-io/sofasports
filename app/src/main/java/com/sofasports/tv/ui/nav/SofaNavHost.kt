@@ -35,6 +35,7 @@ import com.sofasports.tv.ui.scores.ScoresScreen
 import com.sofasports.tv.ui.settings.EditFavoritesScreen
 import com.sofasports.tv.ui.settings.SettingsScreen
 import com.sofasports.tv.ui.theme.SofaColors
+import com.sofasports.tv.ui.update.UpdateSection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -108,7 +109,7 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
                 }
                 composable(Routes.SCORES) { ScoresScreen(onOpenGame = { nav.navigate(Routes.game(it)) }) }
                 composable(Routes.GAME) { GameCenterScreen() }
-                composable(Routes.SETTINGS) { SettingsScreen(onEditFavorites = { nav.navigate(Routes.EDIT_FAVORITES) }) }
+                composable(Routes.SETTINGS) { SettingsScreen(onEditFavorites = { nav.navigate(Routes.EDIT_FAVORITES) }, updateSection = { UpdateSection() }) }
                 composable(Routes.EDIT_FAVORITES) { EditFavoritesScreen(onDone = { nav.popBackStack() }) }
             }
         }

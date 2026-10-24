@@ -25,8 +25,10 @@
 
 - [x] 12. Settings: Sleeper link/unlink, favorites (edit screen reuses the picker), overlay on/off + corner + unpin + adb steps, usage-events opt-out, feedback QR (placeholder URL), version, not-affiliated notice, debug data-source toggle
 
+- [x] 13. Update check: version.json (sample in release-assets) checked hourly-loop/at most every 12 h + manual button in Settings; Home banner with QR + URL when newer; "required" when below minSupportedVersionCode
+
 ## In progress
-- [ ] 13. In-app update check
+- [ ] 14. Sentry
 
 ## Blocked
 - (none)

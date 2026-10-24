@@ -29,6 +29,7 @@ import com.sofasports.tv.ui.fantasy.SleeperLinkForm
 import com.sofasports.tv.ui.theme.SofaColors
 import com.sofasports.tv.ui.theme.SofaShape
 import com.sofasports.tv.ui.theme.focusableRow
+import com.sofasports.tv.ui.update.UpdateBanner
 
 @Composable
 fun HomeScreen(onOpenGame: (String) -> Unit, onOpenScores: () -> Unit, vm: HomeViewModel = hiltViewModel()) {
@@ -43,6 +44,7 @@ fun HomeScreen(onOpenGame: (String) -> Unit, onOpenScores: () -> Unit, vm: HomeV
                 )
             }
         }
+        item(key = "update") { UpdateBanner() }
         if (ui.fantasyEnabled) {
             item(key = "fantasy") { FantasySection(ui, vm) }
         }

@@ -57,3 +57,5 @@ One line per judgment call, with the reason.
 - Feedback QR rendered locally with ZXing core (no network, no Play Services); URL is `sofa.feedbackUrl` in local.properties, placeholder `https://example.com/sofasports-feedback`.
 - Not-affiliated notice also says logos are shown for identification only and scores may be delayed → covers the ESPN-logo and unofficial-API realities.
 - Usage events default to ON with a clear opt-out in Settings → brief asks for an opt-out (not opt-in); nothing is sent anywhere in v0.1 anyway (logging only).
+- Update check never downloads or installs → no REQUEST_INSTALL_PACKAGES permission; shows the APK URL + QR for the Downloader app or adb. Safer and enough for a sideloaded v0.1.
+- version.json URL is `sofa.versionUrl` in local.properties, placeholder GitHub raw URL otherwise; apkUrl must be https.

@@ -3,6 +3,7 @@ package com.sofasports.tv
 import android.app.Application
 import com.sofasports.tv.data.config.ConfigRepository
 import com.sofasports.tv.data.prefs.SettingsStore
+import com.sofasports.tv.data.update.UpdateChecker
 import com.sofasports.tv.di.AppScope
 import com.sofasports.tv.overlay.OverlayController
 import dagger.hilt.android.HiltAndroidApp
@@ -18,6 +19,7 @@ class SofaApp : Application() {
     @Inject @AppScope lateinit var appScope: CoroutineScope
     @Inject lateinit var settings: SettingsStore
     @Inject lateinit var overlay: OverlayController
+    @Inject lateinit var updates: UpdateChecker
 
     override fun onCreate() {
         super.onCreate()
@@ -28,6 +30,7 @@ class SofaApp : Application() {
         appScope.launch {
             while (true) {
                 config.refresh()
+                updates.checkIfDue()
                 delay(CONFIG_REFRESH_MS)
             }
         }
