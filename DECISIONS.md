@@ -32,3 +32,5 @@ One line per judgment call, with the reason.
 - Overlay can't be tested over system Settings (it hides third-party overlays by design) → verified over the Google TV launcher instead.
 - Overlay auto-restarts on app process start if it was left on → it's a persistent user setting. No BOOT_COMPLETED receiver in v0.1 (open the app once after a reboot).
 - Briefly disabled then re-enabled the emulator's Google TV launcher while testing → its setup popups kept covering the app; state restored.
+- Max 4 favorite teams, pick order = priority → "favorites first" stays meaningful and the first favorite decides which side is blue when two favorites meet.
+- Team logos load from ESPN's public CDN via Coil → no bundled NFL marks in the APK.

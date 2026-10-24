@@ -11,8 +11,10 @@
 
 - [x] 5. Overlay: foreground service + TYPE_APPLICATION_OVERLAY ComposeView, corner choice, start/stop in Settings, adb grant steps on screen; verified drawing over the Google TV launcher on the emulator
 
+- [x] 6. First-run favorites picker (32 teams by division, up to 4, pick order kept, skippable)
+
 ## In progress
-- [ ] 6. First-run favorites picker
+- [ ] 7. Scores screen
 
 ## Blocked
 - (none)
