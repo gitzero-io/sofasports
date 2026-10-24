@@ -15,8 +15,10 @@
 
 - [x] 7. Scores: favorites first then live/upcoming/final, close-game badge (rule from remote config), 30 s polling while live (smart idle/kickoff wake-up), countdown on upcoming cards, last-good data kept when offline
 
+- [x] 8. Game Center: header, Summary (win-prob label + blue/red chart, last play, scoring plays, venue), Box score (team + player stats), Play-by-play (drives newest first); polls while live; "Pin to overlay"
+
 ## In progress
-- [ ] 8. Game Center
+- [ ] 9. Sleeper
 
 ## Blocked
 - (none)

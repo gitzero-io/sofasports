@@ -58,7 +58,7 @@ fun ScoresScreen(onOpenGame: (String) -> Unit, vm: ScoresViewModel = hiltViewMod
                         favorites = ui.favorites,
                         closeRule = ui.closeRule,
                         nowMs = if (game.state == GameState.PRE) now else 0L,
-                        onClick = { onOpenGame(game.id) },
+                        onClick = { if (ui.gameCenterEnabled) onOpenGame(game.id) },
                     )
                 }
             }

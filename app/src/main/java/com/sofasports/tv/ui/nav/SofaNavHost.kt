@@ -29,6 +29,7 @@ import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.ui.components.MessageBox
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.components.SpacedRow
+import com.sofasports.tv.ui.game.GameCenterScreen
 import com.sofasports.tv.ui.onboarding.OnboardingScreen
 import com.sofasports.tv.ui.scores.ScoresScreen
 import com.sofasports.tv.ui.settings.SettingsScreen
@@ -45,6 +46,8 @@ object Routes {
     const val HOME = "home"
     const val SCORES = "scores"
     const val SETTINGS = "settings"
+    const val GAME = "game/{gameId}"
+    fun game(id: String) = "game/$id"
 }
 
 private data class Tab(val route: String, val label: String)
@@ -96,7 +99,8 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
                     })
                 }
                 composable(Routes.HOME) { MessageBox("Home") }
-                composable(Routes.SCORES) { ScoresScreen(onOpenGame = { /* Game Center lands in step 8 */ }) }
+                composable(Routes.SCORES) { ScoresScreen(onOpenGame = { nav.navigate(Routes.game(it)) }) }
+                composable(Routes.GAME) { GameCenterScreen() }
                 composable(Routes.SETTINGS) { SettingsScreen() }
             }
         }

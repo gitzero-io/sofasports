@@ -1,6 +1,8 @@
 package com.sofasports.tv.ui.theme
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,4 +32,17 @@ fun Modifier.focusRing(
     this
         .onFocusChanged { focused = it.hasFocus || it.isFocused }
         .border(width, if (focused) color else Color.Transparent, shape)
+}
+
+/**
+ * Makes a read-only row reachable with the D-pad (so long lists scroll on TV) and
+ * highlights it subtly when focused, with the standard ring.
+ */
+fun Modifier.focusableRow(shape: Shape = SofaShape): Modifier = composed {
+    var focused by remember { mutableStateOf(false) }
+    this
+        .onFocusChanged { focused = it.isFocused }
+        .background(if (focused) SofaColors.SurfaceFocused else Color.Transparent, shape)
+        .border(2.dp, if (focused) SofaColors.Focus else Color.Transparent, shape)
+        .focusable()
 }

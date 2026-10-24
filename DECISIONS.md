@@ -41,3 +41,8 @@ One line per judgment call, with the reason.
 - Polling: 30 s while any game is live or a fetch failed; otherwise sleep until the next kickoff (min 30 s, max 5 min) → near-zero traffic on weekdays, instant pickup at kickoff.
 - One app-wide scoreboard poller (shared StateFlow, stops 5 s after the last screen/overlay unsubscribes) → screens and overlay never double-poll ESPN.
 - Countdown: hidden beyond 24 h (date shown), "in 5h 07m" under 24 h, "in 42:05" in the last hour, "Kickoff soon" if ESPN hasn't flipped to live yet.
+- Game Center tabs are buttons, and every read-only row is focusable (`focusableRow`) → TV lazy lists only scroll by moving focus; plain text would be unreachable.
+- Win-prob chart: my side's chance, filled blue above 50% and red below, no axes → readable from the couch; disabled with `features.winProbability`.
+- "Pin to overlay" lives in Game Center (one pinned game at a time; pinning another replaces it).
+- Fixture box score shows the full-game totals even mid-replay → ESPN only gives end-of-game box scores in the fixture; acceptable for a debug mode.
+- `features.gameCenter=false` makes score cards non-clickable rather than removing the screen → simplest remote kill for that feature.

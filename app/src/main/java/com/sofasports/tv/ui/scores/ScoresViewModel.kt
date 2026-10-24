@@ -24,6 +24,7 @@ data class ScoresUi(
     val loading: Boolean = true,
     val error: String? = null,
     val updatedAtMs: Long = 0L,
+    val gameCenterEnabled: Boolean = true,
 )
 
 @HiltViewModel
@@ -41,6 +42,7 @@ class ScoresViewModel @Inject constructor(
             loading = s.loading,
             error = s.error,
             updatedAtMs = s.updatedAtMs,
+            gameCenterEnabled = cfg.features.gameCenter,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScoresUi())
 
