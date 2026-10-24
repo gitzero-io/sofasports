@@ -33,7 +33,7 @@ import com.sofasports.tv.ui.theme.focusableRow
 import com.sofasports.tv.ui.update.UpdateBanner
 
 @Composable
-fun HomeScreen(onOpenGame: (String) -> Unit, onOpenScores: () -> Unit, vm: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(onOpenGame: (String) -> Unit, onOpenScores: () -> Unit, onAddEspnLeague: () -> Unit, vm: HomeViewModel = hiltViewModel()) {
     val ui by vm.ui.collectAsStateWithLifecycle()
     val now = rememberNowMs(1_000)
     LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(20.dp), contentPadding = PaddingValues(bottom = 48.dp)) {
@@ -48,7 +48,7 @@ fun HomeScreen(onOpenGame: (String) -> Unit, onOpenScores: () -> Unit, vm: HomeV
         item(key = "update") { UpdateBanner() }
         // Hidden entirely once skipped (until linked from Settings), so Home is just scores.
         if (ui.fantasyEnabled && (ui.fantasy.linked || !ui.fantasyPromptSkipped)) {
-            item(key = "fantasy") { FantasySection(ui, vm) }
+            item(key = "fantasy") { FantasySection(ui, vm, onAddEspnLeague) }
         }
         item(key = "mine") {
             GameRow(
@@ -70,7 +70,7 @@ fun HomeScreen(onOpenGame: (String) -> Unit, onOpenScores: () -> Unit, vm: HomeV
 }
 
 @Composable
-private fun FantasySection(ui: HomeUi, vm: HomeViewModel) {
+private fun FantasySection(ui: HomeUi, vm: HomeViewModel, onAddEspnLeague: () -> Unit) {
     val f = ui.fantasy
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Fantasy", style = MaterialTheme.typography.headlineSmall, color = SofaColors.TextPrimary)
@@ -79,16 +79,17 @@ private fun FantasySection(ui: HomeUi, vm: HomeViewModel) {
                 Modifier.fillMaxWidth().background(SofaColors.Surface, SofaShape).padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text("Link Sleeper to see your matchup live, here and in the overlay.", style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary)
+                Text("Link Sleeper or add an ESPN league to see your matchup live, here and in the overlay.", style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary)
                 SleeperLinkForm(onLink = vm::link)
                 SpacedRow {
+                    SofaButton("Add ESPN league", onClick = onAddEspnLeague)
                     SofaButton("Skip for now", onClick = vm::skipFantasyPrompt)
-                    Text("You can link Sleeper any time in Settings.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted)
+                    Text("You can do this any time in Settings.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted)
                 }
             }
             f.leagues.isEmpty() -> Text(
                 when {
-                    f.loading -> "Loading ${f.username ?: "Sleeper"}…"
+                    f.loading -> "Loading your leagues…"
                     f.error != null -> "Couldn't load Sleeper leagues: ${f.error}"
                     else -> "${f.username} has no NFL leagues this season. You can change the username in Settings."
                 },
@@ -98,7 +99,7 @@ private fun FantasySection(ui: HomeUi, vm: HomeViewModel) {
                 if (f.leagues.size > 1) {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp)) {
                         items(f.leagues, key = { it.id }) { league ->
-                            SofaButton(league.name, onClick = { vm.selectLeague(league.id) }, selected = league.id == f.selectedLeagueId)
+                            SofaButton("${league.source.label} · ${league.name}", onClick = { vm.selectLeague(league.id) }, selected = league.id == f.selectedLeagueId)
                         }
                     }
                 }

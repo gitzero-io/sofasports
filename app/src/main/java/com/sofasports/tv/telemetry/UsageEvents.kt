@@ -21,6 +21,7 @@ sealed class UsageEvent(val name: String, val props: Map<String, String> = empty
     data class ScreenView(val screen: String) : UsageEvent("screen_view", mapOf("screen" to screen))
     data class FavoritesSaved(val count: Int) : UsageEvent("favorites_saved", mapOf("count" to count.toString()))
     data object SleeperLinked : UsageEvent("sleeper_linked")
+    data class EspnLeagueAdded(val private: Boolean) : UsageEvent("espn_league_added", mapOf("private" to private.toString()))
     data class LeagueCount(val count: Int) : UsageEvent("sleeper_leagues", mapOf("count" to count.coerceAtMost(20).toString()))
     data class OverlayToggled(val on: Boolean) : UsageEvent("overlay_toggled", mapOf("on" to on.toString()))
     data object GameOpened : UsageEvent("game_opened")

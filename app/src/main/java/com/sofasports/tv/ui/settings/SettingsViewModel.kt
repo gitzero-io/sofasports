@@ -2,6 +2,8 @@ package com.sofasports.tv.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sofasports.tv.data.espnff.EspnLeagueLink
+import com.sofasports.tv.data.espnff.EspnLeagueStore
 import com.sofasports.tv.data.prefs.DataMode
 import com.sofasports.tv.data.prefs.OverlayCorner
 import com.sofasports.tv.data.prefs.SettingsStore
@@ -26,7 +28,13 @@ class SettingsViewModel @Inject constructor(
     private val overlay: OverlayController,
     private val fantasy: FantasyRepository,
     private val usage: UsageEvents,
+    private val espnLeagues: EspnLeagueStore,
 ) : ViewModel() {
+
+    val espnLinks: StateFlow<List<EspnLeagueLink>> = espnLeagues.links
+
+    fun removeEspnLeague(key: String) = viewModelScope.launch { espnLeagues.remove(key) }
+
 
     val settings: StateFlow<UserSettings> =
         store.settings.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UserSettings())
@@ -51,7 +59,17 @@ class SettingsViewModel @Inject constructor(
 
     fun setOverlayCorner(corner: OverlayCorner) = viewModelScope.launch { store.setOverlayCorner(corner) }
 
-    fun setDataMode(mode: DataMode) = viewModelScope.launch { store.setDataMode(mode) }
+    /**
+     * Fantasy links and the pinned game made in one data mode point at the other mode's ids
+     * (e.g. the fixture Sleeper user is a real Sleeper account), so switching clears them.
+     */
+    fun setDataMode(mode: DataMode) = viewModelScope.launch {
+        if (settings.value.dataMode == mode) return@launch
+        store.setSleeper(null, null)
+        store.setPinnedGame(null)
+        espnLeagues.clear()
+        store.setDataMode(mode)
+    }
 
     fun setShowOdds(show: Boolean) = viewModelScope.launch { store.setShowOdds(show) }
 

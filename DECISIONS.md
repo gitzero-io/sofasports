@@ -72,3 +72,10 @@ One line per judgment call, with the reason.
 - Pressing Link with an empty box says "Type your Sleeper username first" instead of looking up "".
 - DraftKings "overlay" = DraftKings lines (spread, total, moneyline) that ESPN already publishes from DraftKings, shown on cards, Game Center (with live cover / over-under status) and the overlay. No DraftKings API or account involved. Toggle in Settings; remote kill via `features.odds`.
 - Spread is parsed from ESPN's text ("PIT -3") rather than its numeric `spread`, whose sign differs between scoreboard and summary.
+- ESPN Fantasy uses ESPN's unofficial `lm-api-reads.fantasy.espn.com` API (base URL overridable in remote config). Public leagues: league ID only. Private: espn_s2 + SWID cookies typed or pasted (Google TV phone app keyboard). If SWID is given, the user's team is pre-selected.
+- ESPN cookies live in `files/espn_leagues.json`, excluded from Android backup and device transfer, and are only sent to ESPN.
+- ESPN fixtures come from a real public 2026 league with team names, owner names and account ids scrubbed; NFL player names kept (public).
+- ESPN weekly points: `totalPointsLive` when > 0, else `totalPoints` (ESPN leaves totalPoints at 0 until the week is scored). Starters = lineup slots other than bench (20) and IR (21).
+- Matchup period = league's `currentMatchupPeriod`, also used as scoringPeriodId → correct for standard weekly leagues; multi-week playoff matchups will show only the current week.
+- Switching the debug data mode clears Sleeper/ESPN links and the pinned game → the fixture Sleeper owner id is a real Sleeper account and leaked into live mode during testing.
+- Sleeper and ESPN leagues share one switcher, labelled "Sleeper · …" / "ESPN · …".

@@ -106,12 +106,15 @@ data class GameSummary(
 
 data class FantasyUser(val userId: String, val displayName: String, val avatar: String?)
 
+enum class FantasySource(val label: String) { SLEEPER("Sleeper"), ESPN("ESPN") }
+
 data class FantasyLeague(
     val id: String,
     val name: String,
     val season: String,
     val totalRosters: Int,
     val status: String?,
+    val source: FantasySource = FantasySource.SLEEPER,
 )
 
 data class FantasyPlayer(val id: String, val name: String, val position: String?, val team: String?)

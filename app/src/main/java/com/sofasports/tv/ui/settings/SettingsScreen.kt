@@ -38,11 +38,13 @@ import com.sofasports.tv.ui.theme.focusableRow
 @Composable
 fun SettingsScreen(
     onEditFavorites: () -> Unit,
+    onAddEspnLeague: () -> Unit,
     updateSection: @Composable () -> Unit = {},
     vm: SettingsViewModel = hiltViewModel(),
 ) {
     val settings by vm.settings.collectAsStateWithLifecycle()
     val canDraw by vm.canDrawOverlay.collectAsStateWithLifecycle()
+    val espnLinks by vm.espnLinks.collectAsStateWithLifecycle()
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { vm.recheckPermission() }
 
     LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(32.dp), contentPadding = PaddingValues(bottom = 64.dp)) {
@@ -59,6 +61,21 @@ fun SettingsScreen(
                 } else {
                     SleeperLinkForm(onLink = vm::linkSleeper)
                 }
+            }
+        }
+        item(key = "espn") {
+            SettingsSection("ESPN Fantasy") {
+                espnLinks.forEach { l ->
+                    SpacedRow {
+                        Text(l.leagueName, style = MaterialTheme.typography.titleLarge, color = SofaColors.TextPrimary)
+                        Text("· ${l.teamName}" + if (l.isPrivate) " · private" else "", style = MaterialTheme.typography.titleMedium, color = SofaColors.BlueBright)
+                        SofaButton("Remove", onClick = { vm.removeEspnLeague(l.key) })
+                    }
+                }
+                if (espnLinks.isEmpty()) {
+                    Text("Public leagues need only the league ID. Private leagues also need two ESPN cookies.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary)
+                }
+                SofaButton("Add ESPN league", onClick = onAddEspnLeague)
             }
         }
         item(key = "favorites") {
@@ -145,7 +162,7 @@ fun SettingsScreen(
             item(key = "debug") {
                 SettingsSection("Data source (debug builds only)") {
                     Text(
-                        "Fixtures replay last week's games as if live, with a fake Sleeper league. No network needed.",
+                        "Fixtures replay last week's games as if live, with fake Sleeper and ESPN leagues. No network needed. Switching clears linked fantasy accounts and the pinned game.",
                         style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary,
                     )
                     SpacedRow {

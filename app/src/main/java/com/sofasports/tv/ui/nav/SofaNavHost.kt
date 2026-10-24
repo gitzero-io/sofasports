@@ -31,6 +31,7 @@ import com.sofasports.tv.telemetry.UsageEvent
 import com.sofasports.tv.telemetry.UsageEvents
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.components.SpacedRow
+import com.sofasports.tv.ui.fantasy.AddEspnLeagueScreen
 import com.sofasports.tv.ui.game.GameCenterScreen
 import com.sofasports.tv.ui.home.HomeScreen
 import com.sofasports.tv.ui.onboarding.OnboardingScreen
@@ -53,6 +54,7 @@ object Routes {
     const val SETTINGS = "settings"
     const val GAME = "game/{gameId}"
     const val EDIT_FAVORITES = "favorites"
+    const val ADD_ESPN = "espn-add"
     fun game(id: String) = "game/$id"
 }
 
@@ -115,11 +117,17 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
                     HomeScreen(
                         onOpenGame = { nav.navigate(Routes.game(it)) },
                         onOpenScores = { nav.navigate(Routes.SCORES) { launchSingleTop = true } },
+                        onAddEspnLeague = { nav.navigate(Routes.ADD_ESPN) },
                     )
                 }
                 composable(Routes.SCORES) { ScoresScreen(onOpenGame = { nav.navigate(Routes.game(it)) }) }
                 composable(Routes.GAME) { GameCenterScreen() }
-                composable(Routes.SETTINGS) { SettingsScreen(onEditFavorites = { nav.navigate(Routes.EDIT_FAVORITES) }, updateSection = { UpdateSection() }) }
+                composable(Routes.SETTINGS) { SettingsScreen(
+                        onEditFavorites = { nav.navigate(Routes.EDIT_FAVORITES) },
+                        onAddEspnLeague = { nav.navigate(Routes.ADD_ESPN) },
+                        updateSection = { UpdateSection() },
+                    ) }
+                composable(Routes.ADD_ESPN) { AddEspnLeagueScreen(onDone = { nav.popBackStack() }) }
                 composable(Routes.EDIT_FAVORITES) { EditFavoritesScreen(onDone = { nav.popBackStack() }) }
             }
         }

@@ -31,6 +31,7 @@ data class RemoteConfig(
         endpoints = endpoints.copy(
             espnNflBase = endpoints.espnNflBase.takeIf { it.startsWith("https://") } ?: Endpoints.ESPN_NFL_BASE,
             sleeperBase = endpoints.sleeperBase.takeIf { it.startsWith("https://") } ?: Endpoints.SLEEPER_BASE,
+            espnFantasyBase = endpoints.espnFantasyBase.takeIf { it.startsWith("https://") } ?: Endpoints.ESPN_FANTASY_BASE,
         ),
         announcement = announcement?.takeIf { it.isNotBlank() }?.take(140),
     )
@@ -77,4 +78,5 @@ data class Features(
 data class EndpointConfig(
     val espnNflBase: String = Endpoints.ESPN_NFL_BASE,
     val sleeperBase: String = Endpoints.SLEEPER_BASE,
+    val espnFantasyBase: String = Endpoints.ESPN_FANTASY_BASE,
 )
