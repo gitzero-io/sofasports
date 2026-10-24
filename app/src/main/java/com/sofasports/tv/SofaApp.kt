@@ -5,6 +5,7 @@ import com.sofasports.tv.data.config.ConfigRepository
 import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.data.update.UpdateChecker
 import com.sofasports.tv.di.AppScope
+import com.sofasports.tv.telemetry.CrashReporting
 import com.sofasports.tv.overlay.OverlayController
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,7 @@ class SofaApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        CrashReporting.init(this, BuildConfig.SENTRY_DSN, "sofasports@${BuildConfig.VERSION_NAME}+${BuildConfig.VERSION_CODE}", BuildConfig.DEBUG)
         appScope.launch {
             // Bring the overlay back after the process was killed (it's a user setting, not a one-off).
             if (settings.current().overlayEnabled && !config.killed) overlay.start()

@@ -27,8 +27,10 @@
 
 - [x] 13. Update check: version.json (sample in release-assets) checked hourly-loop/at most every 12 h + manual button in Settings; Home banner with QR + URL when newer; "required" when below minSupportedVersionCode
 
+- [x] 14. Sentry: manual init only with a valid `sentry.dsn` in local.properties; verified the app launches with no DSN ("crash reporting off" in logcat)
+
 ## In progress
-- [ ] 14. Sentry
+- [ ] 15. Anonymous usage events
 
 ## Blocked
 - (none)

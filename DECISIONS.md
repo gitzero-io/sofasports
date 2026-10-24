@@ -59,3 +59,5 @@ One line per judgment call, with the reason.
 - Usage events default to ON with a clear opt-out in Settings → brief asks for an opt-out (not opt-in); nothing is sent anywhere in v0.1 anyway (logging only).
 - Update check never downloads or installs → no REQUEST_INSTALL_PACKAGES permission; shows the APK URL + QR for the Downloader app or adb. Safer and enough for a sideloaded v0.1.
 - version.json URL is `sofa.versionUrl` in local.properties, placeholder GitHub raw URL otherwise; apkUrl must be https.
+- Sentry: no PII, no performance tracing (sample rate 0), release tag `sofasports@<versionName>+<code>`; crash reports are not tied to the usage-events opt-out → crashes are needed to keep the app working, and nothing personal is sent. Revisit if you disagree.
+- No Sentry Gradle plugin (no mapping upload) → it needs an auth token and network at build time; release stack traces will be obfuscated until that's added.
