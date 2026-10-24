@@ -29,6 +29,7 @@ import com.sofasports.tv.domain.GameState
 import com.sofasports.tv.domain.Perspective
 import com.sofasports.tv.ui.components.Badge
 import com.sofasports.tv.ui.components.rememberNowMs
+import com.sofasports.tv.ui.components.scorePulse
 import com.sofasports.tv.ui.fantasy.formatPoints
 import com.sofasports.tv.ui.theme.SofaColors
 
@@ -59,9 +60,9 @@ fun OverlayWidget(state: OverlayState) {
 @Composable
 private fun MatchupRows(m: FantasyMatchup) {
     Text(m.leagueName.uppercase(), style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    OverlayScoreRow(m.me.teamName, formatPoints(m.me.points), SofaColors.Blue, m.opponent != null && m.me.points >= m.opponent.points)
+    OverlayScoreRow(m.me.teamName, formatPoints(m.me.points), SofaColors.Blue, m.opponent != null && m.me.points >= m.opponent.points, m.me.points, onlyIncrease = false)
     if (m.opponent != null) {
-        OverlayScoreRow(m.opponent.teamName, formatPoints(m.opponent.points), SofaColors.Red, m.opponent.points > m.me.points)
+        OverlayScoreRow(m.opponent.teamName, formatPoints(m.opponent.points), SofaColors.Red, m.opponent.points > m.me.points, m.opponent.points, onlyIncrease = false)
     }
 }
 
@@ -88,17 +89,29 @@ private fun GameRows(g: Game, state: OverlayState) {
             t.abbr, t.score?.toString() ?: "–",
             if (t.id == me.id) SofaColors.Blue else SofaColors.Red,
             leading = (t.score ?: 0) > (other.score ?: 0),
+            pulseValue = t.score?.toDouble(),
         )
     }
 }
 
 /** Colour bar + name on the left, score on the right; the leader's score is brighter. */
 @Composable
-internal fun OverlayScoreRow(name: String, score: String, sideColor: Color, leading: Boolean, modifier: Modifier = Modifier) {
+internal fun OverlayScoreRow(
+    name: String,
+    score: String,
+    sideColor: Color,
+    leading: Boolean,
+    pulseValue: Double?,
+    onlyIncrease: Boolean = true,
+    modifier: Modifier = Modifier,
+) {
     Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.width(4.dp).height(22.dp).background(sideColor, RoundedCornerShape(2.dp)))
         Spacer(Modifier.width(8.dp))
         Text(name, style = MaterialTheme.typography.labelLarge, color = SofaColors.TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-        Text(score, style = MaterialTheme.typography.headlineSmall, color = if (leading) SofaColors.TextPrimary else SofaColors.TextSecondary, modifier = Modifier.padding(start = 8.dp))
+        Text(
+            score, style = MaterialTheme.typography.headlineSmall, color = if (leading) SofaColors.TextPrimary else SofaColors.TextSecondary,
+            modifier = Modifier.padding(start = 8.dp).scorePulse(pulseValue, sideColor, onlyIncrease).padding(horizontal = 4.dp),
+        )
     }
 }

@@ -41,6 +41,9 @@ import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.components.SpacedRow
 import com.sofasports.tv.ui.components.TeamLogo
 import com.sofasports.tv.ui.components.formatKickoff
+import com.sofasports.tv.ui.components.rememberNowMs
+import com.sofasports.tv.ui.components.scorePulse
+import com.sofasports.tv.domain.Countdown
 import com.sofasports.tv.ui.components.sideColor
 import com.sofasports.tv.ui.theme.SofaColors
 import com.sofasports.tv.ui.theme.focusableRow
@@ -86,7 +89,13 @@ private fun GameHeader(game: Game, favorites: List<String>) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(horizontal = 24.dp)) {
             when (game.state) {
                 GameState.LIVE -> { Badge("LIVE", SofaColors.Live); Text(game.shortDetail, style = MaterialTheme.typography.titleLarge, color = SofaColors.TextPrimary) }
-                GameState.PRE -> Text(formatKickoff(game.startEpochMs), style = MaterialTheme.typography.titleLarge, color = SofaColors.TextSecondary)
+                GameState.PRE -> {
+                    val now = rememberNowMs(1_000)
+                    Text(formatKickoff(game.startEpochMs), style = MaterialTheme.typography.titleLarge, color = SofaColors.TextSecondary)
+                    Countdown.format(now, game.startEpochMs)?.let {
+                        Text("Kickoff $it", style = MaterialTheme.typography.headlineMedium, color = SofaColors.TextPrimary)
+                    }
+                }
                 else -> Text(game.shortDetail.ifBlank { "Final" }, style = MaterialTheme.typography.titleLarge, color = SofaColors.TextSecondary)
             }
             game.situation?.downDistance?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary) }
@@ -98,7 +107,12 @@ private fun GameHeader(game: Game, favorites: List<String>) {
 @Composable
 private fun HeaderTeam(team: TeamSide, game: Game, favorites: List<String>, modifier: Modifier, alignEnd: Boolean) {
     val color = sideColor(team, game, favorites)
-    val score = @Composable { Text(team.score?.toString() ?: "", style = MaterialTheme.typography.displayLarge, color = SofaColors.TextPrimary) }
+    val score = @Composable {
+        Text(
+            team.score?.toString() ?: "", style = MaterialTheme.typography.displayLarge, color = SofaColors.TextPrimary,
+            modifier = Modifier.scorePulse(team.score?.toDouble(), color).padding(horizontal = 8.dp),
+        )
+    }
     val info = @Composable {
         Column(horizontalAlignment = if (alignEnd) Alignment.End else Alignment.Start) {
             Text(team.shortName, style = MaterialTheme.typography.headlineMedium, color = color)

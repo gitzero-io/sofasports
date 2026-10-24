@@ -53,3 +53,4 @@ One line per judgment call, with the reason.
 - Overlay game = pinned game if it's in this week's scoreboard, else my top favorite's game if live / kicking off within 12 h / finished within 6 h, else none → overlay is useful even before anything is pinned, and stays small otherwise.
 - Overlay hides while Sofa Sports is in the foreground (activity onStart/onStop) → it otherwise covered the app's own header and Pin button.
 - Overlay card is fully opaque → any translucency let bright UI behind it bleed through on the emulator.
+- Score pulse: two quick scale+flash beats (~1.4 s) in the scoring side's colour; game scores pulse only upward (downward = stat correction), fantasy points pulse both ways; never on first load.

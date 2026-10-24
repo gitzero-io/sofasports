@@ -111,7 +111,7 @@ private fun TeamRow(team: TeamSide, game: Game, favorites: List<String>) {
             team.score?.toString() ?: "",
             style = MaterialTheme.typography.displaySmall,
             color = if (dim) SofaColors.TextMuted else SofaColors.TextPrimary,
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.padding(start = 8.dp).scorePulse(team.score?.toDouble(), color).padding(horizontal = 6.dp),
         )
     }
 }

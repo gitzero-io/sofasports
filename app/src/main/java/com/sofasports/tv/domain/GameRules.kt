@@ -122,3 +122,17 @@ object WinProbability {
         return points.map { p -> if (meIsHome) p.homeWinPct else (1.0 - p.homeWinPct - p.tiePct).coerceIn(0.0, 1.0) }
     }
 }
+
+/** When a number on screen should pulse. */
+object ScorePulse {
+    /**
+     * Pulse when a value changes after the first time we've seen it.
+     * Game scores only pulse upward (a downward change is a stat correction, not news);
+     * fantasy points pulse either way (negative plays are news too).
+     */
+    fun shouldPulse(previous: Double?, current: Double?, onlyIncrease: Boolean): Boolean {
+        if (previous == null || current == null) return false
+        if (Math.abs(current - previous) < 0.005) return false
+        return !onlyIncrease || current > previous
+    }
+}

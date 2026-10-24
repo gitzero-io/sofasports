@@ -21,8 +21,10 @@
 
 - [x] 10. Overlay shows the selected Sleeper matchup + the pinned game (falls back to my favorite's game today); hides while Sofa Sports itself is on screen; stops on remote `features.overlay=false` or kill switch
 
+- [x] 11. Kickoff countdown (score cards, Game Center header, overlay; ticks every second in the last hour) + score-change pulse (scale + side-colour flash on game scores, fantasy totals, overlay). Pulse rule unit-tested; the animation itself was not captured on the emulator.
+
 ## In progress
-- [ ] 11. Kickoff countdown + score-change pulse
+- [ ] 12. Settings
 
 ## Blocked
 - (none)

@@ -21,6 +21,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.sofasports.tv.domain.FantasyMatchup
 import com.sofasports.tv.domain.FantasyTeam
+import com.sofasports.tv.ui.components.scorePulse
 import com.sofasports.tv.ui.theme.SofaColors
 import com.sofasports.tv.ui.theme.SofaShape
 import com.sofasports.tv.ui.theme.focusableRow
@@ -58,7 +59,10 @@ private fun TeamTotal(team: FantasyTeam, color: Color, leading: Boolean, modifie
     val pointsColor by animateColorAsState(if (leading) SofaColors.TextPrimary else SofaColors.TextSecondary, label = "pts")
     Column(modifier, horizontalAlignment = if (alignEnd) Alignment.End else Alignment.Start) {
         Text(team.teamName, style = MaterialTheme.typography.headlineSmall, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(formatPoints(team.points), style = MaterialTheme.typography.displayMedium, color = pointsColor)
+        Text(
+            formatPoints(team.points), style = MaterialTheme.typography.displayMedium, color = pointsColor,
+            modifier = Modifier.scorePulse(team.points, color, onlyIncrease = false).padding(horizontal = 8.dp),
+        )
     }
 }
 
