@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.SofaSports" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/sofa_background</item>
+        <item name="android:colorBackground">@color/sofa_background</item>
+    </style>
+</resources>

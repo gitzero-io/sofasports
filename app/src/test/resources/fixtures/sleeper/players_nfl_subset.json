@@ -1,0 +1,2460 @@
+{
+ "1166": {
+  "player_id": "1166",
+  "first_name": "Kirk",
+  "last_name": "Cousins",
+  "full_name": "Kirk Cousins",
+  "position": "QB",
+  "team": "LV",
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "269": {
+  "player_id": "269",
+  "first_name": "Pierre",
+  "last_name": "Garcon",
+  "full_name": "Pierre Garcon",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "829": {
+  "player_id": "829",
+  "first_name": "Andy",
+  "last_name": "Dalton",
+  "full_name": "Andy Dalton",
+  "position": "QB",
+  "team": "ATL",
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "5038": {
+  "player_id": "5038",
+  "first_name": "Michael",
+  "last_name": "Gallup",
+  "full_name": "Michael Gallup",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4651": {
+  "player_id": "4651",
+  "first_name": "Corey",
+  "last_name": "Clement",
+  "full_name": "Corey Clement",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "515": {
+  "player_id": "515",
+  "first_name": "Rob",
+  "last_name": "Gronkowski",
+  "full_name": "Rob Gronkowski",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4149": {
+  "player_id": "4149",
+  "first_name": "Jamaal",
+  "last_name": "Williams",
+  "full_name": "Jamaal Williams",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4866": {
+  "player_id": "4866",
+  "first_name": "Saquon",
+  "last_name": "Barkley",
+  "full_name": "Saquon Barkley",
+  "position": "RB",
+  "team": "PHI",
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": "Questionable"
+ },
+ "3594": {
+  "player_id": "3594",
+  "first_name": "Peyton",
+  "last_name": "Barber",
+  "full_name": "Peyton Barber",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1388": {
+  "player_id": "1388",
+  "first_name": "Tyler",
+  "last_name": "Eifert",
+  "full_name": "Tyler Eifert",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "4622": {
+  "player_id": "4622",
+  "first_name": "Keelan",
+  "last_name": "Cole",
+  "full_name": "Keelan Cole",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "322": {
+  "player_id": "322",
+  "first_name": "Antonio",
+  "last_name": "Gates",
+  "full_name": "Antonio Gates",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "4663": {
+  "player_id": "4663",
+  "first_name": "Austin",
+  "last_name": "Ekeler",
+  "full_name": "Austin Ekeler",
+  "position": "RB",
+  "team": "WAS",
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "184": {
+  "player_id": "184",
+  "first_name": "Adrian",
+  "last_name": "Peterson",
+  "full_name": "Adrian Peterson",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1048": {
+  "player_id": "1048",
+  "first_name": "Lamar",
+  "last_name": "Miller",
+  "full_name": "Lamar Miller",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "344": {
+  "player_id": "344",
+  "first_name": "Julian",
+  "last_name": "Edelman",
+  "full_name": "Julian Edelman",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "284": {
+  "player_id": "284",
+  "first_name": "Delanie",
+  "last_name": "Walker",
+  "full_name": "Delanie Walker",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4018": {
+  "player_id": "4018",
+  "first_name": "Joe",
+  "last_name": "Mixon",
+  "full_name": "Joe Mixon",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": "Questionable"
+ },
+ "167": {
+  "player_id": "167",
+  "first_name": "Tom",
+  "last_name": "Brady",
+  "full_name": "Tom Brady",
+  "position": "QB",
+  "team": null,
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "676": {
+  "player_id": "676",
+  "first_name": "LeSean",
+  "last_name": "McCoy",
+  "full_name": "LeSean McCoy",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "2197": {
+  "player_id": "2197",
+  "first_name": "Brandin",
+  "last_name": "Cooks",
+  "full_name": "Brandin Cooks",
+  "position": "WR",
+  "team": "SF",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1601": {
+  "player_id": "1601",
+  "first_name": "Spencer",
+  "last_name": "Ware",
+  "full_name": "Spencer Ware",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "4157": {
+  "player_id": "4157",
+  "first_name": "Tarik",
+  "last_name": "Cohen",
+  "full_name": "Tarik Cohen",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4035": {
+  "player_id": "4035",
+  "first_name": "Alvin",
+  "last_name": "Kamara",
+  "full_name": "Alvin Kamara",
+  "position": "RB",
+  "team": "NO",
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2028": {
+  "player_id": "2028",
+  "first_name": "Derek",
+  "last_name": "Carr",
+  "full_name": "Derek Carr",
+  "position": "QB",
+  "team": null,
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": "NA"
+ },
+ "1500": {
+  "player_id": "1500",
+  "first_name": "Jordan",
+  "last_name": "Reed",
+  "full_name": "Jordan Reed",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "1234": {
+  "player_id": "1234",
+  "first_name": "Russell",
+  "last_name": "Wilson",
+  "full_name": "Russell Wilson",
+  "position": "QB",
+  "team": null,
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2699": {
+  "player_id": "2699",
+  "first_name": "Cameron",
+  "last_name": "Meredith",
+  "full_name": "Cameron Meredith",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "175": {
+  "player_id": "175",
+  "first_name": "Jordy",
+  "last_name": "Nelson",
+  "full_name": "Jordy Nelson",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "5068": {
+  "player_id": "5068",
+  "first_name": "Kerryon",
+  "last_name": "Johnson",
+  "full_name": "Kerryon Johnson",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1387": {
+  "player_id": "1387",
+  "first_name": "Rex",
+  "last_name": "Burkhead",
+  "full_name": "Rex Burkhead",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "943": {
+  "player_id": "943",
+  "first_name": "Kyle",
+  "last_name": "Rudolph",
+  "full_name": "Kyle Rudolph",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1029": {
+  "player_id": "1029",
+  "first_name": "Nick",
+  "last_name": "Foles",
+  "full_name": "Nick Foles",
+  "position": "QB",
+  "team": null,
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "818": {
+  "player_id": "818",
+  "first_name": "Bilal",
+  "last_name": "Powell",
+  "full_name": "Bilal Powell",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "JAX": {
+  "player_id": "JAX",
+  "first_name": "Jacksonville",
+  "last_name": "Jaguars",
+  "full_name": null,
+  "position": "DEF",
+  "team": "JAX",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "5013": {
+  "player_id": "5013",
+  "first_name": "Anthony",
+  "last_name": "Miller",
+  "full_name": "Anthony Miller",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "289": {
+  "player_id": "289",
+  "first_name": "Drew",
+  "last_name": "Brees",
+  "full_name": "Drew Brees",
+  "position": "QB",
+  "team": null,
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "1339": {
+  "player_id": "1339",
+  "first_name": "Zach",
+  "last_name": "Ertz",
+  "full_name": "Zach Ertz",
+  "position": "TE",
+  "team": "PHI",
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2378": {
+  "player_id": "2378",
+  "first_name": "Tevin",
+  "last_name": "Coleman",
+  "full_name": "Tevin Coleman",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1517": {
+  "player_id": "1517",
+  "first_name": "Theo",
+  "last_name": "Riddick",
+  "full_name": "Theo Riddick",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "574": {
+  "player_id": "574",
+  "first_name": "Dez",
+  "last_name": "Bryant",
+  "full_name": "Dez Bryant",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "4273": {
+  "player_id": "4273",
+  "first_name": "Chris",
+  "last_name": "Carson",
+  "full_name": "Chris Carson",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "GB": {
+  "player_id": "GB",
+  "first_name": "Green Bay",
+  "last_name": "Packers",
+  "full_name": null,
+  "position": "DEF",
+  "team": "GB",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "LAC": {
+  "player_id": "LAC",
+  "first_name": "Los Angeles",
+  "last_name": "Chargers",
+  "full_name": null,
+  "position": "DEF",
+  "team": "LAC",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "4131": {
+  "player_id": "4131",
+  "first_name": "Kenny",
+  "last_name": "Golladay",
+  "full_name": "Kenny Golladay",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "3327": {
+  "player_id": "3327",
+  "first_name": "Alex",
+  "last_name": "Collins",
+  "full_name": "Alex Collins",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "5024": {
+  "player_id": "5024",
+  "first_name": "James",
+  "last_name": "Washington",
+  "full_name": "James Washington",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4111": {
+  "player_id": "4111",
+  "first_name": "D'Onta",
+  "last_name": "Foreman",
+  "full_name": "D'Onta Foreman",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "3178": {
+  "player_id": "3178",
+  "first_name": "Josh",
+  "last_name": "Doctson",
+  "full_name": "Josh Doctson",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4985": {
+  "player_id": "4985",
+  "first_name": "Rashaad",
+  "last_name": "Penny",
+  "full_name": "Rashaad Penny",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "956": {
+  "player_id": "956",
+  "first_name": "Mark",
+  "last_name": "Ingram",
+  "full_name": "Mark Ingram",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "4146": {
+  "player_id": "4146",
+  "first_name": "Dede",
+  "last_name": "Westbrook",
+  "full_name": "Dede Westbrook",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2382": {
+  "player_id": "2382",
+  "first_name": "Duke",
+  "last_name": "Johnson",
+  "full_name": "Duke Johnson",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "928": {
+  "player_id": "928",
+  "first_name": "Randall",
+  "last_name": "Cobb",
+  "full_name": "Randall Cobb",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1408": {
+  "player_id": "1408",
+  "first_name": "Le'Veon",
+  "last_name": "Bell",
+  "full_name": "Le'Veon Bell",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4152": {
+  "player_id": "4152",
+  "first_name": "Marlon",
+  "last_name": "Mack",
+  "full_name": "Marlon Mack",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4199": {
+  "player_id": "4199",
+  "first_name": "Aaron",
+  "last_name": "Jones Sr.",
+  "full_name": "Aaron Jones Sr.",
+  "position": "RB",
+  "team": "MIN",
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2315": {
+  "player_id": "2315",
+  "first_name": "Todd",
+  "last_name": "Gurley",
+  "full_name": "Todd Gurley",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1071": {
+  "player_id": "1071",
+  "first_name": "Mohamed",
+  "last_name": "Sanu",
+  "full_name": "Mohamed Sanu",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "DET": {
+  "player_id": "DET",
+  "first_name": "Detroit",
+  "last_name": "Lions",
+  "full_name": null,
+  "position": "DEF",
+  "team": "DET",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "4055": {
+  "player_id": "4055",
+  "first_name": "O.J.",
+  "last_name": "Howard",
+  "full_name": "O.J. Howard",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "560": {
+  "player_id": "560",
+  "first_name": "Demaryius",
+  "last_name": "Thomas",
+  "full_name": "Demaryius Thomas",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "NO": {
+  "player_id": "NO",
+  "first_name": "New Orleans",
+  "last_name": "Saints",
+  "full_name": null,
+  "position": "DEF",
+  "team": "NO",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "1149": {
+  "player_id": "1149",
+  "first_name": "Alshon",
+  "last_name": "Jeffery",
+  "full_name": "Alshon Jeffery",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1555": {
+  "player_id": "1555",
+  "first_name": "Kenny",
+  "last_name": "Stills",
+  "full_name": "Kenny Stills",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "367": {
+  "player_id": "367",
+  "first_name": "Jared",
+  "last_name": "Cook",
+  "full_name": "Jared Cook",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "788": {
+  "player_id": "788",
+  "first_name": "Dion",
+  "last_name": "Lewis",
+  "full_name": "Dion Lewis",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "1386": {
+  "player_id": "1386",
+  "first_name": "Giovani",
+  "last_name": "Bernard",
+  "full_name": "Giovani Bernard",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2449": {
+  "player_id": "2449",
+  "first_name": "Stefon",
+  "last_name": "Diggs",
+  "full_name": "Stefon Diggs",
+  "position": "WR",
+  "team": "WAS",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1476": {
+  "player_id": "1476",
+  "first_name": "Latavius",
+  "last_name": "Murray",
+  "full_name": "Latavius Murray",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2325": {
+  "player_id": "2325",
+  "first_name": "Nelson",
+  "last_name": "Agholor",
+  "full_name": "Nelson Agholor",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "3163": {
+  "player_id": "3163",
+  "first_name": "Jared",
+  "last_name": "Goff",
+  "full_name": "Jared Goff",
+  "position": "QB",
+  "team": "DET",
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "830": {
+  "player_id": "830",
+  "first_name": "A.J.",
+  "last_name": "Green",
+  "full_name": "A.J. Green",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4017": {
+  "player_id": "4017",
+  "first_name": "Deshaun",
+  "last_name": "Watson",
+  "full_name": "Deshaun Watson",
+  "position": "QB",
+  "team": "CLE",
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "5347": {
+  "player_id": "5347",
+  "first_name": "Nyheim",
+  "last_name": "Miller-Hines",
+  "full_name": "Nyheim Miller-Hines",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2320": {
+  "player_id": "2320",
+  "first_name": "Melvin",
+  "last_name": "Gordon",
+  "full_name": "Melvin Gordon",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "BAL": {
+  "player_id": "BAL",
+  "first_name": "Baltimore",
+  "last_name": "Ravens",
+  "full_name": null,
+  "position": "DEF",
+  "team": "BAL",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "223": {
+  "player_id": "223",
+  "first_name": "Larry",
+  "last_name": "Fitzgerald",
+  "full_name": "Larry Fitzgerald",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "138": {
+  "player_id": "138",
+  "first_name": "Ben",
+  "last_name": "Roethlisberger",
+  "full_name": "Ben Roethlisberger",
+  "position": "QB",
+  "team": "PIT",
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2452": {
+  "player_id": "2452",
+  "first_name": "Jay",
+  "last_name": "Ajayi",
+  "full_name": "Jay Ajayi",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "4033": {
+  "player_id": "4033",
+  "first_name": "David",
+  "last_name": "Njoku",
+  "full_name": "David Njoku",
+  "position": "TE",
+  "team": "LAC",
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Inactive",
+  "injury_status": "IR"
+ },
+ "4038": {
+  "player_id": "4038",
+  "first_name": "John",
+  "last_name": "Ross",
+  "full_name": "John Ross",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "947": {
+  "player_id": "947",
+  "first_name": "Julio",
+  "last_name": "Jones",
+  "full_name": "Julio Jones",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4950": {
+  "player_id": "4950",
+  "first_name": "Christian",
+  "last_name": "Kirk",
+  "full_name": "Christian Kirk",
+  "position": "WR",
+  "team": "SF",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Inactive",
+  "injury_status": "IR"
+ },
+ "1793": {
+  "player_id": "1793",
+  "first_name": "Trey",
+  "last_name": "Burton",
+  "full_name": "Trey Burton",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "3969": {
+  "player_id": "3969",
+  "first_name": "Leonard",
+  "last_name": "Fournette",
+  "full_name": "Leonard Fournette",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "3423": {
+  "player_id": "3423",
+  "first_name": "Robbie",
+  "last_name": "Chosen",
+  "full_name": "Robbie Chosen",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1110": {
+  "player_id": "1110",
+  "first_name": "T.Y.",
+  "last_name": "Hilton",
+  "full_name": "T.Y. Hilton",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "616": {
+  "player_id": "616",
+  "first_name": "Jimmy",
+  "last_name": "Graham",
+  "full_name": "Jimmy Graham",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4981": {
+  "player_id": "4981",
+  "first_name": "Calvin",
+  "last_name": "Ridley",
+  "full_name": "Calvin Ridley",
+  "position": "WR",
+  "team": "TEN",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": "Questionable"
+ },
+ "538": {
+  "player_id": "538",
+  "first_name": "Emmanuel",
+  "last_name": "Sanders",
+  "full_name": "Emmanuel Sanders",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1244": {
+  "player_id": "1244",
+  "first_name": "Josh",
+  "last_name": "Gordon",
+  "full_name": "Josh Gordon",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "3306": {
+  "player_id": "3306",
+  "first_name": "Jordan",
+  "last_name": "Howard",
+  "full_name": "Jordan Howard",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1689": {
+  "player_id": "1689",
+  "first_name": "Adam",
+  "last_name": "Thielen",
+  "full_name": "Adam Thielen",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": "NA"
+ },
+ "5046": {
+  "player_id": "5046",
+  "first_name": "Royce",
+  "last_name": "Freeman",
+  "full_name": "Royce Freeman",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4037": {
+  "player_id": "4037",
+  "first_name": "Chris",
+  "last_name": "Godwin Jr.",
+  "full_name": "Chris Godwin Jr.",
+  "position": "WR",
+  "team": "TB",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2374": {
+  "player_id": "2374",
+  "first_name": "Tyler",
+  "last_name": "Lockett",
+  "full_name": "Tyler Lockett",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "5045": {
+  "player_id": "5045",
+  "first_name": "Courtland",
+  "last_name": "Sutton",
+  "full_name": "Courtland Sutton",
+  "position": "WR",
+  "team": "DEN",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "DEN": {
+  "player_id": "DEN",
+  "first_name": "Denver",
+  "last_name": "Broncos",
+  "full_name": null,
+  "position": "DEF",
+  "team": "DEN",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "455": {
+  "player_id": "455",
+  "first_name": "Michael",
+  "last_name": "Crabtree",
+  "full_name": "Michael Crabtree",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "5052": {
+  "player_id": "5052",
+  "first_name": "Ronald",
+  "last_name": "Jones",
+  "full_name": "Ronald Jones",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4988": {
+  "player_id": "4988",
+  "first_name": "Nick",
+  "last_name": "Chubb",
+  "full_name": "Nick Chubb",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2257": {
+  "player_id": "2257",
+  "first_name": "Carlos",
+  "last_name": "Hyde",
+  "full_name": "Carlos Hyde",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1352": {
+  "player_id": "1352",
+  "first_name": "Robert",
+  "last_name": "Woods",
+  "full_name": "Robert Woods",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": "NA"
+ },
+ "1825": {
+  "player_id": "1825",
+  "first_name": "Jarvis",
+  "last_name": "Landry",
+  "full_name": "Jarvis Landry",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "3503": {
+  "player_id": "3503",
+  "first_name": "Geronimo",
+  "last_name": "Allison",
+  "full_name": "Geronimo Allison",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4962": {
+  "player_id": "4962",
+  "first_name": "Sony",
+  "last_name": "Michel",
+  "full_name": "Sony Michel",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1195": {
+  "player_id": "1195",
+  "first_name": "Doug",
+  "last_name": "Martin",
+  "full_name": "Doug Martin",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "3200": {
+  "player_id": "3200",
+  "first_name": "Sterling",
+  "last_name": "Shepard",
+  "full_name": "Sterling Shepard",
+  "position": "WR",
+  "team": "NYJ",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "3209": {
+  "player_id": "3209",
+  "first_name": "Devontae",
+  "last_name": "Booker",
+  "full_name": "Devontae Booker",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "3242": {
+  "player_id": "3242",
+  "first_name": "Kenyan",
+  "last_name": "Drake",
+  "full_name": "Kenyan Drake",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "331": {
+  "player_id": "331",
+  "first_name": "Philip",
+  "last_name": "Rivers",
+  "full_name": "Philip Rivers",
+  "position": "QB",
+  "team": null,
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "MIN": {
+  "player_id": "MIN",
+  "first_name": "Minnesota",
+  "last_name": "Vikings",
+  "full_name": null,
+  "position": "DEF",
+  "team": "MIN",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "96": {
+  "player_id": "96",
+  "first_name": "Aaron",
+  "last_name": "Rodgers",
+  "full_name": "Aaron Rodgers",
+  "position": "QB",
+  "team": "PIT",
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "CAR": {
+  "player_id": "CAR",
+  "first_name": "Carolina",
+  "last_name": "Panthers",
+  "full_name": null,
+  "position": "DEF",
+  "team": "CAR",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "421": {
+  "player_id": "421",
+  "first_name": "Matthew",
+  "last_name": "Stafford",
+  "full_name": "Matthew Stafford",
+  "position": "QB",
+  "team": "LAR",
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2168": {
+  "player_id": "2168",
+  "first_name": "Devonta",
+  "last_name": "Freeman",
+  "full_name": "Devonta Freeman",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "3161": {
+  "player_id": "3161",
+  "first_name": "Carson",
+  "last_name": "Wentz",
+  "full_name": "Carson Wentz",
+  "position": "QB",
+  "team": "MIN",
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4531": {
+  "player_id": "4531",
+  "first_name": "Ricky",
+  "last_name": "Seals-Jones",
+  "full_name": "Ricky Seals-Jones",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "1329": {
+  "player_id": "1329",
+  "first_name": "Chris",
+  "last_name": "Hogan",
+  "full_name": "Chris Hogan",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "3164": {
+  "player_id": "3164",
+  "first_name": "Ezekiel",
+  "last_name": "Elliott",
+  "full_name": "Ezekiel Elliott",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4066": {
+  "player_id": "4066",
+  "first_name": "Evan",
+  "last_name": "Engram",
+  "full_name": "Evan Engram",
+  "position": "TE",
+  "team": "DEN",
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1502": {
+  "player_id": "1502",
+  "first_name": "Chris",
+  "last_name": "Thompson",
+  "full_name": "Chris Thompson",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4039": {
+  "player_id": "4039",
+  "first_name": "Cooper",
+  "last_name": "Kupp",
+  "full_name": "Cooper Kupp",
+  "position": "WR",
+  "team": "SEA",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1854": {
+  "player_id": "1854",
+  "first_name": "Quincy",
+  "last_name": "Enunwa",
+  "full_name": "Quincy Enunwa",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1346": {
+  "player_id": "1346",
+  "first_name": "Marquise",
+  "last_name": "Goodwin",
+  "full_name": "Marquise Goodwin",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2346": {
+  "player_id": "2346",
+  "first_name": "Devin",
+  "last_name": "Funchess",
+  "full_name": "Devin Funchess",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1111": {
+  "player_id": "1111",
+  "first_name": "Andrew",
+  "last_name": "Luck",
+  "full_name": "Andrew Luck",
+  "position": "QB",
+  "team": null,
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "4040": {
+  "player_id": "4040",
+  "first_name": "JuJu",
+  "last_name": "Smith-Schuster",
+  "full_name": "JuJu Smith-Schuster",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "PIT": {
+  "player_id": "PIT",
+  "first_name": "Pittsburgh",
+  "last_name": "Steelers",
+  "full_name": null,
+  "position": "DEF",
+  "team": "PIT",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "4036": {
+  "player_id": "4036",
+  "first_name": "Corey",
+  "last_name": "Davis",
+  "full_name": "Corey Davis",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1170": {
+  "player_id": "1170",
+  "first_name": "Alfred",
+  "last_name": "Morris",
+  "full_name": "Alfred Morris",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2133": {
+  "player_id": "2133",
+  "first_name": "Davante",
+  "last_name": "Adams",
+  "full_name": "Davante Adams",
+  "position": "WR",
+  "team": "LAR",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Inactive",
+  "injury_status": "IR"
+ },
+ "1992": {
+  "player_id": "1992",
+  "first_name": "Allen",
+  "last_name": "Robinson",
+  "full_name": "Allen Robinson",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "5107": {
+  "player_id": "5107",
+  "first_name": "Jaylen",
+  "last_name": "Samuels",
+  "full_name": "Jaylen Samuels",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2309": {
+  "player_id": "2309",
+  "first_name": "Amari",
+  "last_name": "Cooper",
+  "full_name": "Amari Cooper",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1479": {
+  "player_id": "1479",
+  "first_name": "Keenan",
+  "last_name": "Allen",
+  "full_name": "Keenan Allen",
+  "position": "WR",
+  "team": "IND",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1451": {
+  "player_id": "1451",
+  "first_name": "C.J.",
+  "last_name": "Anderson",
+  "full_name": "C.J. Anderson",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2078": {
+  "player_id": "2078",
+  "first_name": "Odell",
+  "last_name": "Beckham Jr.",
+  "full_name": "Odell Beckham Jr.",
+  "position": "WR",
+  "team": "MIN",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "58": {
+  "player_id": "58",
+  "first_name": "Greg",
+  "last_name": "Olsen",
+  "full_name": "Greg Olsen",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "3199": {
+  "player_id": "3199",
+  "first_name": "Michael",
+  "last_name": "Thomas",
+  "full_name": "Michael Thomas",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1892": {
+  "player_id": "1892",
+  "first_name": "Jeremy",
+  "last_name": "Hill",
+  "full_name": "Jeremy Hill",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "4137": {
+  "player_id": "4137",
+  "first_name": "James",
+  "last_name": "Conner",
+  "full_name": "James Conner",
+  "position": "RB",
+  "team": "ARI",
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Inactive",
+  "injury_status": "IR"
+ },
+ "1466": {
+  "player_id": "1466",
+  "first_name": "Travis",
+  "last_name": "Kelce",
+  "full_name": "Travis Kelce",
+  "position": "TE",
+  "team": "KC",
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2182": {
+  "player_id": "2182",
+  "first_name": "Kelvin",
+  "last_name": "Benjamin",
+  "full_name": "Kelvin Benjamin",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "TE",
+   "WR"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "2410": {
+  "player_id": "2410",
+  "first_name": "Jamison",
+  "last_name": "Crowder",
+  "full_name": "Jamison Crowder",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "745": {
+  "player_id": "745",
+  "first_name": "Marshawn",
+  "last_name": "Lynch",
+  "full_name": "Marshawn Lynch",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "4034": {
+  "player_id": "4034",
+  "first_name": "Christian",
+  "last_name": "McCaffrey",
+  "full_name": "Christian McCaffrey",
+  "position": "RB",
+  "team": "SF",
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2238": {
+  "player_id": "2238",
+  "first_name": "John",
+  "last_name": "Brown",
+  "full_name": "John Brown",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2216": {
+  "player_id": "2216",
+  "first_name": "Mike",
+  "last_name": "Evans",
+  "full_name": "Mike Evans",
+  "position": "WR",
+  "team": "SF",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": "Out"
+ },
+ "988": {
+  "player_id": "988",
+  "first_name": "Doug",
+  "last_name": "Baldwin",
+  "full_name": "Doug Baldwin",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "LAR": {
+  "player_id": "LAR",
+  "first_name": "Los Angeles",
+  "last_name": "Rams",
+  "full_name": null,
+  "position": "DEF",
+  "team": "LAR",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "2118": {
+  "player_id": "2118",
+  "first_name": "Eric",
+  "last_name": "Ebron",
+  "full_name": "Eric Ebron",
+  "position": "TE",
+  "team": "PIT",
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "PHI": {
+  "player_id": "PHI",
+  "first_name": "Philadelphia",
+  "last_name": "Eagles",
+  "full_name": null,
+  "position": "DEF",
+  "team": "PHI",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "1837": {
+  "player_id": "1837",
+  "first_name": "Jimmy",
+  "last_name": "Garoppolo",
+  "full_name": "Jimmy Garoppolo",
+  "position": "QB",
+  "team": null,
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4455": {
+  "player_id": "4455",
+  "first_name": "Matt",
+  "last_name": "Breida",
+  "full_name": "Matt Breida",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "536": {
+  "player_id": "536",
+  "first_name": "Antonio",
+  "last_name": "Brown",
+  "full_name": "Antonio Brown",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4983": {
+  "player_id": "4983",
+  "first_name": "DJ",
+  "last_name": "Moore",
+  "full_name": "DJ Moore",
+  "position": "WR",
+  "team": "BUF",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": "Out"
+ },
+ "4973": {
+  "player_id": "4973",
+  "first_name": "Hayden",
+  "last_name": "Hurst",
+  "full_name": "Hayden Hurst",
+  "position": "TE",
+  "team": null,
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4068": {
+  "player_id": "4068",
+  "first_name": "Mike",
+  "last_name": "Williams",
+  "full_name": "Mike Williams",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4993": {
+  "player_id": "4993",
+  "first_name": "Mike",
+  "last_name": "Gesicki",
+  "full_name": "Mike Gesicki",
+  "position": "TE",
+  "team": "CIN",
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "5076": {
+  "player_id": "5076",
+  "first_name": "John",
+  "last_name": "Kelly",
+  "full_name": "John Kelly",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1987": {
+  "player_id": "1987",
+  "first_name": "Marqise",
+  "last_name": "Lee",
+  "full_name": "Marqise Lee",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "3198": {
+  "player_id": "3198",
+  "first_name": "Derrick",
+  "last_name": "Henry",
+  "full_name": "Derrick Henry",
+  "position": "RB",
+  "team": "BAL",
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "3157": {
+  "player_id": "3157",
+  "first_name": "William",
+  "last_name": "Fuller",
+  "full_name": "William Fuller",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2391": {
+  "player_id": "2391",
+  "first_name": "David",
+  "last_name": "Johnson",
+  "full_name": "David Johnson",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2583": {
+  "player_id": "2583",
+  "first_name": "Tyrell",
+  "last_name": "Williams",
+  "full_name": "Tyrell Williams",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "642": {
+  "player_id": "642",
+  "first_name": "Golden",
+  "last_name": "Tate",
+  "full_name": "Golden Tate",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "954": {
+  "player_id": "954",
+  "first_name": "Cam",
+  "last_name": "Newton",
+  "full_name": "Cam Newton",
+  "position": "QB",
+  "team": null,
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1971": {
+  "player_id": "1971",
+  "first_name": "Donte",
+  "last_name": "Moncrief",
+  "full_name": "Donte Moncrief",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "2341": {
+  "player_id": "2341",
+  "first_name": "T.J.",
+  "last_name": "Yeldon",
+  "full_name": "T.J. Yeldon",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Inactive",
+  "injury_status": null
+ },
+ "3321": {
+  "player_id": "3321",
+  "first_name": "Tyreek",
+  "last_name": "Hill",
+  "full_name": "Tyreek Hill",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": ""
+ },
+ "4029": {
+  "player_id": "4029",
+  "first_name": "Dalvin",
+  "last_name": "Cook",
+  "full_name": "Dalvin Cook",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1901": {
+  "player_id": "1901",
+  "first_name": "Isaiah",
+  "last_name": "Crowell",
+  "full_name": "Isaiah Crowell",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Inactive",
+  "injury_status": "Questionable"
+ },
+ "2399": {
+  "player_id": "2399",
+  "first_name": "Ty",
+  "last_name": "Montgomery",
+  "full_name": "Ty Montgomery",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1848": {
+  "player_id": "1848",
+  "first_name": "James",
+  "last_name": "White",
+  "full_name": "James White",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1067": {
+  "player_id": "1067",
+  "first_name": "Marvin",
+  "last_name": "Jones",
+  "full_name": "Marvin Jones",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": "Questionable"
+ },
+ "24": {
+  "player_id": "24",
+  "first_name": "Matt",
+  "last_name": "Ryan",
+  "full_name": "Matt Ryan",
+  "position": "QB",
+  "team": null,
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1984": {
+  "player_id": "1984",
+  "first_name": "Allen",
+  "last_name": "Hurns",
+  "full_name": "Allen Hurns",
+  "position": "WR",
+  "team": "MIA",
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1817": {
+  "player_id": "1817",
+  "first_name": "Sammy",
+  "last_name": "Watkins",
+  "full_name": "Sammy Watkins",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "1046": {
+  "player_id": "1046",
+  "first_name": "Rishard",
+  "last_name": "Matthews",
+  "full_name": "Rishard Matthews",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "2307": {
+  "player_id": "2307",
+  "first_name": "Marcus",
+  "last_name": "Mariota",
+  "full_name": "Marcus Mariota",
+  "position": "QB",
+  "team": "WAS",
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": "Out"
+ },
+ "HOU": {
+  "player_id": "HOU",
+  "first_name": "Houston",
+  "last_name": "Texans",
+  "full_name": null,
+  "position": "DEF",
+  "team": "HOU",
+  "fantasy_positions": [
+   "DEF"
+  ],
+  "status": null,
+  "injury_status": null
+ },
+ "730": {
+  "player_id": "730",
+  "first_name": "LeGarrette",
+  "last_name": "Blount",
+  "full_name": "LeGarrette Blount",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Injured Reserve",
+  "injury_status": null
+ },
+ "1737": {
+  "player_id": "1737",
+  "first_name": "Case",
+  "last_name": "Keenum",
+  "full_name": "Case Keenum",
+  "position": "QB",
+  "team": "CHI",
+  "fantasy_positions": [
+   "QB"
+  ],
+  "status": "Active",
+  "injury_status": "Out"
+ },
+ "1426": {
+  "player_id": "1426",
+  "first_name": "DeAndre",
+  "last_name": "Hopkins",
+  "full_name": "DeAndre Hopkins",
+  "position": "WR",
+  "team": null,
+  "fantasy_positions": [
+   "WR"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "5100": {
+  "player_id": "5100",
+  "first_name": "Jordan",
+  "last_name": "Wilkins",
+  "full_name": "Jordan Wilkins",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4217": {
+  "player_id": "4217",
+  "first_name": "George",
+  "last_name": "Kittle",
+  "full_name": "George Kittle",
+  "position": "TE",
+  "team": "SF",
+  "fantasy_positions": [
+   "TE"
+  ],
+  "status": "Active",
+  "injury_status": null
+ },
+ "4098": {
+  "player_id": "4098",
+  "first_name": "Kareem",
+  "last_name": "Hunt",
+  "full_name": "Kareem Hunt",
+  "position": "RB",
+  "team": null,
+  "fantasy_positions": [
+   "RB"
+  ],
+  "status": "Active",
+  "injury_status": null
+ }
+}
