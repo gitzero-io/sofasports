@@ -57,6 +57,13 @@ android {
         compose = true
         buildConfig = true
     }
+    sourceSets {
+        // Debug builds ship the unit-test fixtures as assets so the app can run fully offline
+        // (Settings → Data source → Fixtures). Release builds don't include them.
+        getByName("debug") {
+            assets.directories.add("src/test/resources")
+        }
+    }
     testOptions {
         unitTests.isReturnDefaultValues = true
     }

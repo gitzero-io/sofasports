@@ -13,3 +13,7 @@ One line per judgment call, with the reason.
 - Kotlin bumped 2.2.10 → 2.4.21 → Ktor 3.6 / kotlinx.serialization 1.12 are built with newer Kotlin; avoids metadata-version errors.
 - Debug build uses applicationId suffix `.debug` → debug and a future release build can sit side by side on the Onn box.
 - Started the local `Television_1080p` AVD headless for screenshots → no physical device was connected; it's a local emulator, nothing external.
+- Sleeper fixtures use Sleeper's own documented example league (289646328504385536, 2018 season) → the brief's Sleeper username was left as the literal placeholder `[YOUR SLEEPER USERNAME]`, and I won't pull a stranger's league into the repo.
+- Sleeper `players/nfl` is 14 MB → fixture is trimmed to the 189 players in the fixture matchups; at runtime the app caches a trimmed copy and refreshes at most once a day (Sleeper's guidance).
+- Fixture JSON lives once, in `app/src/test/resources/fixtures`, and is added to debug assets via sourceSets → one copy for tests and the debug "Fixtures" data mode; release APK excludes it.
+- ESPN `broadcasts` differ between scoreboard (`names[]`) and summary (`media.shortName`) → DTO accepts both; found by testing against real fixtures.
