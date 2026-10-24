@@ -26,10 +26,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.sofasports.tv.data.prefs.SettingsStore
-import com.sofasports.tv.ui.components.MessageBox
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.components.SpacedRow
 import com.sofasports.tv.ui.game.GameCenterScreen
+import com.sofasports.tv.ui.home.HomeScreen
 import com.sofasports.tv.ui.onboarding.OnboardingScreen
 import com.sofasports.tv.ui.scores.ScoresScreen
 import com.sofasports.tv.ui.settings.SettingsScreen
@@ -98,7 +98,12 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
                         nav.navigate(Routes.HOME) { popUpTo(Routes.ONBOARDING) { inclusive = true } }
                     })
                 }
-                composable(Routes.HOME) { MessageBox("Home") }
+                composable(Routes.HOME) {
+                    HomeScreen(
+                        onOpenGame = { nav.navigate(Routes.game(it)) },
+                        onOpenScores = { nav.navigate(Routes.SCORES) { launchSingleTop = true } },
+                    )
+                }
                 composable(Routes.SCORES) { ScoresScreen(onOpenGame = { nav.navigate(Routes.game(it)) }) }
                 composable(Routes.GAME) { GameCenterScreen() }
                 composable(Routes.SETTINGS) { SettingsScreen() }

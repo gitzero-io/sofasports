@@ -17,8 +17,10 @@
 
 - [x] 8. Game Center: header, Summary (win-prob label + blue/red chart, last play, scoring plays, venue), Box score (team + player stats), Play-by-play (drives newest first); polls while live; "Pin to overlay"
 
+- [x] 9. Sleeper: username entry on Home (no password), all of the user's NFL leagues for the current season with a switcher, live matchup card (me blue / opponent red, starters + points), refreshes at 30 s while NFL games are live
+
 ## In progress
-- [ ] 9. Sleeper
+- [ ] 10. Overlay wiring
 
 ## Blocked
 - (none)

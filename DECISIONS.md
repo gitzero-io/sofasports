@@ -46,3 +46,7 @@ One line per judgment call, with the reason.
 - "Pin to overlay" lives in Game Center (one pinned game at a time; pinning another replaces it).
 - Fixture box score shows the full-game totals even mid-replay → ESPN only gives end-of-game box scores in the fixture; acceptable for a debug mode.
 - `features.gameCenter=false` makes score cards non-clickable rather than removing the screen → simplest remote kill for that feature.
+- Sleeper "login" is username only → Sleeper's public read API needs no auth; nothing secret is stored.
+- First league is auto-selected and the choice persisted; leagues refetched hourly, matchup every 30 s while any NFL game is live (5 min otherwise).
+- Matchup week = Sleeper `state/nfl` `display_week` → matches what the Sleeper app shows.
+- Testing Sleeper username in the brief was the unfilled placeholder `[YOUR SLEEPER USERNAME]` → live Sleeper verified only via unit tests against real response shapes and fixture mode; you need to enter your username on the box.
