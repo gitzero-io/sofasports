@@ -23,8 +23,10 @@
 
 - [x] 11. Kickoff countdown (score cards, Game Center header, overlay; ticks every second in the last hour) + score-change pulse (scale + side-colour flash on game scores, fantasy totals, overlay). Pulse rule unit-tested; the animation itself was not captured on the emulator.
 
+- [x] 12. Settings: Sleeper link/unlink, favorites (edit screen reuses the picker), overlay on/off + corner + unpin + adb steps, usage-events opt-out, feedback QR (placeholder URL), version, not-affiliated notice, debug data-source toggle
+
 ## In progress
-- [ ] 12. Settings
+- [ ] 13. In-app update check
 
 ## Blocked
 - (none)

@@ -3,13 +3,17 @@ package com.sofasports.tv.ui.settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -22,18 +26,58 @@ import androidx.tv.material3.Text
 import com.sofasports.tv.BuildConfig
 import com.sofasports.tv.data.prefs.DataMode
 import com.sofasports.tv.data.prefs.OverlayCorner
+import com.sofasports.tv.domain.NflTeams
+import com.sofasports.tv.ui.components.QrCode
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.components.SpacedRow
+import com.sofasports.tv.ui.components.TeamLogo
+import com.sofasports.tv.ui.fantasy.SleeperLinkForm
 import com.sofasports.tv.ui.theme.SofaColors
+import com.sofasports.tv.ui.theme.focusableRow
 
 @Composable
-fun SettingsScreen(vm: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(
+    onEditFavorites: () -> Unit,
+    updateSection: @Composable () -> Unit = {},
+    vm: SettingsViewModel = hiltViewModel(),
+) {
     val settings by vm.settings.collectAsStateWithLifecycle()
     val canDraw by vm.canDrawOverlay.collectAsStateWithLifecycle()
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { vm.recheckPermission() }
 
-    LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(28.dp)) {
-        item {
+    LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(32.dp), contentPadding = PaddingValues(bottom = 64.dp)) {
+        item(key = "sleeper") {
+            SettingsSection("Sleeper") {
+                val name = settings.sleeperUsername
+                if (name != null && settings.sleeperUserId != null) {
+                    SpacedRow {
+                        Text("Linked as ", style = MaterialTheme.typography.titleMedium, color = SofaColors.TextSecondary)
+                        Text(name, style = MaterialTheme.typography.titleLarge, color = SofaColors.BlueBright)
+                        SofaButton("Unlink", onClick = vm::unlinkSleeper)
+                    }
+                    Text("To switch accounts, unlink and enter a different username.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted)
+                } else {
+                    SleeperLinkForm(onLink = vm::linkSleeper)
+                }
+            }
+        }
+        item(key = "favorites") {
+            SettingsSection("Favorite teams") {
+                SpacedRow {
+                    if (settings.favoriteTeams.isEmpty()) {
+                        Text("None yet", style = MaterialTheme.typography.titleMedium, color = SofaColors.TextSecondary)
+                    }
+                    settings.favoriteTeams.mapNotNull(NflTeams::find).forEach { t ->
+                        SpacedRow(gap = 6) {
+                            TeamLogo(t.logoUrl, t.name, size = 36.dp)
+                            Text(t.abbr, style = MaterialTheme.typography.headlineSmall, color = SofaColors.BlueBright)
+                        }
+                    }
+                    SofaButton("Edit", onClick = onEditFavorites)
+                }
+            }
+        }
+        item(key = "overlay") {
             SettingsSection("Score overlay") {
                 OverlaySettings(
                     enabled = settings.overlayEnabled,
@@ -43,10 +87,50 @@ fun SettingsScreen(vm: SettingsViewModel = hiltViewModel()) {
                     onEnabled = vm::setOverlayEnabled,
                     onCorner = vm::setOverlayCorner,
                 )
+                if (settings.pinnedGameId != null) {
+                    SpacedRow {
+                        Text("A game is pinned to the overlay.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary)
+                        SofaButton("Unpin", onClick = vm::clearPinnedGame)
+                    }
+                } else {
+                    Text("Tip: open a game and choose \"Pin to overlay\". Otherwise it shows your team's game.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted)
+                }
+            }
+        }
+        item(key = "privacy") {
+            SettingsSection("Anonymous usage events") {
+                Text(
+                    "Counts like \"opened Scores\" or \"turned the overlay on\", with no account, name or IP address attached. They help decide what to build next.",
+                    style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary, modifier = Modifier.widthIn(max = 900.dp),
+                )
+                SpacedRow {
+                    SofaButton("Share", onClick = { vm.setUsageOptOut(false) }, selected = !settings.usageEventsOptOut)
+                    SofaButton("Don't share", onClick = { vm.setUsageOptOut(true) }, selected = settings.usageEventsOptOut)
+                }
+            }
+        }
+        item(key = "feedback") {
+            SettingsSection("Feedback") {
+                Row(Modifier.focusableRow().padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                    QrCode(BuildConfig.FEEDBACK_URL)
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text("Scan with your phone to send feedback or report a bug.", style = MaterialTheme.typography.titleMedium, color = SofaColors.TextPrimary)
+                        Text(BuildConfig.FEEDBACK_URL, style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted)
+                    }
+                }
+            }
+        }
+        item(key = "about") {
+            SettingsSection("About") {
+                Column(Modifier.fillMaxWidth().focusableRow().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("Sofa Sports ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})", style = MaterialTheme.typography.titleMedium, color = SofaColors.TextPrimary)
+                    Text(NOT_AFFILIATED, style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary, modifier = Modifier.widthIn(max = 1000.dp))
+                }
+                updateSection()
             }
         }
         if (BuildConfig.DEBUG) {
-            item {
+            item(key = "debug") {
                 SettingsSection("Data source (debug builds only)") {
                     Text(
                         "Fixtures replay last week's games as if live, with a fake Sleeper league. No network needed.",
@@ -61,6 +145,10 @@ fun SettingsScreen(vm: SettingsViewModel = hiltViewModel()) {
         }
     }
 }
+
+const val NOT_AFFILIATED =
+    "Sofa Sports is an independent app. It is not affiliated with, endorsed by, or sponsored by the NFL, its teams, ESPN, or Sleeper. " +
+        "Team names and logos are trademarks of their owners and are shown for identification only. Scores may be delayed."
 
 @Composable
 internal fun SettingsSection(title: String, content: @Composable () -> Unit) {
@@ -101,6 +189,7 @@ private fun AdbInstructions(command: String) {
     Column(
         Modifier
             .fillMaxWidth()
+            .focusableRow()
             .background(SofaColors.SurfaceRaised, RoundedCornerShape(12.dp))
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -110,7 +199,7 @@ private fun AdbInstructions(command: String) {
             "Android TV hides the \"display over other apps\" setting, so grant it from a computer on the same Wi-Fi:",
             style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary,
         )
-        Text("1. On the TV: Settings → System → Developer options → USB/Network debugging on.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary)
+        Text("1. On the TV: Settings → System → About → click Build 7 times, then Developer options → USB debugging on.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary)
         Text("2. On the computer: adb connect <TV IP address>", style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace), color = SofaColors.TextPrimary)
         Text("3. Then run:", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary)
         Text(command, style = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Monospace), color = SofaColors.TextPrimary)

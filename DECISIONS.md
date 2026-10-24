@@ -54,3 +54,6 @@ One line per judgment call, with the reason.
 - Overlay hides while Sofa Sports is in the foreground (activity onStart/onStop) → it otherwise covered the app's own header and Pin button.
 - Overlay card is fully opaque → any translucency let bright UI behind it bleed through on the emulator.
 - Score pulse: two quick scale+flash beats (~1.4 s) in the scoring side's colour; game scores pulse only upward (downward = stat correction), fantasy points pulse both ways; never on first load.
+- Feedback QR rendered locally with ZXing core (no network, no Play Services); URL is `sofa.feedbackUrl` in local.properties, placeholder `https://example.com/sofasports-feedback`.
+- Not-affiliated notice also says logos are shown for identification only and scores may be delayed → covers the ESPN-logo and unofficial-API realities.
+- Usage events default to ON with a clear opt-out in Settings → brief asks for an opt-out (not opt-in); nothing is sent anywhere in v0.1 anyway (logging only).
