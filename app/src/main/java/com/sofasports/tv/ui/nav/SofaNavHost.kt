@@ -24,6 +24,7 @@ import androidx.tv.material3.Text
 import com.sofasports.tv.ui.components.MessageBox
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.components.SpacedRow
+import com.sofasports.tv.ui.settings.SettingsScreen
 import com.sofasports.tv.ui.theme.SofaColors
 
 object Routes {
@@ -61,7 +62,7 @@ fun SofaNavHost(nav: NavHostController = rememberNavController()) {
             NavHost(nav, startDestination = Routes.HOME) {
                 composable(Routes.HOME) { MessageBox("Home") }
                 composable(Routes.SCORES) { MessageBox("Scores") }
-                composable(Routes.SETTINGS) { MessageBox("Settings") }
+                composable(Routes.SETTINGS) { SettingsScreen() }
             }
         }
     }

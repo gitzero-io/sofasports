@@ -27,3 +27,8 @@ One line per judgment call, with the reason.
 - Bad config never replaces good: unparseable/wrong-typed JSON is ignored, poll intervals clamped (live ≥15 s), endpoint overrides must be https → a typo in config.json can't brick or DDoS anything.
 - Kill switch supports `maxVersionCode` → can kill one broken build without killing a fixed one.
 - Unit test reads `/release-assets/config.json` directly → the shipped sample can't drift from the parser.
+- Overlay is a foreground service (type `specialUse`) → needed to survive in the background on API 26+; the notification is IMPORTANCE_MIN so it doesn't nag.
+- Overlay window is NOT_FOCUSABLE but deliberately not NOT_TOUCHABLE → Android caps NOT_TOUCHABLE overlays at 0.8 alpha; TVs have no touch, so full opacity costs nothing.
+- Overlay can't be tested over system Settings (it hides third-party overlays by design) → verified over the Google TV launcher instead.
+- Overlay auto-restarts on app process start if it was left on → it's a persistent user setting. No BOOT_COMPLETED receiver in v0.1 (open the app once after a reboot).
+- Briefly disabled then re-enabled the emulator's Google TV launcher while testing → its setup popups kept covering the app; state restored.

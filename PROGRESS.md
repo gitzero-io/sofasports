@@ -9,8 +9,10 @@
 
 - [x] 4. Remote config: cached in filesDir, safe defaults, clamped values, kill switch screen, hourly refresh; sample at release-assets/config.json
 
+- [x] 5. Overlay: foreground service + TYPE_APPLICATION_OVERLAY ComposeView, corner choice, start/stop in Settings, adb grant steps on screen; verified drawing over the Google TV launcher on the emulator
+
 ## In progress
-- [ ] 5. Overlay service
+- [ ] 6. First-run favorites picker
 
 ## Blocked
 - (none)
