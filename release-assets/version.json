@@ -1,7 +1,7 @@
 {
-  "latestVersionCode": 1,
-  "latestVersionName": "0.1.0",
+  "latestVersionCode": 2,
+  "latestVersionName": "0.2.0",
   "minSupportedVersionCode": 1,
   "apkUrl": "https://github.com/gitzero-io/sofasports/releases/latest/download/sofasports.apk",
-  "notes": "First release: NFL scores, Game Center, Sleeper and ESPN Fantasy matchups, a picks tracker, DraftKings lines, the score overlay and a news ticker."
+  "notes": "Remote buttons to show, hide and flip the overlay while you watch, new overlay pages, size/opacity/position options, and smart mode that pops up on big moments."
 }
