@@ -1,7 +1,8 @@
 {
-  "latestVersionCode": 2,
-  "latestVersionName": "0.2.0",
+  "latestVersionCode": 3,
+  "latestVersionName": "0.2.1",
   "minSupportedVersionCode": 1,
-  "apkUrl": "https://github.com/gitzero-io/sofasports/releases/latest/download/sofasports.apk",
-  "notes": "Remote buttons to show, hide and flip the overlay while you watch, new overlay pages, size/opacity/position options, and smart mode that pops up on big moments."
+  "apkUrl": "https://github.com/gitzero-io/sofasports/releases/download/v0.2.1/sofasports.apk",
+  "apkSha256": "62993ed5274033cbf6c07f24fc8c63442550083a6d995d5a2ada9c6e3d494aaf",
+  "notes": "Bet and parlay tracker for any sportsbook, more prop types and team totals, a redesigned Home, easier navigation, and one-click updates from now on."
 }
