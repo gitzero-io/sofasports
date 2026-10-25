@@ -31,8 +31,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "SENTRY_DSN", "\"${localProp("sentry.dsn")}\"")
-        buildConfigField("String", "CONFIG_URL", "\"${localProp("sofa.configUrl").ifEmpty { "https://raw.githubusercontent.com/YOUR_GITHUB_USER/sofasports-releases/main/config.json" }}\"")
-        buildConfigField("String", "VERSION_URL", "\"${localProp("sofa.versionUrl").ifEmpty { "https://raw.githubusercontent.com/YOUR_GITHUB_USER/sofasports-releases/main/version.json" }}\"")
+        buildConfigField("String", "CONFIG_URL", "\"${localProp("sofa.configUrl").ifEmpty { "https://raw.githubusercontent.com/gitzero-io/sofasports/main/release-assets/config.json" }}\"")
+        buildConfigField("String", "VERSION_URL", "\"${localProp("sofa.versionUrl").ifEmpty { "https://raw.githubusercontent.com/gitzero-io/sofasports/main/release-assets/version.json" }}\"")
         buildConfigField("String", "FEEDBACK_URL", "\"${localProp("sofa.feedbackUrl").ifEmpty { "https://example.com/sofasports-feedback" }}\"")
     }
 

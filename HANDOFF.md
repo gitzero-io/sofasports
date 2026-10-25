@@ -1,6 +1,6 @@
 # Sofa Sports v0.1: handoff
 
-All 16 steps are done and committed (17 commits on `main`, local only; nothing pushed or published).
+All 16 steps are done and committed (on `main`; pushed to https://github.com/gitzero-io/sofasports).
 `./gradlew assembleDebug` and `./gradlew test` pass: **91 unit tests, 0 failures**. Lint: 0 errors.
 Screenshots from the Android TV emulator are in `/screenshots`.
 
@@ -108,9 +108,9 @@ These are read at build time, so rebuild after editing (`./gradlew assembleDebug
 
 | What | Where | Current value |
 |---|---|---|
-| Remote config URL | local.properties `sofa.configUrl` (default in `app/build.gradle.kts`) | `https://raw.githubusercontent.com/YOUR_GITHUB_USER/sofasports-releases/main/config.json` |
-| Update check URL | local.properties `sofa.versionUrl` (default in `app/build.gradle.kts`) | `https://raw.githubusercontent.com/YOUR_GITHUB_USER/sofasports-releases/main/version.json` |
-| APK download URL | `release-assets/version.json` → `apkUrl` | `https://github.com/YOUR_GITHUB_USER/sofasports-releases/releases/download/v0.1.0/sofasports-0.1.0.apk` |
+| Remote config URL | local.properties `sofa.configUrl` (default in `app/build.gradle.kts`) | `https://raw.githubusercontent.com/gitzero-io/sofasports/main/release-assets/config.json` |
+| Update check URL | local.properties `sofa.versionUrl` (default in `app/build.gradle.kts`) | `https://raw.githubusercontent.com/gitzero-io/sofasports/main/release-assets/version.json` |
+| APK download URL | `release-assets/version.json` → `apkUrl` | `https://github.com/gitzero-io/sofasports/releases/download/v0.1.0/sofasports-0.1.0.apk` |
 | Feedback QR URL | local.properties `sofa.feedbackUrl` (default in `app/build.gradle.kts`) | `https://example.com/sofasports-feedback` |
 | Sentry DSN | local.properties `sentry.dsn` | empty (crash reporting off) |
 | Sleeper username | Enter it on the box (Home or Settings) | the brief had `[YOUR SLEEPER USERNAME]` |

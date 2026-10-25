@@ -2,6 +2,6 @@
   "latestVersionCode": 1,
   "latestVersionName": "0.1.0",
   "minSupportedVersionCode": 1,
-  "apkUrl": "https://github.com/YOUR_GITHUB_USER/sofasports-releases/releases/download/v0.1.0/sofasports-0.1.0.apk",
-  "notes": "First release: NFL scores, Game Center, Sleeper matchup and the corner overlay."
+  "apkUrl": "https://github.com/gitzero-io/sofasports/releases/download/v0.1.0/sofasports-0.1.0.apk",
+  "notes": "First release: NFL scores, Game Center, Sleeper and ESPN Fantasy matchups, a picks tracker, DraftKings lines, the score overlay and a news ticker."
 }
