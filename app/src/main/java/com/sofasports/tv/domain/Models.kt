@@ -36,6 +36,8 @@ data class Game(
     val situation: Situation? = null,
     val week: Int? = null,
     val odds: GameOdds? = null,
+    /** Every network/service carrying it ("ESPN", "ABC", "Disney+"); [broadcast] is just the first. */
+    val networks: List<String> = emptyList(),
 ) {
     val teams get() = listOf(away, home)
     fun involves(teamAbbr: String) = home.abbr == teamAbbr || away.abbr == teamAbbr

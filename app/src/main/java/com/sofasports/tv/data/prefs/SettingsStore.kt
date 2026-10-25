@@ -41,6 +41,8 @@ data class UserSettings(
     val overlayTicker: OverlayTicker = OverlayTicker.CORNER,
     val dataMode: DataMode = DataMode.LIVE,
     val overlay: OverlayPrefs = OverlayPrefs(),
+    /** Package of the user's live TV app (YouTube TV, Hulu…), opened by "Watch". Null = not chosen. */
+    val watchApp: String? = null,
 )
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
@@ -64,6 +66,7 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
         val tickerInApp = booleanPreferencesKey("ticker_in_app")
         val overlayTicker = stringPreferencesKey("overlay_ticker")
         val dataMode = stringPreferencesKey("data_mode")
+        val watchApp = stringPreferencesKey("watch_app")
         val ovPages = stringPreferencesKey("overlay_pages")
         val ovSize = stringPreferencesKey("overlay_size")
         val ovOpacity = stringPreferencesKey("overlay_opacity")
@@ -123,6 +126,7 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
             overlayTicker = p[Keys.overlayTicker]?.let { runCatching { OverlayTicker.valueOf(it) }.getOrNull() } ?: OverlayTicker.CORNER,
             dataMode = p[Keys.dataMode]?.let { runCatching { DataMode.valueOf(it) }.getOrNull() } ?: DataMode.LIVE,
             overlay = overlayPrefs(p),
+            watchApp = p[Keys.watchApp],
         )
     }
 
@@ -158,6 +162,7 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
     suspend fun setTickerInApp(on: Boolean) = store.edit { it[Keys.tickerInApp] = on }
     suspend fun setOverlayTicker(mode: OverlayTicker) = store.edit { it[Keys.overlayTicker] = mode.name }
     suspend fun setDataMode(mode: DataMode) = store.edit { it[Keys.dataMode] = mode.name }
+    suspend fun setWatchApp(pkg: String?) = store.edit { if (pkg == null) it.remove(Keys.watchApp) else it[Keys.watchApp] = pkg }
 
     /** Read-modify-write inside one edit, so quick remote presses can't lose each other's changes. */
     suspend fun updateOverlayPrefs(change: (OverlayPrefs) -> OverlayPrefs) = store.edit { writeOverlay(it, change(overlayPrefs(it))) }

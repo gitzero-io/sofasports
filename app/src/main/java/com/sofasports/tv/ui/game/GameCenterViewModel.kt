@@ -7,7 +7,13 @@ import com.sofasports.tv.data.config.ConfigRepository
 import com.sofasports.tv.data.fixture.FixtureUnavailableException
 import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.data.provider.GameStatsProvider
+import com.sofasports.tv.data.watch.AppLauncher
+import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameState
+import com.sofasports.tv.domain.InstalledApp
+import com.sofasports.tv.domain.LiveTvApps
+import com.sofasports.tv.domain.WatchOption
+import com.sofasports.tv.domain.WatchPlanner
 import com.sofasports.tv.domain.GameSummary
 import com.sofasports.tv.telemetry.UsageEvent
 import com.sofasports.tv.telemetry.UsageEvents
@@ -28,6 +34,7 @@ data class GameCenterUi(
     val pinnedGameId: String? = null,
     val showWinProbability: Boolean = true,
     val showOdds: Boolean = false,
+    val watchApp: String? = null,
 ) {
     val loading get() = summary == null && error == null
 }
@@ -39,7 +46,25 @@ class GameCenterViewModel @Inject constructor(
     private val settings: SettingsStore,
     private val config: ConfigRepository,
     private val usage: UsageEvents,
+    private val launcher: AppLauncher,
 ) : ViewModel() {
+    private val tvApps = launcher.installedTvApps()
+
+    /** Where this game can be opened, best first. */
+    fun watchOptions(game: Game, watchApp: String?): List<WatchOption> =
+        WatchPlanner.options(game.networks.ifEmpty { listOfNotNull(game.broadcast) }, tvApps.firstOrNull { it.pkg == watchApp }?.let {
+            InstalledApp(it.pkg, LiveTvApps.known[it.pkg] ?: it.label)
+        }, tvApps.map { it.pkg }.toSet())
+
+    fun watch(option: WatchOption) {
+        usage.track(UsageEvent.WatchOpened(option.label))
+        launcher.launch(option.pkg)
+    }
+
+    fun findOnGoogleTv(game: Game) {
+        usage.track(UsageEvent.WatchOpened("google_tv_search"))
+        launcher.searchGoogleTv(WatchPlanner.searchQuery(game))
+    }
 
     val gameId: String = checkNotNull(savedState["gameId"])
     private val _ui = MutableStateFlow(GameCenterUi())
@@ -48,7 +73,7 @@ class GameCenterViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             combine(settings.settings, config.config) { s, c -> s to c }.collect { (s, c) ->
-                _ui.update { it.copy(favorites = s.favoriteTeams, pinnedGameId = s.pinnedGameId, showOdds = c.features.odds && s.showOdds) }
+                _ui.update { it.copy(favorites = s.favoriteTeams, pinnedGameId = s.pinnedGameId, showOdds = c.features.odds && s.showOdds, watchApp = s.watchApp) }
             }
         }
         viewModelScope.launch {

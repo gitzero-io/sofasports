@@ -125,6 +125,10 @@ object EspnParser {
             shortDetail = status?.type?.shortDetail ?: status?.type?.detail.orEmpty(),
             broadcast = comp.broadcast?.takeIf { it.isNotBlank() }
                 ?: comp.broadcasts.firstNotNullOfOrNull { it.names.firstOrNull() ?: it.media?.shortName },
+            // The broadcasts list when there is one; else the combined "ESPN/ABC" text, split.
+            networks = comp.broadcasts.flatMap { b -> b.names.ifEmpty { listOfNotNull(b.media?.shortName) } }
+                .ifEmpty { comp.broadcast?.split('/').orEmpty() }
+                .map { it.trim() }.filter { it.isNotEmpty() }.distinct(),
             situation = sit?.let {
                 Situation(
                     downDistance = it.shortDownDistanceText ?: it.downDistanceText,

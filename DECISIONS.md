@@ -112,3 +112,9 @@ One line per judgment call, with the reason.
 - Bet types: player props, spread, game total, moneyline (game winner), team total. Props added: anytime TD (yes/no), rushing and receiving TDs, longest rush/reception, targets, pass+rush yards, field goals made and kicking points (kickers come from the roster's special-teams group; the kicking box score table is now parsed and shows in Game Center).
 - A parlay is a `BetTicket` plus legs that point to it (`TrackedPick.ticketId`), stored in tickets.json beside picks.json so existing saved picks load unchanged. One lost leg loses it, pushes drop out, all pushes push.
 - No stake, odds or payout: the user said financial details are irrelevant, so the tracker only answers "is it hitting".
+
+## Watch games (launcher)
+- "Watch on …" opens the user's own app; no account or provider sign-in happens in Sofa Sports.
+- No provider offers a public link that opens a specific game or channel, so we open the app (the user picks the channel) or ask Google TV search for "Away vs Home", whose results list where it's live.
+- Routing: games on TV networks (CBS, Fox, NBC, ABC, ESPN, NFL Net) open the live TV app the user picked (Settings → Watch games, chosen from installed TV apps); streaming exclusives (Prime Video, Peacock, Netflix, YouTube, Disney+, Paramount+, NFL+) open that app when installed. ESPN's full broadcasts list is kept as `Game.networks`.
+- Package visibility: the manifest `<queries>` asks only for home-screen (LEANBACK_LAUNCHER) apps and the global search action, not all packages.

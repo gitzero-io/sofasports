@@ -14,6 +14,11 @@ import com.sofasports.tv.data.repo.ScoresRepository
 import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameSorting
 import com.sofasports.tv.domain.Perspective
+import com.sofasports.tv.data.watch.AppLauncher
+import com.sofasports.tv.domain.InstalledApp
+import com.sofasports.tv.domain.LiveTvApps
+import com.sofasports.tv.domain.WatchOption
+import com.sofasports.tv.domain.WatchPlanner
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +41,7 @@ data class HomeUi(
     val gameCenterEnabled: Boolean = true,
     val showOdds: Boolean = false,
     val picks: List<PickProgress> = emptyList(),
+    val watchApp: String? = null,
 )
 
 @HiltViewModel
@@ -45,7 +51,17 @@ class HomeViewModel @Inject constructor(
     private val settings: SettingsStore,
     picks: PicksRepository,
     config: ConfigRepository,
+    private val launcher: AppLauncher,
 ) : ViewModel() {
+    private val tvApps = launcher.installedTvApps()
+
+    fun watchOptions(game: Game, watchApp: String?): List<WatchOption> =
+        WatchPlanner.options(game.networks.ifEmpty { listOfNotNull(game.broadcast) }, tvApps.firstOrNull { it.pkg == watchApp }?.let {
+            InstalledApp(it.pkg, LiveTvApps.known[it.pkg] ?: it.label)
+        }, tvApps.map { it.pkg }.toSet())
+
+    fun watch(option: WatchOption) { launcher.launch(option.pkg) }
+    fun findOnGoogleTv(game: Game) { launcher.searchGoogleTv(WatchPlanner.searchQuery(game)) }
 
     val ui: StateFlow<HomeUi> = combine(fantasy.state, scores.state, settings.settings, config.config, picks.progress) { f, s, prefs, cfg, pk ->
         val games = s.scoreboard?.games.orEmpty()
@@ -63,6 +79,7 @@ class HomeViewModel @Inject constructor(
             gameCenterEnabled = cfg.features.gameCenter,
             showOdds = cfg.features.odds && prefs.showOdds,
             picks = if (cfg.features.picks) pk else emptyList(),
+            watchApp = prefs.watchApp,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUi())
 

@@ -12,6 +12,8 @@ import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.data.prefs.UserSettings
 import com.sofasports.tv.data.repo.FantasyRepository
 import com.sofasports.tv.data.repo.LinkResult
+import com.sofasports.tv.data.watch.AppLauncher
+import com.sofasports.tv.domain.InstalledApp
 import com.sofasports.tv.overlay.OverlayController
 import com.sofasports.tv.telemetry.UsageEvent
 import com.sofasports.tv.telemetry.UsageEvents
@@ -32,7 +34,13 @@ class SettingsViewModel @Inject constructor(
     private val usage: UsageEvents,
     private val espnLeagues: EspnLeagueStore,
     private val picks: PicksStore,
+    private val launcher: AppLauncher,
 ) : ViewModel() {
+
+    /** TV apps for "Your live TV app"; read on resume, since the user may install one meanwhile. */
+    private val _tvApps = MutableStateFlow(launcher.installedTvApps())
+    val tvApps: StateFlow<List<InstalledApp>> = _tvApps.asStateFlow()
+    fun setWatchApp(pkg: String?) = viewModelScope.launch { store.setWatchApp(pkg) }
 
     val espnLinks: StateFlow<List<EspnLeagueLink>> = espnLeagues.links
 
@@ -50,6 +58,7 @@ class SettingsViewModel @Inject constructor(
     /** Called on resume: the user may have just run the adb command. */
     fun recheckPermission() {
         _canDrawOverlay.value = overlay.canDraw()
+        _tvApps.value = launcher.installedTvApps()
     }
 
     fun setOverlayEnabled(enabled: Boolean) = viewModelScope.launch {

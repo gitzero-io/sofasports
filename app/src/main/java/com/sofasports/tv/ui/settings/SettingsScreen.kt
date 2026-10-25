@@ -24,6 +24,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import com.sofasports.tv.data.espnff.EspnLeagueLink
 import com.sofasports.tv.data.prefs.UserSettings
+import com.sofasports.tv.domain.InstalledApp
+import com.sofasports.tv.domain.LiveTvApps
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -64,6 +66,7 @@ fun SettingsScreen(
     val settings by vm.settings.collectAsStateWithLifecycle()
     val canDraw by vm.canDrawOverlay.collectAsStateWithLifecycle()
     val espnLinks by vm.espnLinks.collectAsStateWithLifecycle()
+    val tvApps by vm.tvApps.collectAsStateWithLifecycle()
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { vm.recheckPermission() }
 
     var category by rememberSaveable { mutableStateOf(SettingsCategory.FANTASY) }
@@ -84,7 +87,7 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(32.dp),
             contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp),
         ) {
-            settingsPane(category, settings, canDraw, espnLinks, vm, onEditFavorites, onAddEspnLeague, onCustomizeOverlay, onRemoteButtons, updateSection)
+            settingsPane(category, settings, canDraw, espnLinks, tvApps, vm, onEditFavorites, onAddEspnLeague, onCustomizeOverlay, onRemoteButtons, updateSection)
         }
     }
 }
@@ -94,6 +97,7 @@ enum class SettingsCategory(val label: String) {
     FANTASY("Fantasy"),
     TEAMS("Favorite teams"),
     OVERLAY("Score overlay"),
+    WATCH("Watch games"),
     TICKER("Ticker & lines"),
     PRIVACY("Privacy & feedback"),
     ABOUT("About & updates"),
@@ -131,6 +135,7 @@ private fun LazyListScope.settingsPane(
     settings: UserSettings,
     canDraw: Boolean,
     espnLinks: List<EspnLeagueLink>,
+    tvApps: List<InstalledApp>,
     vm: SettingsViewModel,
     onEditFavorites: () -> Unit,
     onAddEspnLeague: () -> Unit,
@@ -142,6 +147,7 @@ private fun LazyListScope.settingsPane(
         SettingsCategory.FANTASY -> fantasyItems(settings, espnLinks, vm, onAddEspnLeague)
         SettingsCategory.TEAMS -> teamItems(settings, onEditFavorites)
         SettingsCategory.OVERLAY -> overlayItems(settings, canDraw, vm, onCustomizeOverlay, onRemoteButtons)
+        SettingsCategory.WATCH -> watchItems(settings, tvApps, vm)
         SettingsCategory.TICKER -> tickerItems(settings, vm)
         SettingsCategory.PRIVACY -> privacyItems(settings, vm)
         SettingsCategory.ABOUT -> aboutItems(updateSection)
@@ -235,6 +241,31 @@ private fun LazyListScope.overlayItems(
                 }
             } else {
                 Text("Tip: open a game and choose \"Pin to overlay\". Otherwise it shows your team's game.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted)
+            }
+        }
+    }
+}
+
+private fun LazyListScope.watchItems(settings: UserSettings, apps: List<InstalledApp>, vm: SettingsViewModel) {
+    item(key = "watch") {
+        SettingsSection("Your live TV app") {
+            Text(
+                "\"Watch\" on a game opens this app for games on TV (CBS, Fox, NBC, ABC, ESPN, NFL Network). Games streamed only on " +
+                    "Prime Video, Peacock, Netflix and the like open that app when it's installed. The score overlay stays on top.",
+                style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary,
+            )
+            Text(
+                "Apps can't be opened straight to a game, so pick the channel once the app opens, or use \"Find on Google TV\".",
+                style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted,
+            )
+            SofaButton("None: I use cable or an antenna", onClick = { vm.setWatchApp(null) }, selected = settings.watchApp == null)
+            apps.chunked(3).forEach { row ->
+                SpacedRow {
+                    row.forEach { app ->
+                        val known = LiveTvApps.known[app.pkg]
+                        SofaButton(known ?: app.label, onClick = { vm.setWatchApp(app.pkg) }, selected = settings.watchApp == app.pkg)
+                    }
+                }
             }
         }
     }

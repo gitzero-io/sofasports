@@ -34,6 +34,7 @@ import com.sofasports.tv.domain.Betting
 import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameOdds
 import com.sofasports.tv.domain.GameState
+import com.sofasports.tv.domain.WatchOption
 import com.sofasports.tv.domain.GameSummary
 import com.sofasports.tv.domain.Play
 import com.sofasports.tv.domain.TeamSide
@@ -66,6 +67,9 @@ fun GameCenterScreen(vm: GameCenterViewModel = hiltViewModel()) {
     }
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         GameHeader(summary.game, ui.favorites)
+        if (summary.game.state != GameState.FINAL) {
+            WatchRow(summary.game, vm.watchOptions(summary.game, ui.watchApp), onWatch = vm::watch, onSearch = { vm.findOnGoogleTv(summary.game) })
+        }
         SpacedRow {
             GameTab.entries.forEach { t ->
                 SofaButton(t.label, onClick = { tab = t }, selected = tab == t, modifier = if (t == GameTab.SUMMARY) Modifier.focusRequester(firstTab) else Modifier)
@@ -81,6 +85,22 @@ fun GameCenterScreen(vm: GameCenterViewModel = hiltViewModel()) {
                 GameTab.PLAYS -> playsTab(summary)
             }
             item { Spacer(Modifier.padding(24.dp)) }
+        }
+    }
+}
+
+/** "On NBC · Peacock   [Watch on YouTube TV] [Watch on Peacock] [Find on Google TV]" */
+@Composable
+fun WatchRow(game: Game, options: List<WatchOption>, onWatch: (WatchOption) -> Unit, onSearch: () -> Unit, modifier: Modifier = Modifier) {
+    SpacedRow(modifier) {
+        val networks = game.networks.ifEmpty { listOfNotNull(game.broadcast) }
+        if (networks.isNotEmpty()) {
+            Text("On ${networks.joinToString(" · ")}", style = MaterialTheme.typography.titleSmall, color = SofaColors.TextSecondary)
+        }
+        options.forEachIndexed { i, o -> SofaButton("Watch on ${o.label}", onClick = { onWatch(o) }, selected = i == 0) }
+        SofaButton("Find on Google TV", onClick = onSearch)
+        if (options.isEmpty()) {
+            Text("Pick your live TV app in Settings → Watch games", style = MaterialTheme.typography.bodySmall, color = SofaColors.TextMuted)
         }
     }
 }

@@ -83,6 +83,12 @@ fun HomeScreen(
                             modifier = if (fantasyLinked) Modifier.fillMaxWidth() else Modifier.width(520.dp),
                             showOdds = ui.showOdds,
                         )
+                        if (hero.state != GameState.FINAL) {
+                            // Just the best option here; Game Center lists every way to watch.
+                            val best = vm.watchOptions(hero, ui.watchApp).firstOrNull()
+                            if (best != null) SofaButton("Watch on ${best.label}", onClick = { vm.watch(best) }, selected = true)
+                            else SofaButton("Find on Google TV", onClick = { vm.findOnGoogleTv(hero) })
+                        }
                     }
                 }
                 if (fantasyLinked) {

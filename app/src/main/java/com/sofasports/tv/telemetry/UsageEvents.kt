@@ -26,6 +26,8 @@ sealed class UsageEvent(val name: String, val props: Map<String, String> = empty
     data class OverlayToggled(val on: Boolean) : UsageEvent("overlay_toggled", mapOf("on" to on.toString()))
     data object GameOpened : UsageEvent("game_opened")
     data object GamePinned : UsageEvent("game_pinned")
+    /** Which app "Watch" opened (an app label, or google_tv_search); never the game. */
+    data class WatchOpened(val target: String) : UsageEvent("watch_opened", mapOf("target" to target))
     data class PickAdded(val book: String, val type: String) : UsageEvent("pick_added", mapOf("book" to book, "type" to type))
     data object UpdateChecked : UsageEvent("update_checked")
 }
