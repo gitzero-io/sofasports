@@ -7,7 +7,7 @@ import com.sofasports.tv.domain.FantasyStarter
 import com.sofasports.tv.domain.FantasyTeam
 import java.time.LocalDate
 
-data class EspnFfTeam(val id: Int, val name: String, val abbrev: String?, val ownerIds: List<String>)
+data class EspnFfTeam(val id: Int, val name: String, val abbrev: String?, val ownerIds: List<String>, val record: String? = null)
 
 data class EspnFfLeague(
     val id: String,
@@ -48,6 +48,7 @@ object EspnFantasyParser {
                         ?: listOfNotNull(t.location, t.nickname).joinToString(" ").ifBlank { "Team ${t.id}" },
                     abbrev = t.abbrev,
                     ownerIds = t.owners,
+                    record = t.record?.overall?.let { r -> if (r.ties > 0) "${r.wins}-${r.losses}-${r.ties}" else "${r.wins}-${r.losses}" },
                 )
             },
         )
@@ -58,6 +59,29 @@ object EspnFantasyParser {
         val id = swid?.trim()?.uppercase()?.let { if (it.startsWith("{")) it else "{$it}" } ?: return null
         return league.teams.firstOrNull { t -> t.ownerIds.any { it.uppercase() == id } }
     }
+
+    /** This week's projection from a player's stats list; null when ESPN sent none. */
+    fun projection(player: EspnFfPlayerDto?, season: Int, period: Int): Double? =
+        player?.stats?.firstOrNull { it.statSourceId == 1 && it.scoringPeriodId == period && (season == 0 || it.seasonId == season) }?.appliedTotal
+
+    /** Player id → ESPN's default projection, from the public leaguedefaults feed. */
+    fun parseDefaultProjections(json: String, season: Int, period: Int): Map<String, Double> =
+        SofaJson.decodeFromString(EspnFfPlayersDto.serializer(), json).players
+            .mapNotNull { e -> e.player?.let { p -> projection(p, season, period)?.let { p.id.toString() to it } } }
+            .toMap()
+
+    fun injuryTag(status: String?): String? = when (status?.uppercase()) {
+        null, "", "ACTIVE", "NORMAL" -> null
+        "QUESTIONABLE" -> "Q"
+        "DOUBTFUL" -> "D"
+        "OUT" -> "O"
+        "INJURY_RESERVE" -> "IR"
+        "SUSPENSION" -> "SUS"
+        else -> status.take(3)
+    }
+
+    /** ESPN headshots by athlete id; team defenses have negative ids and use the team logo instead. */
+    fun headshot(playerId: Long): String? = if (playerId > 0) "https://a.espncdn.com/i/headshots/nfl/players/full/$playerId.png" else null
 
     fun buildMatchup(league: EspnFfLeague, boxJson: String, myTeamId: Int, leagueKey: String): FantasyMatchup? {
         val box = SofaJson.decodeFromString(EspnFfLeagueDto.serializer(), boxJson)
@@ -74,14 +98,19 @@ object EspnFantasyParser {
                 .sortedBy { e -> slotOrder.indexOfFirst { it.first == e.lineupSlotId }.let { if (it < 0) 99 else it } }
                 .map { e ->
                     val p = e.playerPoolEntry?.player
+                    val slot = slotOrder.firstOrNull { it.first == e.lineupSlotId }?.second
                     FantasyStarter(
                         player = FantasyPlayer(
                             id = e.playerId.toString(),
                             name = p?.fullName ?: "Player ${e.playerId}",
-                            position = slotOrder.firstOrNull { it.first == e.lineupSlotId }?.second,
+                            position = slot,
                             team = p?.proTeamId?.let { proTeams[it] },
+                            headshotUrl = headshot(e.playerId),
+                            injury = injuryTag(p?.injuryStatus),
                         ),
                         points = e.playerPoolEntry?.appliedStatTotal ?: 0.0,
+                        projected = projection(p, league.season, period),
+                        slot = slot,
                     )
                 }
             val live = side.totalPointsLive
@@ -92,6 +121,7 @@ object EspnFantasyParser {
                 // totalPoints is 0 until the week is scored; totalPointsLive has the running total.
                 points = if (live != null && live > 0.0) live else side.totalPoints ?: starters.sumOf { it.points },
                 starters = starters,
+                record = teamsById[side.teamId]?.record,
             )
         }
         return FantasyMatchup(

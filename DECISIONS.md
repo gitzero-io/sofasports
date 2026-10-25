@@ -122,3 +122,10 @@ One line per judgment call, with the reason.
 ## Ticker: bettor/fantasy news only
 - Headlines must be ESPN "HeadlineNews" (not Story/Media), tag at least one player, and read as a status change (out, questionable, IR, activated, starting, returning, traded, injury terms). Everything else (rankings, betting guides, uniforms, features, team off-field news) is dropped. Scoring plays and live scores are unchanged.
 - The feed request went from 25 to 50 items because roughly a third survive the filter.
+
+## Fantasy page: projections, win probability, photos
+- New Fantasy tab with the ESPN-style matchup: totals with live projections, a win-probability bar between the teams, then each lineup slot side by side (photo, injury tag, game and clock, points, projection). Home keeps a compact card that opens it.
+- Projections: Sleeper's public weekly projections (api.sleeper.app/projections, undocumented) in the league's scoring (PPR/half/standard from scoring_settings.rec); ESPN's from the league box score's projected stat, falling back to ESPN's public default (PPR) projections by player id.
+- Live projection per player = points + projection × share of his game left (from period and clock); finished players count their points. Win probability = normal model with each remaining projection's spread at 50% of itself; settled when no game time is left.
+- Photos: ESPN headshots by athlete id, Sleeper thumbnails by player id; defenses show the team logo.
+- Sleeper's trimmed player cache gained injury status (file renamed to _v2 so old caches refresh).

@@ -46,6 +46,7 @@ import com.sofasports.tv.telemetry.UsageEvents
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.components.SpacedRow
 import com.sofasports.tv.ui.fantasy.AddEspnLeagueScreen
+import com.sofasports.tv.ui.fantasy.FantasyScreen
 import com.sofasports.tv.ui.game.GameCenterScreen
 import com.sofasports.tv.ui.home.HomeScreen
 import com.sofasports.tv.ui.onboarding.OnboardingScreen
@@ -78,6 +79,7 @@ object Routes {
     const val EDIT_FAVORITES = "favorites"
     const val ADD_ESPN = "espn-add"
     const val PICKS = "picks"
+    const val FANTASY = "fantasy"
     const val ADD_PICK = "picks-add"
     const val OVERLAY_SETTINGS = "overlay-settings"
     const val REMOTE_BUTTONS = "remote-buttons"
@@ -86,9 +88,10 @@ object Routes {
 
 private data class Tab(val route: String, val label: String)
 
-private fun tabs(picks: Boolean) = listOfNotNull(
+private fun tabs(picks: Boolean, fantasy: Boolean) = listOfNotNull(
     Tab(Routes.HOME, "Home"),
     Tab(Routes.SCORES, "Scores"),
+    Tab(Routes.FANTASY, "Fantasy").takeIf { fantasy },
     Tab(Routes.PICKS, "Picks").takeIf { picks },
     Tab(Routes.SETTINGS, "Settings"),
 )
@@ -110,6 +113,9 @@ class RootViewModel @Inject constructor(
     val picksEnabled: StateFlow<Boolean> =
         config.config.map { it.features.picks }.stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
+    val fantasyEnabled: StateFlow<Boolean> =
+        config.config.map { it.features.fantasy }.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
     fun screenView(route: String) {
         // Only the route pattern ("game/{gameId}"), never the id.
         usage.track(UsageEvent.ScreenView(route.substringBefore('/')))
@@ -125,6 +131,7 @@ class RootViewModel @Inject constructor(
 fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewModel = hiltViewModel()) {
     val onboardingDone by vm.onboardingDone.collectAsStateWithLifecycle()
     val picksEnabled by vm.picksEnabled.collectAsStateWithLifecycle()
+    val fantasyEnabled by vm.fantasyEnabled.collectAsStateWithLifecycle()
     val tickerItems by vm.tickerItems.collectAsStateWithLifecycle()
     val done = onboardingDone ?: run {
         Box(Modifier.fillMaxSize().background(SofaColors.Background))
@@ -143,7 +150,7 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
                 .padding(start = 48.dp, end = 48.dp, top = 24.dp, bottom = 8.dp),
         ) {
             if (showChrome) {
-                TopBar(current = current, tabs = tabs(picksEnabled), onSelect = { route ->
+                TopBar(current = current, tabs = tabs(picksEnabled, fantasyEnabled), onSelect = { route ->
                     nav.navigate(route) {
                         popUpTo(Routes.HOME) { saveState = true }
                         launchSingleTop = true
@@ -164,8 +171,10 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
                             onOpenScores = { nav.navigate(Routes.SCORES) { launchSingleTop = true } },
                             onAddEspnLeague = { nav.navigate(Routes.ADD_ESPN) },
                             onOpenPicks = { nav.navigate(Routes.PICKS) { launchSingleTop = true } },
+                            onOpenFantasy = { nav.navigate(Routes.FANTASY) { launchSingleTop = true } },
                         )
                     }
+                    composable(Routes.FANTASY) { FantasyScreen(onLink = { nav.navigate(Routes.SETTINGS) { launchSingleTop = true } }) }
                     composable(Routes.PICKS) { PicksScreen(onAddPick = { nav.navigate(Routes.ADD_PICK) }) }
                     composable(Routes.ADD_PICK) { AddPickScreen(onDone = { nav.popBackStack() }) }
                     composable(Routes.SCORES) { ScoresScreen(onOpenGame = { nav.navigate(Routes.game(it)) }) }

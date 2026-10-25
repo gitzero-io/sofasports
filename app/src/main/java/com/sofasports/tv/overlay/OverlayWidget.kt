@@ -25,6 +25,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.sofasports.tv.domain.FantasyProjection
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.ui.draw.clip
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -81,7 +85,7 @@ fun OverlayWidget(state: OverlayState, display: RenderedDisplay) {
                 }
                 OverlayPage.MATCHUP -> state.matchup?.let { m ->
                     PageHeader(m.leagueName, display)
-                    MatchupRows(m)
+                    MatchupRows(m, state.games)
                     if (OverlayRow.PLAYING_NOW in prefs.rows) PlayingNowRows(OverlayPages.playingNow(state))
                 }
                 OverlayPage.MY_GAME -> state.game?.let { g ->
@@ -164,10 +168,28 @@ private fun MiniPill(state: OverlayState, bg: Color) {
 }
 
 @Composable
-private fun MatchupRows(m: FantasyMatchup) {
+private fun MatchupRows(m: FantasyMatchup, games: List<Game>) {
     OverlayScoreRow(m.me.teamName, formatPoints(m.me.points), SofaColors.Blue, m.opponent != null && m.me.points >= m.opponent.points, m.me.points, onlyIncrease = false)
     if (m.opponent != null) {
         OverlayScoreRow(m.opponent.teamName, formatPoints(m.opponent.points), SofaColors.Red, m.opponent.points > m.me.points, m.opponent.points, onlyIncrease = false)
+    }
+    // "Proj 118.4–105.2" and a thin win-probability bar, when the site gives projections.
+    val live = remember(m, games) { FantasyProjection.live(m, games) }
+    val mine = live.me.projected
+    val theirs = live.opponent?.projected
+    val win = live.winProbability
+    if (mine != null && theirs != null && win != null) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(
+                "Proj ${String.format(java.util.Locale.US, "%.1f–%.1f", mine, theirs)}",
+                style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, modifier = Modifier.weight(1f),
+            )
+            Text("${Math.round(win * 100)}% win", style = MaterialTheme.typography.labelLarge, color = if (win >= 0.5) SofaColors.BlueBright else SofaColors.RedBright)
+        }
+        Row(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp))) {
+            Box(Modifier.weight(win.toFloat().coerceIn(0.01f, 0.99f)).fillMaxHeight().background(SofaColors.Blue))
+            Box(Modifier.weight((1 - win).toFloat().coerceIn(0.01f, 0.99f)).fillMaxHeight().background(SofaColors.Red))
+        }
     }
 }
 

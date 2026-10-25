@@ -121,9 +121,25 @@ data class FantasyLeague(
     val source: FantasySource = FantasySource.SLEEPER,
 )
 
-data class FantasyPlayer(val id: String, val name: String, val position: String?, val team: String?)
+data class FantasyPlayer(
+    val id: String,
+    val name: String,
+    val position: String?,
+    val team: String?,
+    /** Player photo; null for team defenses (the UI shows the team logo) or when the source has none. */
+    val headshotUrl: String? = null,
+    /** Short injury tag from the fantasy site: "Q", "D", "O", "IR"; null when healthy. */
+    val injury: String? = null,
+)
 
-data class FantasyStarter(val player: FantasyPlayer, val points: Double)
+data class FantasyStarter(
+    val player: FantasyPlayer,
+    val points: Double,
+    /** The site's pre-game projection for this week; null when it has none. */
+    val projected: Double? = null,
+    /** Lineup slot ("QB", "FLEX", "D/ST"…), when the site says. */
+    val slot: String? = null,
+)
 
 data class FantasyTeam(
     val rosterId: Int,
@@ -131,6 +147,8 @@ data class FantasyTeam(
     val teamName: String,
     val points: Double,
     val starters: List<FantasyStarter>,
+    /** "5-2" or "4-2-1". */
+    val record: String? = null,
 )
 
 data class FantasyMatchup(

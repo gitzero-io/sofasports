@@ -6,6 +6,13 @@ data class NflTeam(val abbr: String, val city: String, val name: String, val div
 
 /** All 32 teams, ESPN abbreviations, grouped by division (picker order). */
 object NflTeams {
+    /** Sleeper and ESPN fantasy use a few abbreviations that differ from ESPN's scoreboard. */
+    fun scoreboardAbbr(fantasyTeam: String): String = when (val t = fantasyTeam.uppercase()) {
+        "WAS" -> "WSH"
+        "JAC" -> "JAX"
+        else -> t
+    }
+
     val all: List<NflTeam> = listOf(
         NflTeam("BUF", "Buffalo", "Bills", "AFC East"),
         NflTeam("MIA", "Miami", "Dolphins", "AFC East"),

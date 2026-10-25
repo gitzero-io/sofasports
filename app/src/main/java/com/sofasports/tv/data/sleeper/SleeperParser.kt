@@ -24,7 +24,49 @@ object SleeperParser {
 
     fun parseState(json: String): SleeperStateDto = SofaJson.decodeFromString(SleeperStateDto.serializer(), json)
 
-    fun parseLeague(json: String): FantasyLeague = toLeague(SofaJson.decodeFromString(SleeperLeagueDto.serializer(), json))
+    fun parseLeague(json: String): FantasyLeague = toLeague(parseLeagueDto(json))
+
+    fun parseLeagueDto(json: String): SleeperLeagueDto = SofaJson.decodeFromString(SleeperLeagueDto.serializer(), json)
+
+    /**
+     * Player id → this week's projected points in the league's scoring: PPR, half or standard,
+     * whichever is closest to the league's points per reception.
+     */
+    fun parseProjections(json: String, pointsPerReception: Double): Map<String, Double> {
+        val key = when {
+            pointsPerReception >= 0.75 -> "pts_ppr"
+            pointsPerReception >= 0.25 -> "pts_half_ppr"
+            else -> "pts_std"
+        }
+        return nullableList(json, SleeperProjectionDto.serializer())
+            .mapNotNull { p -> p.playerId?.let { id -> p.stats?.get(key)?.let { id to it } } }
+            .toMap()
+    }
+
+    /** Sleeper slot names → what a lineup shows. */
+    fun slotLabel(slot: String): String = when (slot) {
+        "FLEX" -> "FLEX"
+        "SUPER_FLEX" -> "SFLX"
+        "REC_FLEX" -> "W/T"
+        "WRRB_FLEX" -> "W/R"
+        "IDP_FLEX" -> "IDP"
+        "DEF" -> "D/ST"
+        else -> slot
+    }
+
+    fun injuryTag(status: String?): String? = when (status?.lowercase()) {
+        null, "", "active", "healthy" -> null
+        "questionable" -> "Q"
+        "doubtful" -> "D"
+        "out" -> "O"
+        "ir", "injured reserve" -> "IR"
+        "pup" -> "PUP"
+        "sus", "suspended" -> "SUS"
+        else -> status.take(3).uppercase()
+    }
+
+    fun headshot(playerId: String): String? =
+        if (playerId.all { it.isDigit() }) "https://sleepercdn.com/content/nfl/players/thumb/$playerId.jpg" else null
 
     fun parseLeagues(json: String): List<FantasyLeague> =
         nullableList(json, SleeperLeagueDto.serializer()).map(::toLeague)
@@ -45,6 +87,8 @@ object SleeperParser {
         name = p.fullName ?: listOfNotNull(p.firstName, p.lastName).joinToString(" ").ifBlank { id },
         position = p.position,
         team = p.team,
+        headshotUrl = headshot(id),
+        injury = injuryTag(p.injuryStatus),
     )
 
     /**
@@ -59,7 +103,10 @@ object SleeperParser {
         rosters: List<SleeperRosterDto>,
         matchups: List<SleeperMatchupDto>,
         players: Map<String, FantasyPlayer>,
+        rosterPositions: List<String> = emptyList(),
+        projections: Map<String, Double> = emptyMap(),
     ): FantasyMatchup? {
+        val slots = rosterPositions.filter { it != "BN" && it != "IR" && it != "TAXI" }
         val myRoster = rosters.firstOrNull { it.ownerId == myUserId || myUserId in it.coOwners.orEmpty() } ?: return null
         val mine = matchups.firstOrNull { it.rosterId == myRoster.rosterId } ?: return null
         val theirs = mine.matchupId?.let { id ->
@@ -77,8 +124,13 @@ object SleeperParser {
                     FantasyStarter(
                         player = players[id] ?: defenseOrUnknown(id),
                         points = m.startersPoints?.getOrNull(i) ?: m.playersPoints?.get(id) ?: 0.0,
+                        projected = projections[id],
+                        slot = slots.getOrNull(i)?.let(::slotLabel),
                     )
                 }
+            val record = rostersById[m.rosterId]?.settings?.let { s ->
+                if (s.ties > 0) "${s.wins}-${s.losses}-${s.ties}" else "${s.wins}-${s.losses}"
+            }
             return FantasyTeam(
                 rosterId = m.rosterId,
                 ownerId = ownerId,
@@ -86,6 +138,7 @@ object SleeperParser {
                     ?: owner?.displayName ?: "Team ${m.rosterId}",
                 points = m.customPoints ?: m.points ?: starters.sumOf { it.points },
                 starters = starters,
+                record = record,
             )
         }
         return FantasyMatchup(
@@ -101,7 +154,7 @@ object SleeperParser {
     private fun defenseOrUnknown(id: String) =
         if (id.all { it.isLetter() }) FantasyPlayer(id, "$id D/ST", "DEF", id) else FantasyPlayer(id, "Player $id", null, null)
 
-    private fun toLeague(dto: SleeperLeagueDto) = FantasyLeague(
+    fun toLeague(dto: SleeperLeagueDto) = FantasyLeague(
         id = dto.leagueId,
         name = dto.name,
         season = dto.season,

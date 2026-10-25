@@ -62,12 +62,7 @@ class FixtureFantasyProvider @Inject constructor(
             matchups = SleeperParser.parseMatchups(source.read("sleeper/league_matchups_w1.json").orEmpty()),
             players = SleeperParser.parsePlayers(source.read("sleeper/players_nfl_subset.json") ?: "{}"),
         ) ?: return null
-        val p = replay.progress()
-        fun FantasyTeam.scaled() = copy(
-            points = Math.round(points * p * 100) / 100.0,
-            starters = starters.map { FantasyStarter(it.player, Math.round(it.points * p * 100) / 100.0) },
-        )
-        return m.copy(me = m.me.scaled(), opponent = m.opponent?.scaled())
+        return FixtureFantasy.replayed(m, replay.progress())
     }
 
     companion object {
@@ -75,5 +70,30 @@ class FixtureFantasyProvider @Inject constructor(
         const val SECOND_LEAGUE_ID = "fixture-second-league"
         /** Owner of roster 5 in the example league. */
         const val SECOND_LEAGUE_USER_ID = "720638189125632"
+    }
+}
+
+/**
+ * Fixture leagues are from old seasons: their players aren't in the replayed games and the files
+ * carry no projections. So, for fixtures only, each starter is placed on one of the replayed teams
+ * and given a projection near his final score, and points grow with replay progress.
+ */
+object FixtureFantasy {
+    private val replayTeams = listOf("HOU", "JAX", "LAC", "KC")
+
+    fun replayed(m: FantasyMatchup, progress: Double): FantasyMatchup {
+        fun FantasyTeam.scaled(): FantasyTeam {
+            val s = starters.map { st ->
+                val h = (st.player.id.hashCode() and 0x7fffffff)
+                val team = if (st.player.position == "DEF" || st.player.position == "D/ST") st.player.team else replayTeams[h % replayTeams.size]
+                st.copy(
+                    player = st.player.copy(team = team),
+                    points = Math.round(st.points * progress * 100) / 100.0,
+                    projected = Math.round(st.points * (0.75 + (h % 50) / 100.0) * 10) / 10.0,
+                )
+            }
+            return copy(points = Math.round(points * progress * 100) / 100.0, starters = s)
+        }
+        return m.copy(me = m.me.scaled(), opponent = m.opponent?.scaled())
     }
 }

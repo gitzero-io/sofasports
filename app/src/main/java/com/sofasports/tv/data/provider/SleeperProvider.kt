@@ -53,12 +53,34 @@ class SleeperFantasyProvider @Inject constructor(
     override suspend fun currentMatchup(leagueId: String, userId: String): FantasyMatchup? = coroutineScope {
         val base = bases.sleeperBase
         val state = async { SleeperParser.parseState(http.get("$base/state/nfl").bodyAsText()) }
-        val league = async { SleeperParser.parseLeague(http.get("$base/league/$leagueId").bodyAsText()) }
+        val league = async { SleeperParser.parseLeagueDto(http.get("$base/league/$leagueId").bodyAsText()) }
         val users = async { SleeperParser.parseLeagueUsers(http.get("$base/league/$leagueId/users").bodyAsText()) }
         val rosters = async { SleeperParser.parseRosters(http.get("$base/league/$leagueId/rosters").bodyAsText()) }
-        val week = state.await().let { it.displayWeek ?: it.week }.coerceAtLeast(1)
-        val matchups = SleeperParser.parseMatchups(http.get("$base/league/$leagueId/matchups/$week").bodyAsText())
-        SleeperParser.buildMatchup(league.await(), week, userId, users.await(), rosters.await(), matchups, players.get())
+        val st = state.await()
+        val week = (st.displayWeek ?: st.week).coerceAtLeast(1)
+        val matchups = async { SleeperParser.parseMatchups(http.get("$base/league/$leagueId/matchups/$week").bodyAsText()) }
+        val l = league.await()
+        // Projections are nice to have: a failure just means no projected totals.
+        val proj = runCatching { projections(st.season, week, l.scoringSettings?.get("rec") ?: 1.0) }.getOrDefault(emptyMap())
+        SleeperParser.buildMatchup(
+            SleeperParser.toLeague(l), week, userId,
+            users.await(), rosters.await(), matchups.await(), players.get(),
+            rosterPositions = l.rosterPositions.orEmpty(), projections = proj,
+        )
+    }
+
+    private val projectionCache = mutableMapOf<String, Pair<Long, Map<String, Double>>>()
+
+    /** The whole week's projections (~3,000 players, one request), kept 15 minutes per scoring type. */
+    private suspend fun projections(season: String, week: Int, rec: Double): Map<String, Double> {
+        val key = "$season-$week-$rec"
+        val now = System.currentTimeMillis()
+        projectionCache[key]?.takeIf { now - it.first < 15 * 60_000L }?.let { return it.second }
+        val root = bases.sleeperBase.removeSuffix("/").removeSuffix("/v1")
+        val positions = listOf("QB", "RB", "WR", "TE", "K", "DEF").joinToString("&") { "position%5B%5D=$it" }
+        val res = http.get("$root/projections/nfl/$season/$week?season_type=regular&$positions")
+        if (!res.status.isSuccess()) return emptyMap()
+        return SleeperParser.parseProjections(res.bodyAsText(), rec).also { projectionCache[key] = now to it }
     }
 }
 
@@ -80,7 +102,8 @@ class SleeperPlayerCache @Inject constructor(
     private val mutex = Mutex()
     private var memory: Map<String, FantasyPlayer>? = null
     private var lastAttemptMs = 0L
-    private val file get() = File(context.filesDir, "sleeper_players_trimmed.json")
+    // v2 adds injury status; the new name makes old caches refresh.
+    private val file get() = File(context.filesDir, "sleeper_players_trimmed_v2.json")
 
     @OptIn(ExperimentalSerializationApi::class)
     override suspend fun get(): Map<String, FantasyPlayer> = mutex.withLock {
@@ -111,7 +134,10 @@ class SleeperPlayerCache @Inject constructor(
         val serializer = MapSerializer(String.serializer(), SleeperPlayerDto.serializer())
         val all = raw.inputStream().use { SofaJson.decodeFromStream(serializer, it) }
         val trimmed = all.mapValues { (_, p) ->
-            SleeperPlayerDto(fullName = p.fullName ?: listOfNotNull(p.firstName, p.lastName).joinToString(" "), position = p.position, team = p.team)
+            SleeperPlayerDto(
+                fullName = p.fullName ?: listOfNotNull(p.firstName, p.lastName).joinToString(" "),
+                position = p.position, team = p.team, injuryStatus = p.injuryStatus,
+            )
         }
         val tmp = File(context.filesDir, "sleeper_players_trimmed.tmp")
         tmp.writeText(SofaJson.encodeToString(serializer, trimmed))

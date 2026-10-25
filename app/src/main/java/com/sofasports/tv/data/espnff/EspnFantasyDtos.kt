@@ -27,7 +27,11 @@ data class EspnFfTeamDto(
     val location: String? = null,
     val nickname: String? = null,
     val owners: List<String> = emptyList(),
+    val record: EspnFfRecordDto? = null,
 )
+
+@Serializable data class EspnFfRecordDto(val overall: EspnFfWinLossDto? = null)
+@Serializable data class EspnFfWinLossDto(val wins: Int = 0, val losses: Int = 0, val ties: Int = 0)
 
 @Serializable
 data class EspnFfMatchupDto(
@@ -62,4 +66,19 @@ data class EspnFfPlayerDto(
     val fullName: String? = null,
     val proTeamId: Int? = null,
     val defaultPositionId: Int? = null,
+    /** "ACTIVE", "QUESTIONABLE", "OUT", "INJURY_RESERVE"… */
+    val injuryStatus: String? = null,
+    /** Actual (statSourceId 0) and projected (1) points per scoring period. */
+    val stats: List<EspnFfStatDto> = emptyList(),
 )
+
+@Serializable
+data class EspnFfStatDto(
+    val seasonId: Int = 0,
+    val scoringPeriodId: Int = 0,
+    val statSourceId: Int = 0,
+    val appliedTotal: Double? = null,
+)
+
+/** leaguedefaults kona_player_info: ESPN's own projections, used when a league's box score has none. */
+@Serializable data class EspnFfPlayersDto(val players: List<EspnFfPoolEntryDto> = emptyList())

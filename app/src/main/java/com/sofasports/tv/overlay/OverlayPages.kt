@@ -5,6 +5,7 @@ import com.sofasports.tv.domain.CloseGame
 import com.sofasports.tv.domain.FantasyStarter
 import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameState
+import com.sofasports.tv.domain.NflTeams
 
 /** Which overlay pages have something to show, and how the remote moves between them. */
 object OverlayPages {
@@ -58,12 +59,7 @@ object OverlayPages {
             .take(PLAYING_NOW_MAX)
     }
 
-    /** Sleeper and ESPN fantasy use a few abbreviations that differ from ESPN's scoreboard. */
-    fun teamAbbr(fantasyTeam: String): String = when (val t = fantasyTeam.uppercase()) {
-        "WAS" -> "WSH"
-        "JAC" -> "JAX"
-        else -> t
-    }
+    fun teamAbbr(fantasyTeam: String): String = NflTeams.scoreboardAbbr(fantasyTeam)
 
     private const val HOUR = 3_600_000L
 }

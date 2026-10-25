@@ -42,6 +42,8 @@ data class HomeUi(
     val showOdds: Boolean = false,
     val picks: List<PickProgress> = emptyList(),
     val watchApp: String? = null,
+    /** This week's scoreboard, for fantasy live projections. */
+    val games: List<Game> = emptyList(),
 )
 
 @HiltViewModel
@@ -80,6 +82,7 @@ class HomeViewModel @Inject constructor(
             showOdds = cfg.features.odds && prefs.showOdds,
             picks = if (cfg.features.picks) pk else emptyList(),
             watchApp = prefs.watchApp,
+            games = games,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUi())
 

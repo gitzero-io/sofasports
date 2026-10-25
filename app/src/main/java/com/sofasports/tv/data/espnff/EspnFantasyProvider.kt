@@ -1,5 +1,6 @@
 package com.sofasports.tv.data.espnff
 
+import com.sofasports.tv.data.fixture.FixtureFantasy
 import com.sofasports.tv.data.fixture.FixtureReplay
 import com.sofasports.tv.data.fixture.FixtureSource
 import com.sofasports.tv.data.provider.ApiBases
@@ -79,7 +80,27 @@ class EspnFantasyApi @Inject constructor(
             header("x-fantasy-filter", """{"schedule":{"filterMatchupPeriodIds":{"value":[$period]}}}""")
         }
         if (!res.status.isSuccess()) error("ESPN said HTTP ${res.status.value}")
-        return EspnFantasyParser.buildMatchup(league, res.bodyAsText(), link.teamId, link.key)
+        val m = EspnFantasyParser.buildMatchup(league, res.bodyAsText(), link.teamId, link.key) ?: return null
+        return withDefaultProjections(m, link.season, period)
+    }
+
+    /**
+     * Fills in projections the league's box score left out, from ESPN's public default (PPR)
+     * projections. A league with its own projections is left alone.
+     */
+    private suspend fun withDefaultProjections(m: FantasyMatchup, season: Int, period: Int): FantasyMatchup {
+        val all = m.me.starters + m.opponent?.starters.orEmpty()
+        val missing = all.filter { it.projected == null }.mapNotNull { it.player.id.toLongOrNull()?.takeIf { id -> id > 0 } }
+        if (missing.isEmpty()) return m
+        val defaults = runCatching {
+            val res = http.get("${bases.espnFantasyBase}/seasons/$season/segments/0/leaguedefaults/3?scoringPeriodId=$period&view=kona_player_info") {
+                header("x-fantasy-filter", """{"players":{"filterIds":{"value":[${missing.joinToString(",")}]}}}""")
+            }
+            if (res.status.isSuccess()) EspnFantasyParser.parseDefaultProjections(res.bodyAsText(), season, period) else emptyMap()
+        }.getOrDefault(emptyMap())
+        if (defaults.isEmpty()) return m
+        fun FantasyTeam.fill() = copy(starters = starters.map { s -> if (s.projected != null) s else s.copy(projected = defaults[s.player.id]) })
+        return m.copy(me = m.me.fill(), opponent = m.opponent?.fill())
     }
 
     /** Team names and the current week change rarely; refetch every 30 min. */
@@ -109,12 +130,7 @@ class FixtureEspnFantasyProvider @Inject constructor(
         val l = league() ?: return null
         val box = source.read("espn_fantasy/league_box_w6.json") ?: return null
         val m = EspnFantasyParser.buildMatchup(l, box, link.teamId, link.key) ?: return null
-        val p = replay.progress()
-        fun FantasyTeam.scaled() = copy(
-            points = Math.round(points * p * 100) / 100.0,
-            starters = starters.map { FantasyStarter(it.player, Math.round(it.points * p * 100) / 100.0) },
-        )
-        return m.copy(leagueName = link.leagueName, me = m.me.scaled(), opponent = m.opponent?.scaled())
+        return FixtureFantasy.replayed(m, replay.progress()).copy(leagueName = link.leagueName)
     }
 }
 

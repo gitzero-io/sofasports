@@ -14,9 +14,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import com.sofasports.tv.domain.FantasyProjection
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -46,6 +45,7 @@ fun HomeScreen(
     onOpenScores: () -> Unit,
     onAddEspnLeague: () -> Unit,
     onOpenPicks: () -> Unit,
+    onOpenFantasy: () -> Unit = {},
     vm: HomeViewModel = hiltViewModel(),
 ) {
     val ui by vm.ui.collectAsStateWithLifecycle()
@@ -94,7 +94,7 @@ fun HomeScreen(
                 if (fantasyLinked) {
                     Column(Modifier.weight(0.58f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         RowLabel("Fantasy")
-                        FantasySection(ui, vm, onAddEspnLeague)
+                        FantasySection(ui, vm, onAddEspnLeague, onOpenFantasy)
                     }
                 }
             }
@@ -132,7 +132,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun FantasySection(ui: HomeUi, vm: HomeViewModel, onAddEspnLeague: () -> Unit) {
+private fun FantasySection(ui: HomeUi, vm: HomeViewModel, onAddEspnLeague: () -> Unit, onOpenFantasy: () -> Unit = {}) {
     val f = ui.fantasy
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         when {
@@ -167,8 +167,8 @@ private fun FantasySection(ui: HomeUi, vm: HomeViewModel, onAddEspnLeague: () ->
                 val m = f.matchup
                 when {
                     m != null -> {
-                        var full by rememberSaveable(m.leagueId) { mutableStateOf(false) }
-                        MatchupCard(m, compact = !full, onClick = { full = !full })
+                        val live = remember(m, ui.games) { FantasyProjection.live(m, ui.games) }
+                        MatchupCard(live, compact = true, onClick = onOpenFantasy)
                     }
                     f.loading -> Text("Loading matchup…", style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary)
                     else -> Text(
