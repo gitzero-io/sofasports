@@ -30,9 +30,11 @@ import com.sofasports.tv.ui.components.formatKickoff
 import com.sofasports.tv.ui.components.scorePulse
 import com.sofasports.tv.ui.theme.SofaColors
 
+/** Book badges never use red or blue, so the Red vs Blue meaning stays clean. */
 fun bookColor(b: PickBook): Color = when (b) {
     PickBook.DRAFTKINGS -> SofaColors.DraftKings
     PickBook.PRIZEPICKS -> SofaColors.PrizePicks
+    PickBook.FANDUEL, PickBook.BETMGM, PickBook.OTHER -> SofaColors.TextSecondary
 }
 
 fun statusText(p: PickProgress): String = when (p.status) {
@@ -55,7 +57,7 @@ fun statusColor(s: BetStatus): Color = when (s) {
 fun currentText(p: PickProgress): String? {
     val c = p.current ?: return null
     return when (p.pick.type) {
-        PickType.PROP, PickType.TOTAL -> "${Betting.formatNumber(c)} / ${Betting.formatNumber(p.pick.line)}"
+        PickType.PROP, PickType.TOTAL, PickType.TEAM_TOTAL -> "${Betting.formatNumber(c)} / ${Betting.formatNumber(p.pick.line)}"
         PickType.SPREAD -> "${if (c >= 0) "covering by" else "short by"} ${Betting.formatNumber(kotlin.math.abs(c))}"
         PickType.MONEYLINE -> if (c > 0) "up ${c.toInt()}" else if (c < 0) "down ${(-c).toInt()}" else "tied"
     }
@@ -79,7 +81,7 @@ fun PickRow(p: PickProgress, modifier: Modifier = Modifier) {
             }
             Text(statusText(p), style = MaterialTheme.typography.labelLarge, color = statusColor(p.status))
         }
-        if ((p.pick.type == PickType.PROP || p.pick.type == PickType.TOTAL) && p.current != null && p.pick.line > 0) {
+        if (p.pick.type.overUnder && p.current != null && p.pick.line > 0) {
             ProgressBar((p.current / p.pick.line).toFloat(), statusColor(p.status), Modifier.padding(top = 8.dp))
         }
     }

@@ -20,15 +20,15 @@ data class RosterPlayer(val id: String, val name: String, val position: String?,
 @Serializable private data class RosterPosDto(val abbreviation: String? = null)
 
 object RosterParser {
-    private val propPositions = listOf("QB", "RB", "WR", "TE")
+    private val propPositions = listOf("QB", "RB", "WR", "TE", "K")
 
-    /** Offensive skill players only (the ones props exist for), QB → RB → WR → TE. */
+    /** Skill players and kickers (the ones props exist for), QB → RB → WR → TE → K. ESPN calls kickers "PK". */
     fun parse(json: String): List<RosterPlayer> =
         SofaJson.decodeFromString(RosterDto.serializer(), json).athletes
-            .filter { it.position == "offense" }
+            .filter { it.position == "offense" || it.position == "specialTeam" }
             .flatMap { it.items }
             .mapNotNull { a ->
-                val pos = a.position?.abbreviation
+                val pos = a.position?.abbreviation?.let { if (it == "PK") "K" else it }
                 if (pos !in propPositions) null else RosterPlayer(a.id, a.displayName ?: a.id, pos, a.jersey)
             }
             .sortedBy { propPositions.indexOf(it.position) }

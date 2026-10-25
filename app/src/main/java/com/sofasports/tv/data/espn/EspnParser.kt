@@ -22,7 +22,7 @@ import java.time.OffsetDateTime
 object EspnParser {
 
     /** Player stat categories shown in the box score, in display order. */
-    private val boxCategories = listOf("passing", "rushing", "receiving")
+    private val boxCategories = listOf("passing", "rushing", "receiving", "kicking")
 
     fun parseScoreboard(json: String): Scoreboard {
         val dto = SofaJson.decodeFromString(EspnScoreboardDto.serializer(), json)

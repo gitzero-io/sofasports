@@ -10,6 +10,9 @@ import com.sofasports.tv.domain.GameSummary
 import com.sofasports.tv.domain.PickEvaluator
 import com.sofasports.tv.domain.PickProgress
 import com.sofasports.tv.domain.PickType
+import com.sofasports.tv.domain.BetTicket
+import com.sofasports.tv.domain.TicketEvaluator
+import com.sofasports.tv.domain.TicketProgress
 import com.sofasports.tv.domain.TrackedPick
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -65,9 +68,21 @@ class PicksRepository @Inject constructor(
             }
         }.stateIn(scope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    /** Bet slips with their legs' live progress. */
+    val tickets: StateFlow<List<TicketProgress>> =
+        combine(store.tickets, progress) { t, p -> TicketEvaluator.group(t, p) }
+            .stateIn(scope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     suspend fun add(pick: TrackedPick) = store.add(pick)
+    suspend fun addTicket(ticket: BetTicket, legs: List<TrackedPick>) = store.addTicket(ticket, legs)
     suspend fun remove(id: String) = store.remove(id)
-    suspend fun clearSettled() = store.removeAll(progress.value.filter { it.settled }.map { it.pick.id }.toSet())
+
+    /** Settled singles, and whole slips once they're settled (an open parlay keeps its finished legs). */
+    suspend fun clearSettled() {
+        val singles = progress.value.filter { it.settled && it.pick.ticketId == null }.map { it.pick.id }
+        val slips = TicketEvaluator.group(store.tickets.value, progress.value).filter { it.settled }.map { it.ticket.id }
+        store.removeAll((singles + slips).toSet())
+    }
 
     companion object {
         /** This week's game for the pick's team. */

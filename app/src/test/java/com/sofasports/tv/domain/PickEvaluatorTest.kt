@@ -24,6 +24,35 @@ class PickEvaluatorTest {
         assertEquals(4.0, PickEvaluator.statValue(s, id("Jaylin Noel"), PropStat.RECEPTIONS)!!, 0.0)
     }
 
+    @Test fun `reads the extra props`() {
+        assertEquals(1.0, PickEvaluator.statValue(s, id("Jaylin Noel"), PropStat.ANYTIME_TD)!!, 0.0)
+        assertEquals(1.0, PickEvaluator.statValue(s, id("Jaylin Noel"), PropStat.REC_TDS)!!, 0.0)
+        assertEquals(50.0, PickEvaluator.statValue(s, id("Jaylin Noel"), PropStat.LONGEST_REC)!!, 0.0)
+        assertEquals(4.0, PickEvaluator.statValue(s, id("Jaylin Noel"), PropStat.TARGETS)!!, 0.0)
+        assertEquals(1.0, PickEvaluator.statValue(s, id("Jawhar Jordan"), PropStat.RUSH_TDS)!!, 0.0)
+        assertEquals(25.0, PickEvaluator.statValue(s, id("Jawhar Jordan"), PropStat.LONGEST_RUSH)!!, 0.0)
+        assertEquals(0.0, PickEvaluator.statValue(s, id("Woody Marks"), PropStat.ANYTIME_TD)!!, 0.0)
+        assertEquals(2.0, PickEvaluator.statValue(s, id("Ka'imi Fairbairn"), PropStat.FG_MADE)!!, 0.0)
+        assertEquals(10.0, PickEvaluator.statValue(s, id("Ka'imi Fairbairn"), PropStat.KICKING_PTS)!!, 0.0)
+    }
+
+    @Test fun `anytime TD wins the moment he scores and reads as yes-no`() {
+        val live = g.copy(state = GameState.LIVE)
+        val td = prop("Jaylin Noel", PropStat.ANYTIME_TD, 0.5)
+        assertEquals(BetStatus.WON, PickEvaluator.evaluate(td, live, s).status)
+        assertEquals("Jaylin Noel Anytime TD", td.describe())
+        assertEquals(BetStatus.LOST, PickEvaluator.evaluate(prop("Woody Marks", PropStat.ANYTIME_TD, 0.5), g, s).status)
+    }
+
+    @Test fun `team total uses one team's points`() {
+        fun tt(team: String, line: Double, over: Boolean = true) = TrackedPick("t", PickBook.FANDUEL, PickType.TEAM_TOTAL, team, line, over)
+        assertEquals(BetStatus.WON, PickEvaluator.evaluate(tt("HOU", 27.5), g, s).status)
+        assertEquals(BetStatus.LOST, PickEvaluator.evaluate(tt("JAX", 31.5), g, s).status)
+        assertEquals(34.0, PickEvaluator.evaluate(tt("HOU", 27.5), g, s).current!!, 0.0)
+        assertEquals("HOU team total O 27.5", tt("HOU", 27.5).describe())
+        assertEquals(BetStatus.PENDING, PickEvaluator.evaluate(tt("HOU", 27.5), g.copy(state = GameState.PRE), null).status)
+    }
+
     @Test fun `player in box score but not that table counts as zero`() =
         assertEquals(0.0, PickEvaluator.statValue(s, id("Jaylin Noel"), PropStat.RUSH_YDS)!!, 0.0)
 

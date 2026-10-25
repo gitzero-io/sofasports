@@ -105,3 +105,10 @@ One line per judgment call, with the reason.
 - A show/hide press overrides smart mode's rules until those rules change their answer (e.g. games start or end), so it never sticks forever.
 - Size is a density multiplier (0.85 / 1 / 1.25) so text and spacing scale together; opacity applies to the background only.
 - `adb shell input keyevent` bypasses Android's accessibility key filter, so remote-button tests on the emulator use a `uinput` virtual remote (real key events).
+
+## Bet and parlay tracker (0.2.1)
+- Manual by design: sportsbooks and PrizePicks have no public API for a user's bets, so this works with no account and never breaks on a sync.
+- Books: PrizePicks (props only), DraftKings, FanDuel, BetMGM, Other. Badges stay off red/blue.
+- Bet types: player props, spread, game total, moneyline (game winner), team total. Props added: anytime TD (yes/no), rushing and receiving TDs, longest rush/reception, targets, pass+rush yards, field goals made and kicking points (kickers come from the roster's special-teams group; the kicking box score table is now parsed and shows in Game Center).
+- A parlay is a `BetTicket` plus legs that point to it (`TrackedPick.ticketId`), stored in tickets.json beside picks.json so existing saved picks load unchanged. One lost leg loses it, pushes drop out, all pushes push.
+- No stake, odds or payout: the user said financial details are irrelevant, so the tracker only answers "is it hitting".
