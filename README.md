@@ -14,13 +14,13 @@ Blue is always you (your team, your fantasy side) and red is the opponent.
 
 ## Install
 
-1. Download `sofasports-<version>.apk` from [Releases](../../releases/latest).
+1. Download the latest APK: https://github.com/gitzero-io/sofasports/releases/latest/download/sofasports.apk
 2. On the TV, turn on Developer options and **Network debugging** (Settings → System → About → tap *Android TV OS build* 7 times).
 3. From a computer with [adb](https://developer.android.com/tools/releases/platform-tools):
 
    ```sh
    adb connect <TV_IP>:5555
-   adb install -r sofasports-<version>.apk
+   adb install -r sofasports.apk
    # allow the score overlay (TVs have no settings screen for this)
    adb shell appops set com.sofasports.tv SYSTEM_ALERT_WINDOW allow
    ```

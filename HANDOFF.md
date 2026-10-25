@@ -110,7 +110,7 @@ These are read at build time, so rebuild after editing (`./gradlew assembleDebug
 |---|---|---|
 | Remote config URL | local.properties `sofa.configUrl` (default in `app/build.gradle.kts`) | `https://raw.githubusercontent.com/gitzero-io/sofasports/main/release-assets/config.json` |
 | Update check URL | local.properties `sofa.versionUrl` (default in `app/build.gradle.kts`) | `https://raw.githubusercontent.com/gitzero-io/sofasports/main/release-assets/version.json` |
-| APK download URL | `release-assets/version.json` → `apkUrl` | `https://github.com/gitzero-io/sofasports/releases/download/v0.1.0/sofasports-0.1.0.apk` |
+| APK download URL | `release-assets/version.json` → `apkUrl` | `https://github.com/gitzero-io/sofasports/releases/latest/download/sofasports.apk` |
 | Feedback QR URL | local.properties `sofa.feedbackUrl` (default in `app/build.gradle.kts`) | `https://example.com/sofasports-feedback` |
 | Sentry DSN | local.properties `sentry.dsn` | empty (crash reporting off) |
 | Sleeper username | Enter it on the box (Home or Settings) | the brief had `[YOUR SLEEPER USERNAME]` |
