@@ -75,6 +75,29 @@ class GameSortingTest {
         )
         assertEquals(listOf("b", "a"), GameSorting.sorted(games, listOf("KC")).map { it.id })
     }
+
+    @Test fun `around the league is live games, close first, without my teams`() {
+        val games = listOf(
+            game("blowout", awayScore = 0, homeScore = 28, period = 4),
+            game("close", awayScore = 20, homeScore = 21, period = 4),
+            game("mine", away = "KC", period = 4),
+            game("next", state = GameState.PRE, start = 9, awayScore = null, homeScore = null),
+        )
+        val a = GameSorting.aroundLeague(games, listOf("KC"), CloseGameRule())
+        assertTrue(a.live)
+        assertEquals(listOf("close", "blowout"), a.games.map { it.id })
+    }
+
+    @Test fun `around the league falls back to the next kickoffs`() {
+        val games = listOf(
+            game("late", state = GameState.PRE, start = 50, awayScore = null, homeScore = null),
+            game("early", state = GameState.PRE, start = 10, awayScore = null, homeScore = null),
+            game("done", state = GameState.FINAL),
+        )
+        val a = GameSorting.aroundLeague(games, emptyList(), CloseGameRule())
+        assertFalse(a.live)
+        assertEquals(listOf("early", "late"), a.games.map { it.id })
+    }
 }
 
 class PerspectiveTest {

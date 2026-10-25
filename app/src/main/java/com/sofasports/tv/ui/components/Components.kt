@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Border
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.MaterialTheme
@@ -102,6 +103,15 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier) {
         color = SofaColors.TextPrimary,
         modifier = modifier.padding(bottom = 12.dp),
     )
+}
+
+/** Small caps label above a row of cards ("YOUR GAME", "LIVE NOW"); the same on every screen. */
+@Composable
+fun RowLabel(text: String, modifier: Modifier = Modifier, trailing: String? = null) {
+    SpacedRow(modifier, gap = 10) {
+        Text(text.uppercase(), style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.5.sp), color = SofaColors.TextSecondary)
+        trailing?.let { Text(it, style = MaterialTheme.typography.labelLarge, color = SofaColors.TextMuted) }
+    }
 }
 
 @Composable

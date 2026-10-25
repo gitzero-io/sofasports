@@ -11,7 +11,6 @@ import com.sofasports.tv.data.repo.FantasyRepository
 import com.sofasports.tv.data.repo.FantasyState
 import com.sofasports.tv.data.repo.LinkResult
 import com.sofasports.tv.data.repo.ScoresRepository
-import com.sofasports.tv.domain.CloseGame
 import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameSorting
 import com.sofasports.tv.domain.Perspective
@@ -28,7 +27,8 @@ data class HomeUi(
     val fantasy: FantasyState = FantasyState(),
     val fantasyPromptSkipped: Boolean = false,
     val myGames: List<Game> = emptyList(),
-    val closeGames: List<Game> = emptyList(),
+    /** Live games beyond my teams (close first), or the next kickoffs when nothing is live. */
+    val aroundLeague: GameSorting.AroundLeague = GameSorting.AroundLeague(false, emptyList()),
     val favorites: List<String> = emptyList(),
     val closeRule: CloseGameRule = CloseGameRule(),
     val announcement: String? = null,
@@ -55,7 +55,7 @@ class HomeViewModel @Inject constructor(
             fantasy = f,
             fantasyPromptSkipped = prefs.fantasyPromptSkipped,
             myGames = mine,
-            closeGames = games.filter { CloseGame.isClose(it, cfg.closeGame) && it !in mine },
+            aroundLeague = GameSorting.aroundLeague(games, prefs.favoriteTeams, cfg.closeGame),
             favorites = prefs.favoriteTeams,
             closeRule = cfg.closeGame,
             announcement = cfg.announcement,

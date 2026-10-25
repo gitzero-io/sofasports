@@ -49,6 +49,20 @@ object GameSorting {
 
     fun sorted(games: List<Game>, favorites: List<String>): List<Game> = sections(games, favorites).flatMap { it.second }
 
+    /**
+     * Home's second row, beyond my teams: live games with close ones first or, when nothing is
+     * live, the next kickoffs. [live] says which, for the row title.
+     */
+    data class AroundLeague(val live: Boolean, val games: List<Game>)
+
+    fun aroundLeague(games: List<Game>, favorites: List<String>, rule: CloseGameRule, max: Int = 8): AroundLeague {
+        val rest = games.filterNot { Perspective.involvesFavorite(it, favorites) }
+        val live = rest.filter { it.state == GameState.LIVE }
+            .sortedWith(compareByDescending<Game> { CloseGame.isClose(it, rule) }.thenBy { -it.period }.thenBy { it.startEpochMs })
+        if (live.isNotEmpty()) return AroundLeague(true, live.take(max))
+        return AroundLeague(false, rest.filter { it.state == GameState.PRE }.sortedBy { it.startEpochMs }.take(max))
+    }
+
     private fun stateRank(g: Game) = when (g.state) {
         GameState.LIVE -> 0
         GameState.PRE -> 1

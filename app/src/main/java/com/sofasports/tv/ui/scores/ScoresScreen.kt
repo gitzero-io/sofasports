@@ -19,6 +19,7 @@ import androidx.tv.material3.Text
 import com.sofasports.tv.domain.GameState
 import com.sofasports.tv.ui.components.GameCard
 import com.sofasports.tv.ui.components.MessageBox
+import com.sofasports.tv.ui.components.RowLabel
 import com.sofasports.tv.ui.components.SpacedRow
 import com.sofasports.tv.ui.components.rememberNowMs
 import com.sofasports.tv.ui.theme.SofaColors
@@ -50,7 +51,7 @@ fun ScoresScreen(onOpenGame: (String) -> Unit, vm: ScoresViewModel = hiltViewMod
             }
             ui.sections.forEach { (section, games) ->
                 item(span = { GridItemSpan(maxLineSpan) }, key = "h-${section.name}") {
-                    Text(section.title.uppercase(), style = MaterialTheme.typography.labelLarge, color = SofaColors.TextSecondary, modifier = Modifier.padding(top = 4.dp))
+                    RowLabel(section.title, Modifier.padding(top = 12.dp), trailing = games.size.takeIf { it > 1 }?.toString())
                 }
                 items(games, key = { "${section.name}-${it.id}" }) { game ->
                     GameCard(

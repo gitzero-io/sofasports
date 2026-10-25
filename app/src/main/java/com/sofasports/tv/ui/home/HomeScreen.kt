@@ -12,7 +12,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -22,6 +26,7 @@ import androidx.tv.material3.Text
 import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameState
 import com.sofasports.tv.ui.components.GameCard
+import com.sofasports.tv.ui.components.RowLabel
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.components.SpacedRow
 import com.sofasports.tv.ui.components.rememberNowMs
@@ -45,7 +50,8 @@ fun HomeScreen(
 ) {
     val ui by vm.ui.collectAsStateWithLifecycle()
     val now = rememberNowMs(1_000)
-    LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(20.dp), contentPadding = PaddingValues(bottom = 48.dp)) {
+    val fantasyLinked = ui.fantasyEnabled && ui.fantasy.linked
+    LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(28.dp), contentPadding = PaddingValues(top = 4.dp, bottom = 48.dp)) {
         ui.announcement?.let { msg ->
             item(key = "announce") {
                 Text(
@@ -55,17 +61,54 @@ fun HomeScreen(
             }
         }
         item(key = "update") { UpdateBanner() }
-        // Hidden entirely once skipped (until linked from Settings), so Home is just scores.
-        if (ui.fantasyEnabled && (ui.fantasy.linked || !ui.fantasyPromptSkipped)) {
-            item(key = "fantasy") { FantasySection(ui, vm, onAddEspnLeague) }
+        // The two things people open the app for, side by side: my team's game and my matchup.
+        item(key = "hero") {
+            Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                Column(Modifier.weight(if (fantasyLinked) 0.42f else 1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    RowLabel(if (ui.myGames.size > 1) "Your teams" else "Your game")
+                    val hero = ui.myGames.firstOrNull()
+                    if (hero == null) {
+                        Text(
+                            when {
+                                ui.scoresLoading -> "Loading scores…"
+                                ui.favorites.isEmpty() -> "No favorite teams yet. Pick some in Settings."
+                                else -> "Your teams don't play this week."
+                            },
+                            style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary,
+                        )
+                    } else {
+                        GameCard(
+                            hero, ui.favorites, ui.closeRule, if (hero.state == GameState.PRE) now else 0L,
+                            onClick = { if (ui.gameCenterEnabled) onOpenGame(hero.id) },
+                            modifier = if (fantasyLinked) Modifier.fillMaxWidth() else Modifier.width(520.dp),
+                            showOdds = ui.showOdds,
+                        )
+                    }
+                }
+                if (fantasyLinked) {
+                    Column(Modifier.weight(0.58f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        RowLabel("Fantasy")
+                        FantasySection(ui, vm, onAddEspnLeague)
+                    }
+                }
+            }
+        }
+        if (ui.myGames.size > 1) {
+            item(key = "mine") { GameRow("More of your teams", ui.myGames.drop(1), ui, now, onOpenGame) }
+        }
+        // Not linked yet: the prompt sits below the scores so it never hides them.
+        if (ui.fantasyEnabled && !ui.fantasy.linked && !ui.fantasyPromptSkipped) {
+            item(key = "fantasy") {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    RowLabel("Fantasy")
+                    FantasySection(ui, vm, onAddEspnLeague)
+                }
+            }
         }
         if (ui.picks.isNotEmpty()) {
             item(key = "picks") {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        "Picks · ${PickEvaluator.hitting(ui.picks)} of ${ui.picks.size} hitting",
-                        style = MaterialTheme.typography.headlineSmall, color = SofaColors.TextPrimary,
-                    )
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    RowLabel("Picks", trailing = "${PickEvaluator.hitting(ui.picks)} of ${ui.picks.size} hitting")
                     Column(Modifier.fillMaxWidth().background(SofaColors.Surface, SofaShape)) {
                         sortForDisplay(ui.picks).take(5).forEach { PickRow(it, Modifier.focusableRow(SofaShape)) }
                     }
@@ -73,20 +116,10 @@ fun HomeScreen(
                 }
             }
         }
-        item(key = "mine") {
-            GameRow(
-                title = "Your teams",
-                games = ui.myGames,
-                empty = when {
-                    ui.scoresLoading -> "Loading scores…"
-                    ui.favorites.isEmpty() -> "No favorite teams yet. Pick some in Settings."
-                    else -> "Your teams don't play this week."
-                },
-                ui = ui, now = now, onOpenGame = onOpenGame,
-            )
-        }
-        if (ui.closeGames.isNotEmpty()) {
-            item(key = "close") { GameRow("Close games right now", ui.closeGames, "", ui, now, onOpenGame) }
+        if (ui.aroundLeague.games.isNotEmpty()) {
+            item(key = "league") {
+                GameRow(if (ui.aroundLeague.live) "Live now" else "Up next", ui.aroundLeague.games, ui, now, onOpenGame)
+            }
         }
         item(key = "all") { SofaButton("All scores", onClick = onOpenScores) }
     }
@@ -96,7 +129,6 @@ fun HomeScreen(
 private fun FantasySection(ui: HomeUi, vm: HomeViewModel, onAddEspnLeague: () -> Unit) {
     val f = ui.fantasy
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Fantasy", style = MaterialTheme.typography.headlineSmall, color = SofaColors.TextPrimary)
         when {
             !f.linked -> Column(
                 Modifier.fillMaxWidth().background(SofaColors.Surface, SofaShape).padding(20.dp),
@@ -128,7 +160,10 @@ private fun FantasySection(ui: HomeUi, vm: HomeViewModel, onAddEspnLeague: () ->
                 }
                 val m = f.matchup
                 when {
-                    m != null -> MatchupCard(m)
+                    m != null -> {
+                        var full by rememberSaveable(m.leagueId) { mutableStateOf(false) }
+                        MatchupCard(m, compact = !full, onClick = { full = !full })
+                    }
                     f.loading -> Text("Loading matchup…", style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary)
                     else -> Text(
                         f.error ?: "No matchup this week in ${f.selectedLeague?.name ?: "this league"}.",
@@ -141,21 +176,17 @@ private fun FantasySection(ui: HomeUi, vm: HomeViewModel, onAddEspnLeague: () ->
 }
 
 @Composable
-private fun GameRow(title: String, games: List<Game>, empty: String, ui: HomeUi, now: Long, onOpenGame: (String) -> Unit) {
+private fun GameRow(title: String, games: List<Game>, ui: HomeUi, now: Long, onOpenGame: (String) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(title, style = MaterialTheme.typography.headlineSmall, color = SofaColors.TextPrimary)
-        if (games.isEmpty()) {
-            Text(empty, style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary)
-        } else {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(20.dp), contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp)) {
-                items(games, key = { it.id }) { g ->
-                    GameCard(
-                        g, ui.favorites, ui.closeRule, if (g.state == GameState.PRE) now else 0L,
-                        onClick = { if (ui.gameCenterEnabled) onOpenGame(g.id) },
-                        modifier = Modifier.width(420.dp),
-                        showOdds = ui.showOdds,
-                    )
-                }
+        RowLabel(title, trailing = games.size.takeIf { it > 1 }?.toString())
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(20.dp), contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp)) {
+            items(games, key = { it.id }) { g ->
+                GameCard(
+                    g, ui.favorites, ui.closeRule, if (g.state == GameState.PRE) now else 0L,
+                    onClick = { if (ui.gameCenterEnabled) onOpenGame(g.id) },
+                    modifier = Modifier.width(420.dp),
+                    showOdds = ui.showOdds,
+                )
             }
         }
     }

@@ -13,7 +13,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.focusGroup
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -125,7 +135,7 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
     LaunchedEffect(current) { current?.let(vm::screenView) }
     val showChrome = current != Routes.ONBOARDING
 
-    Column(Modifier.fillMaxSize().background(SofaColors.Background)) {
+    Column(Modifier.fillMaxSize().background(SofaColors.Background).brandGlow()) {
         Column(
             Modifier
                 .weight(1f)
@@ -182,15 +192,40 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
     }
 }
 
+/** A faint blue glow from the top left and red from the top right: the Red vs Blue brand, kept well behind content. */
+private fun Modifier.brandGlow(): Modifier = drawBehind {
+    val radius = size.width * 0.6f
+    drawRect(Brush.radialGradient(listOf(SofaColors.Blue.copy(alpha = 0.10f), Color.Transparent), center = Offset(0f, 0f), radius = radius))
+    drawRect(Brush.radialGradient(listOf(SofaColors.Red.copy(alpha = 0.07f), Color.Transparent), center = Offset(size.width, 0f), radius = radius))
+}
+
+/**
+ * Tabs follow the usual TV pattern: moving onto a tab switches to it, and pressing Up from the
+ * page always lands on the page's own tab (not whichever tab had focus last).
+ */
 @Composable
 private fun TopBar(current: String?, tabs: List<Tab>, onSelect: (String) -> Unit) {
+    val requesters = remember(tabs) { tabs.associate { it.route to FocusRequester() } }
+    val onTab = tabs.any { it.route == current }
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text("SOFA", style = MaterialTheme.typography.headlineLarge, color = SofaColors.Blue)
         Text("SPORTS", style = MaterialTheme.typography.headlineLarge, color = SofaColors.Red)
         Spacer(Modifier.width(32.dp))
-        SpacedRow {
+        SpacedRow(
+            Modifier
+                .focusProperties { onEnter = { requesters[current]?.let { if (!it.requestFocus()) cancelFocusChange() } } }
+                .focusGroup(),
+        ) {
             tabs.forEach { tab ->
-                SofaButton(text = tab.label, onClick = { onSelect(tab.route) }, selected = current == tab.route)
+                SofaButton(
+                    text = tab.label,
+                    onClick = { onSelect(tab.route) },
+                    selected = current == tab.route,
+                    modifier = Modifier
+                        .focusRequester(requesters.getValue(tab.route))
+                        // Only switch on focus between tabs; from a detail page (a game) it takes a press.
+                        .onFocusChanged { if (it.isFocused && onTab && current != tab.route) onSelect(tab.route) },
+                )
             }
         }
     }

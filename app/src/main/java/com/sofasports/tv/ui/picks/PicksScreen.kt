@@ -1,5 +1,6 @@
 package com.sofasports.tv.ui.picks
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -66,10 +67,35 @@ fun PicksScreen(onAddPick: () -> Unit, vm: PicksViewModel = hiltViewModel()) {
                 }
             }
         }
+        if (progress.isEmpty()) {
+            item(key = "how") { HowPicksWork() }
+        }
         items(sortForDisplay(progress), key = { it.pick.id }) { p ->
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 PickRow(p, Modifier.weight(1f).focusableRow(SofaShape))
                 SofaButton("Remove", onClick = { vm.remove(p.pick.id) }, modifier = Modifier.padding(start = 12.dp))
+            }
+        }
+    }
+}
+
+/** Empty state: three steps instead of a blank page. */
+@Composable
+private fun HowPicksWork() {
+    Row(Modifier.fillMaxWidth().padding(top = 24.dp), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+        listOf(
+            "1" to "Add a pick" to "A player prop (over/under) or a game spread, total or moneyline.",
+            "2" to "Watch it live" to "It updates from ESPN stats as the game goes, here, on Home and in the overlay.",
+            "3" to "See the result" to "Hit, miss or push is marked when the game ends. Clear settled picks any time.",
+        ).forEach { (head, body) ->
+            val (n, title) = head
+            Column(
+                Modifier.weight(1f).focusableRow().background(SofaColors.Surface, SofaShape).padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(n, style = MaterialTheme.typography.displaySmall, color = SofaColors.BlueBright)
+                Text(title, style = MaterialTheme.typography.titleLarge, color = SofaColors.TextPrimary)
+                Text(body, style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary)
             }
         }
     }
