@@ -27,6 +27,7 @@ import com.sofasports.tv.BuildConfig
 import com.sofasports.tv.R
 import com.sofasports.tv.data.config.ConfigRepository
 import com.sofasports.tv.data.prefs.OverlayCorner
+import com.sofasports.tv.data.prefs.OverlayEdge
 import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.ui.theme.SofaSportsTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,6 +48,7 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
     @Inject lateinit var feed: OverlayFeed
     @Inject lateinit var config: ConfigRepository
     @Inject lateinit var appVisibility: AppVisibility
+    @Inject lateinit var overlayDisplay: OverlayDisplay
 
     private val savedStateController = SavedStateRegistryController.create(this)
     override val savedStateRegistry: SavedStateRegistry get() = savedStateController.savedStateRegistry
@@ -60,11 +62,12 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
         savedStateController.performRestore(null)
         super.onCreate()
         startAsForeground()
-        val barShown = feed.state.map { it.barTicker }.distinctUntilChanged()
+        val barShown = combine(feed.state, overlayDisplay.rendered) { s, d -> s.barTicker && d.visible }.distinctUntilChanged()
+        // The card's window stays attached while hidden (it just draws nothing), so a remote press shows it instantly.
         lifecycleScope.launch {
-            combine(settings.settings.map { it.overlayCorner }, appVisibility.inForeground, barShown) { corner, appShown, bar -> Triple(corner, appShown, bar) }
+            combine(settings.settings.map { it.overlayCorner to it.overlay.edge }, appVisibility.inForeground, barShown) { place, appShown, bar -> Triple(place, appShown, bar) }
                 .distinctUntilChanged()
-                .collect { (corner, appShown, bar) -> if (appShown) removeView() else show(corner, liftAboveBar = bar) }
+                .collect { (place, appShown, bar) -> if (appShown) removeView() else show(place.first, place.second, liftAboveBar = bar) }
         }
         lifecycleScope.launch {
             combine(appVisibility.inForeground, barShown) { appShown, bar -> !appShown && bar }
@@ -72,6 +75,7 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
                 .collect { visible -> if (visible) showBar() else removeBar() }
         }
         feed.start(lifecycleScope)
+        overlayDisplay.start(lifecycleScope)
         // Remote config can switch the overlay off (feature flag) or kill the whole app.
         lifecycleScope.launch {
             config.config.collect { cfg ->
@@ -91,14 +95,15 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
     }
 
     override fun onDestroy() {
+        overlayDisplay.stop()
         removeView()
         removeBar()
         super.onDestroy()
     }
 
-    private fun show(corner: OverlayCorner, liftAboveBar: Boolean) {
+    private fun show(corner: OverlayCorner, edge: OverlayEdge, liftAboveBar: Boolean) {
         removeView()
-        val margin = OverlayLayout.marginPx(resources.displayMetrics.widthPixels)
+        val margin = OverlayLayout.marginPx(resources.displayMetrics.widthPixels, edge.factor)
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -110,10 +115,9 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
             PixelFormat.TRANSLUCENT,
         ).apply {
             gravity = OverlayLayout.gravityFor(corner)
-            x = margin
-            // A bottom-corner card sits above the full-width ticker bar instead of covering it.
-            val bottom = corner == OverlayCorner.BOTTOM_LEFT || corner == OverlayCorner.BOTTOM_RIGHT
-            y = margin + if (bottom && liftAboveBar) OverlayLayout.barHeightPx(resources.displayMetrics.density) else 0
+            x = if (gravity and Gravity.HORIZONTAL_GRAVITY_MASK == Gravity.CENTER_HORIZONTAL) 0 else margin
+            // A bottom card sits above the full-width ticker bar instead of covering it.
+            y = margin + if (OverlayLayout.isBottom(corner) && liftAboveBar) OverlayLayout.barHeightPx(resources.displayMetrics.density) else 0
         }
         val compose = ComposeView(this).apply {
             setViewTreeLifecycleOwner(this@OverlayService)
@@ -121,7 +125,8 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
             setContent {
                 SofaSportsTheme {
                     val state by feed.state.collectAsStateWithLifecycle()
-                    OverlayWidget(state)
+                    val shown by overlayDisplay.rendered.collectAsStateWithLifecycle()
+                    OverlayWidget(state, shown)
                 }
             }
         }
@@ -160,7 +165,8 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
             setContent {
                 SofaSportsTheme {
                     val state by feed.state.collectAsStateWithLifecycle()
-                    OverlayTickerBar(state)
+                    val shown by overlayDisplay.rendered.collectAsStateWithLifecycle()
+                    OverlayTickerBar(state, shown)
                 }
             }
         }

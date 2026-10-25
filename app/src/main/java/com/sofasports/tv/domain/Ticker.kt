@@ -48,13 +48,7 @@ object TickerBuilder {
                 (t.score ?: 0) > was
             } ?: return@mapNotNull null
             val delta = (scorer.score ?: 0) - (old.side(scorer.abbr)?.score ?: 0)
-            val what = when (delta) {
-                6, 7, 8 -> "TD"
-                3 -> "FG"
-                2 -> "2 PTS"
-                1 -> "XP"
-                else -> "+$delta"
-            }
+            val what = scoreLabel(delta)
             val score = "${g.away.abbr} ${g.away.score ?: 0}–${g.home.score ?: 0} ${g.home.abbr}"
             val play = g.situation?.lastPlay?.takeIf { it.isNotBlank() }?.let { trimPlay(it) }
             TickerItem(
@@ -65,6 +59,15 @@ object TickerBuilder {
                 timeMs = nowMs,
             )
         }
+    }
+
+    /** Points scored between two polls → "TD", "FG", … */
+    fun scoreLabel(delta: Int): String = when (delta) {
+        6, 7, 8 -> "TD"
+        3 -> "FG"
+        2 -> "2 PTS"
+        1 -> "XP"
+        else -> "+$delta"
     }
 
     /** ESPN play text can run long; keep the first sentence. */

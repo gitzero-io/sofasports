@@ -28,6 +28,7 @@ import com.sofasports.tv.data.prefs.DataMode
 import com.sofasports.tv.data.prefs.OverlayCorner
 import com.sofasports.tv.data.prefs.OverlayTicker
 import com.sofasports.tv.domain.NflTeams
+import com.sofasports.tv.remote.RemoteKeys
 import com.sofasports.tv.ui.components.QrCode
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.components.SpacedRow
@@ -40,6 +41,8 @@ import com.sofasports.tv.ui.theme.focusableRow
 fun SettingsScreen(
     onEditFavorites: () -> Unit,
     onAddEspnLeague: () -> Unit,
+    onCustomizeOverlay: () -> Unit = {},
+    onRemoteButtons: () -> Unit = {},
     updateSection: @Composable () -> Unit = {},
     vm: SettingsViewModel = hiltViewModel(),
 ) {
@@ -105,6 +108,16 @@ fun SettingsScreen(
                     onEnabled = vm::setOverlayEnabled,
                     onCorner = vm::setOverlayCorner,
                 )
+                val remoteKey = settings.overlay.toggleKey
+                Text(
+                    if (remoteKey != null) "Remote: ${RemoteKeys.keyName(remoteKey)} shows/hides the overlay while you watch."
+                    else "Set up a remote button to show, hide and flip the overlay without leaving your video.",
+                    style = MaterialTheme.typography.bodyMedium, color = if (remoteKey != null) SofaColors.BlueBright else SofaColors.TextSecondary,
+                )
+                SpacedRow {
+                    SofaButton("Customize overlay", onClick = onCustomizeOverlay)
+                    SofaButton("Remote buttons", onClick = onRemoteButtons)
+                }
                 if (settings.pinnedGameId != null) {
                     SpacedRow {
                         Text("A game is pinned to the overlay.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary)
@@ -224,7 +237,7 @@ private fun OverlaySettings(
         if (!canDraw) {
             AdbInstructions(adbCommand)
         }
-        Text("Corner", style = MaterialTheme.typography.titleSmall, color = SofaColors.TextSecondary)
+        Text("Position", style = MaterialTheme.typography.titleSmall, color = SofaColors.TextSecondary)
         SpacedRow {
             OverlayCorner.entries.forEach { c ->
                 SofaButton(cornerLabel(c), onClick = { onCorner(c) }, selected = c == corner)
@@ -258,7 +271,9 @@ private fun AdbInstructions(command: String) {
 
 internal fun cornerLabel(c: OverlayCorner) = when (c) {
     OverlayCorner.TOP_LEFT -> "Top left"
+    OverlayCorner.TOP_CENTER -> "Top center"
     OverlayCorner.TOP_RIGHT -> "Top right"
     OverlayCorner.BOTTOM_LEFT -> "Bottom left"
+    OverlayCorner.BOTTOM_CENTER -> "Bottom center"
     OverlayCorner.BOTTOM_RIGHT -> "Bottom right"
 }

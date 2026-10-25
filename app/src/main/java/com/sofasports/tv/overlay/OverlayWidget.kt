@@ -1,6 +1,15 @@
 package com.sofasports.tv.overlay
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
+import com.sofasports.tv.data.prefs.OverlayPage
+import com.sofasports.tv.data.prefs.OverlayRow
+import com.sofasports.tv.domain.FantasyStarter
+import com.sofasports.tv.domain.TickerBuilder
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,45 +52,158 @@ import com.sofasports.tv.ui.components.scorePulse
 import com.sofasports.tv.ui.fantasy.formatPoints
 import com.sofasports.tv.ui.theme.SofaColors
 
-/** The corner card. Kept small (≈ 320dp) and high-contrast so it reads over any video. */
+/** The overlay card: one page at a time (or the minimized pill), scaled and tinted per the user's overlay settings. */
 @Composable
-fun OverlayWidget(state: OverlayState) {
-    Column(
-        Modifier
-            .widthIn(min = 260.dp, max = 340.dp)
-            .background(SofaColors.Background, RoundedCornerShape(12.dp))
-            .border(1.dp, SofaColors.Outline, RoundedCornerShape(12.dp))
-            .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        val m = state.matchup
-        val g = state.game
-        val picks = state.picks
-        if (m == null && g == null && picks.isEmpty() && !state.cornerTicker) {
-            Text("SOFA SPORTS", style = MaterialTheme.typography.labelLarge, color = SofaColors.TextSecondary)
-            Text("Pin a game or link Sleeper", style = MaterialTheme.typography.bodySmall, color = SofaColors.TextMuted)
-            return@Column
+fun OverlayWidget(state: OverlayState, display: RenderedDisplay) {
+    if (!display.visible) return
+    val prefs = state.prefs
+    val base = LocalDensity.current
+    CompositionLocalProvider(LocalDensity provides Density(base.density * prefs.size.scale, base.fontScale)) {
+        val bg = SofaColors.Background.copy(alpha = prefs.opacity.alpha)
+        if (display.page == OverlayPage.MINI && display.moment == null) {
+            MiniPill(state, bg)
+            return@CompositionLocalProvider
         }
-        if (m != null) MatchupRows(m)
-        if (m != null && g != null) Box(Modifier.fillMaxWidth().height(1.dp).background(SofaColors.Outline))
-        if (g != null) GameRows(g, state)
-        if (picks.isNotEmpty()) {
-            if (m != null || g != null) Box(Modifier.fillMaxWidth().height(1.dp).background(SofaColors.Outline))
-            PicksRows(picks)
+        Column(
+            Modifier
+                .widthIn(min = 260.dp, max = 360.dp)
+                .background(bg, RoundedCornerShape(12.dp))
+                .border(1.dp, SofaColors.Outline, RoundedCornerShape(12.dp))
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            display.moment?.let { MomentBanner(it) }
+            when (display.page) {
+                null -> {
+                    Text("SOFA SPORTS", style = MaterialTheme.typography.labelLarge, color = SofaColors.TextSecondary)
+                    Text("Pin a game or link a fantasy league", style = MaterialTheme.typography.bodySmall, color = SofaColors.TextMuted)
+                    return@Column
+                }
+                OverlayPage.MATCHUP -> state.matchup?.let { m ->
+                    PageHeader(m.leagueName, display)
+                    MatchupRows(m)
+                    if (OverlayRow.PLAYING_NOW in prefs.rows) PlayingNowRows(OverlayPages.playingNow(state))
+                }
+                OverlayPage.MY_GAME -> state.game?.let { g ->
+                    PageHeader(if (state.gamePinned) "Pinned game" else "My game", display)
+                    GameRows(g, state)
+                }
+                OverlayPage.LEAGUE -> {
+                    PageHeader("Around the league", display)
+                    LeagueRows(OverlayPages.leagueGames(state, System.currentTimeMillis()), state)
+                }
+                OverlayPage.PICKS -> {
+                    PageHeader("Picks", display)
+                    PicksRows(state.picks)
+                }
+                // A pop over the minimized pill shows the moment's own page; this is just the fallback.
+                OverlayPage.MINI -> Text(miniText(state), style = MaterialTheme.typography.labelLarge, color = SofaColors.TextPrimary, maxLines = 1)
+            }
+            if (state.cornerTicker) {
+                Box(Modifier.fillMaxWidth().height(1.dp).background(SofaColors.Outline))
+                TickerCrawl(state.ticker, textStyle = MaterialTheme.typography.labelLarge, velocity = 45.dp)
+            }
         }
-        if (state.cornerTicker) {
-            if (m != null || g != null || picks.isNotEmpty()) Box(Modifier.fillMaxWidth().height(1.dp).background(SofaColors.Outline))
-            TickerCrawl(state.ticker, textStyle = MaterialTheme.typography.labelLarge, velocity = 45.dp)
+    }
+}
+
+/** Page title on the left, one dot per page on the right (the current one bright). */
+@Composable
+private fun PageHeader(title: String, display: RenderedDisplay) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(title.uppercase(), style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        if (display.count > 1 && display.moment == null) {
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                repeat(display.count) { i ->
+                    Box(Modifier.size(6.dp).background(if (i == display.index) SofaColors.TextPrimary else SofaColors.Outline, CircleShape))
+                }
+            }
         }
     }
 }
 
 @Composable
+private fun MomentBanner(m: Moment) {
+    val color = when (m.tone) {
+        MomentTone.MINE -> SofaColors.Blue
+        MomentTone.OPPONENT -> SofaColors.Red
+        MomentTone.NEUTRAL -> SofaColors.Close
+    }
+    Text(
+        m.text,
+        style = MaterialTheme.typography.titleSmall,
+        color = if (m.tone == MomentTone.NEUTRAL) SofaColors.Background else SofaColors.TextPrimary,
+        maxLines = 2, overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.fillMaxWidth().background(color, RoundedCornerShape(8.dp)).padding(horizontal = 10.dp, vertical = 6.dp),
+    )
+}
+
+/** One line: my matchup, my game and picks, whichever exist. */
+internal fun miniText(s: OverlayState): String = listOfNotNull(
+    s.matchup?.let { m -> "★ " + formatPoints(m.me.points) + (m.opponent?.let { "–" + formatPoints(it.points) } ?: "") },
+    s.game?.let { g -> "${g.away.abbr} ${g.away.score ?: 0}–${g.home.score ?: 0} ${g.home.abbr}" + if (g.state == GameState.LIVE) " · ${g.shortDetail}" else "" },
+    s.picks.takeIf { it.isNotEmpty() }?.let { "Picks ${PickEvaluator.hitting(it)}/${it.size}" },
+).joinToString("  ·  ").ifEmpty { "SOFA SPORTS" }
+
+@Composable
+private fun MiniPill(state: OverlayState, bg: Color) {
+    val m = state.matchup
+    val leading = m?.opponent?.let { m.me.points >= it.points }
+    Row(
+        Modifier
+            .background(bg, RoundedCornerShape(50))
+            .border(1.dp, SofaColors.Outline, RoundedCornerShape(50))
+            .padding(horizontal = 14.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        // Blue dot when I'm winning my matchup, red when I'm behind.
+        if (leading != null) Box(Modifier.size(8.dp).background(if (leading) SofaColors.Blue else SofaColors.Red, CircleShape))
+        Text(miniText(state), style = MaterialTheme.typography.labelLarge, color = SofaColors.TextPrimary, maxLines = 1)
+    }
+}
+
+@Composable
 private fun MatchupRows(m: FantasyMatchup) {
-    Text(m.leagueName.uppercase(), style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
     OverlayScoreRow(m.me.teamName, formatPoints(m.me.points), SofaColors.Blue, m.opponent != null && m.me.points >= m.opponent.points, m.me.points, onlyIncrease = false)
     if (m.opponent != null) {
         OverlayScoreRow(m.opponent.teamName, formatPoints(m.opponent.points), SofaColors.Red, m.opponent.points > m.me.points, m.opponent.points, onlyIncrease = false)
+    }
+}
+
+@Composable
+private fun PlayingNowRows(players: List<FantasyStarter>) {
+    if (players.isEmpty()) return
+    Text("PLAYING NOW", style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted)
+    players.forEach { st ->
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                listOfNotNull(st.player.name, st.player.position).joinToString(" · "),
+                style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
+            )
+            Text(
+                formatPoints(st.points), style = MaterialTheme.typography.labelLarge, color = SofaColors.TextPrimary,
+                modifier = Modifier.padding(start = 6.dp).scorePulse(st.points, SofaColors.Blue, onlyIncrease = false).padding(horizontal = 4.dp),
+            )
+        }
+    }
+}
+
+/** Compact scoreboard: "HOU 24  21 JAX   Q4 2:13", favorites' side in blue. */
+@Composable
+private fun LeagueRows(games: List<Game>, state: OverlayState) {
+    games.forEach { g ->
+        val mine = state.favorites.any { g.involves(it) }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Box(Modifier.width(4.dp).height(16.dp).background(if (mine) SofaColors.Blue else SofaColors.Outline, RoundedCornerShape(2.dp)))
+            val score = if (g.state == GameState.PRE) "${g.away.abbr} @ ${g.home.abbr}" else "${g.away.abbr} ${g.away.score ?: 0}  ${g.home.score ?: 0} ${g.home.abbr}"
+            Text(score, style = MaterialTheme.typography.labelLarge, color = if (mine) SofaColors.BlueBright else SofaColors.TextPrimary, maxLines = 1, modifier = Modifier.weight(1f).scorePulse(g.teams.sumOf { it.score ?: 0 }.toDouble(), if (mine) SofaColors.Blue else SofaColors.TextSecondary))
+            val detail = if (g.state == GameState.PRE) {
+                Countdown.format(System.currentTimeMillis(), g.startEpochMs) ?: g.shortDetail
+            } else g.shortDetail
+            Text(detail, style = MaterialTheme.typography.labelSmall, color = SofaColors.TextSecondary, maxLines = 1)
+            if (CloseGame.isClose(g, state.closeRule)) Badge("CLOSE", SofaColors.Close, outlined = true)
+        }
     }
 }
 
@@ -102,7 +224,7 @@ private fun GameRows(g: Game, state: OverlayState) {
             else -> Text(g.shortDetail.ifBlank { "Final" }, style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1)
         }
     }
-    if (state.showOdds) g.odds?.let { o ->
+    if (state.showOdds && OverlayRow.DK_LINE in state.prefs.rows) g.odds?.let { o ->
         val spread = Betting.spreadFor(o, g, me.abbr)
         val status = spread?.let { Betting.status(Betting.coverMargin(g, me.abbr, it), g.state) }
         Text(
@@ -118,6 +240,16 @@ private fun GameRows(g: Game, state: OverlayState) {
             leading = (t.score ?: 0) > (other.score ?: 0),
             pulseValue = t.score?.toDouble(),
         )
+    }
+    val sit = g.situation?.takeIf { g.state == GameState.LIVE }
+    if (sit != null && OverlayRow.DOWN_DISTANCE in state.prefs.rows) {
+        val ball = g.teams.firstOrNull { it.id == sit.possessionTeamId }
+        listOfNotNull(ball?.let { "${it.abbr} ball" }, sit.downDistance, if (sit.isRedZone) "RED ZONE" else null)
+            .takeIf { it.isNotEmpty() }
+            ?.let { Text(it.joinToString(" · "), style = MaterialTheme.typography.labelMedium, color = if (sit.isRedZone) SofaColors.Live else SofaColors.TextSecondary, maxLines = 1) }
+    }
+    if (OverlayRow.LAST_PLAY in state.prefs.rows) g.situation?.lastPlay?.takeIf { it.isNotBlank() && g.state == GameState.LIVE }?.let {
+        Text(TickerBuilder.trimPlay(it), style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -154,11 +286,11 @@ internal fun coverLabel(s: BetStatus): String? = when (s) {
     BetStatus.PENDING -> null
 }
 
-/** "PICKS 3/5 hitting" + up to 3 picks that are live (or next up). */
+/** "PICKS 3/5 hitting" + up to 5 picks that are live (or next up). */
 @Composable
 private fun PicksRows(picks: List<PickProgress>) {
     Text("PICKS ${PickEvaluator.hitting(picks)}/${picks.size} HITTING", style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted)
-    sortForDisplay(picks).filterNot { it.settled }.take(3).forEach { p ->
+    sortForDisplay(picks).filterNot { it.settled }.take(5).forEach { p ->
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.width(4.dp).height(18.dp).background(bookColor(p.pick.book), RoundedCornerShape(2.dp)))
             Spacer(Modifier.width(8.dp))
@@ -174,6 +306,6 @@ private fun PicksRows(picks: List<PickProgress>) {
 
 /** Full-width headline bar along the bottom of the screen, over the video. */
 @Composable
-fun OverlayTickerBar(state: OverlayState) {
-    if (state.barTicker) TickerBar(state.ticker, Modifier.background(SofaColors.Background))
+fun OverlayTickerBar(state: OverlayState, display: RenderedDisplay) {
+    if (state.barTicker && display.visible) TickerBar(state.ticker, Modifier.background(SofaColors.Background))
 }

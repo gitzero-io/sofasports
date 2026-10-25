@@ -44,6 +44,9 @@ import com.sofasports.tv.ui.picks.PicksScreen
 import com.sofasports.tv.ui.scores.ScoresScreen
 import com.sofasports.tv.ui.settings.EditFavoritesScreen
 import com.sofasports.tv.ui.settings.SettingsScreen
+import com.sofasports.tv.ui.settings.SettingsViewModel
+import com.sofasports.tv.ui.overlaysettings.OverlaySettingsScreen
+import com.sofasports.tv.ui.overlaysettings.RemoteButtonsScreen
 import com.sofasports.tv.ui.theme.SofaColors
 import com.sofasports.tv.ui.update.UpdateSection
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -66,6 +69,8 @@ object Routes {
     const val ADD_ESPN = "espn-add"
     const val PICKS = "picks"
     const val ADD_PICK = "picks-add"
+    const val OVERLAY_SETTINGS = "overlay-settings"
+    const val REMOTE_BUTTONS = "remote-buttons"
     fun game(id: String) = "game/$id"
 }
 
@@ -158,8 +163,15 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
                     composable(Routes.SETTINGS) { SettingsScreen(
                             onEditFavorites = { nav.navigate(Routes.EDIT_FAVORITES) },
                             onAddEspnLeague = { nav.navigate(Routes.ADD_ESPN) },
+                            onCustomizeOverlay = { nav.navigate(Routes.OVERLAY_SETTINGS) },
+                            onRemoteButtons = { nav.navigate(Routes.REMOTE_BUTTONS) },
                             updateSection = { UpdateSection() },
                         ) }
+                    composable(Routes.OVERLAY_SETTINGS) {
+                        val settingsVm: SettingsViewModel = hiltViewModel()
+                        OverlaySettingsScreen(onDone = { nav.popBackStack() }, onPosition = settingsVm::setOverlayCorner)
+                    }
+                    composable(Routes.REMOTE_BUTTONS) { RemoteButtonsScreen(onDone = { nav.popBackStack() }) }
                     composable(Routes.ADD_ESPN) { AddEspnLeagueScreen(onDone = { nav.popBackStack() }) }
                     composable(Routes.EDIT_FAVORITES) { EditFavoritesScreen(onDone = { nav.popBackStack() }) }
                 }

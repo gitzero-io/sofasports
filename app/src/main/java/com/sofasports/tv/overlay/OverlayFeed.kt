@@ -3,6 +3,7 @@ package com.sofasports.tv.overlay
 import com.sofasports.tv.data.config.CloseGameRule
 import com.sofasports.tv.data.config.ConfigRepository
 import com.sofasports.tv.data.picks.PicksRepository
+import com.sofasports.tv.data.prefs.OverlayPrefs
 import com.sofasports.tv.data.prefs.OverlayTicker
 import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.data.repo.TickerRepository
@@ -40,12 +41,15 @@ data class OverlayState(
     val picks: List<PickProgress> = emptyList(),
     val tickerMode: OverlayTicker = OverlayTicker.OFF,
     val ticker: List<TickerItem> = emptyList(),
+    /** This week's scoreboard, for "Around the league", "playing now" and close-game moments. */
+    val games: List<Game> = emptyList(),
+    val prefs: OverlayPrefs = OverlayPrefs(),
 ) {
     val cornerTicker get() = (tickerMode == OverlayTicker.CORNER || tickerMode == OverlayTicker.BOTH) && ticker.isNotEmpty()
     val barTicker get() = (tickerMode == OverlayTicker.BAR || tickerMode == OverlayTicker.BOTH) && ticker.isNotEmpty()
 }
 
-/** What the corner overlay shows: the selected Sleeper matchup and one game. */
+/** What the overlay can show: the selected fantasy matchup, one game, picks, the scoreboard and the ticker. */
 @Singleton
 class OverlayFeed @Inject constructor(
     private val fantasy: FantasyRepository,
@@ -83,6 +87,8 @@ class OverlayFeed @Inject constructor(
                     picks = if (cfg.features.picks) pk else emptyList(),
                     tickerMode = tk.first,
                     ticker = tk.second,
+                    games = games,
+                    prefs = prefs.overlay,
                 )
             }.collect { _state.value = it }
         }

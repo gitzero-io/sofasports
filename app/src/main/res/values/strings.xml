@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Sofa Sports</string>
+    <string name="remote_service_label">Sofa Sports remote buttons</string>
+    <string name="remote_service_description">Lets one or two remote buttons you choose show, hide and flip the Sofa Sports score overlay while you watch. It only listens for those buttons: it never reads what\'s on screen, and every other button works as usual.</string>
 </resources>
