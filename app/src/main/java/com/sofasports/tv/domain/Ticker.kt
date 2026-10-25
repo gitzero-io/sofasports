@@ -8,7 +8,30 @@ data class NewsItem(
     val teamAbbrs: Set<String> = emptySet(),
     val athleteIds: Set<String> = emptySet(),
     val athleteNames: Set<String> = emptySet(),
+    /** ESPN's article type; see [NewsFilter]. */
+    val kind: String? = null,
 )
+
+/**
+ * The ticker only carries news a bettor or fantasy player would act on: a named player's status
+ * (out, questionable, IR, starting, returning, traded…). Feature stories, rankings, betting guides,
+ * videos and off-field team news are dropped.
+ */
+object NewsFilter {
+    private val status = Regex(
+        "\\b(out|ruled? out|rules out|questionable|doubtful|probable|inactive|limited|game-time|" +
+            "injur\\w*|ir|reserve|activat\\w*|return\\w*|debut\\w*|expected to play|will play|won't play|unsure|" +
+            "miss(es|ed|ing)?|practice\\w*|to start|will start|starting|starts|benched|bench|demoted|promoted|" +
+            "suspen\\w*|trade[sd]?|acquire[sd]?|sign(s|ed)?|releas\\w*|waive[sd]?|cut|carted|elevat\\w*|" +
+            "sprain\\w*|ankle|knee|hamstring|groin|calf|concussion|chest|shoulder|foot|hip|illness|surgery)\\b",
+        RegexOption.IGNORE_CASE,
+    )
+
+    fun isUseful(n: NewsItem): Boolean =
+        (n.kind == null || n.kind == "HeadlineNews") &&
+            (n.athleteIds.isNotEmpty() || n.athleteNames.isNotEmpty()) &&
+            status.containsMatchIn(n.headline)
+}
 
 enum class TickerKind(val tag: String) { SCORE_EVENT("SCORE"), LIVE_SCORE("LIVE"), HEADLINE("NEWS") }
 
@@ -115,7 +138,7 @@ object TickerBuilder {
             e.copy(mine = byId[gameId]?.let(interests::matches) == true)
         }
         val live = games.filter { it.state == GameState.LIVE }.map { g -> liveScore(g).copy(mine = interests.matches(g)) }
-        val headlines = news.sortedByDescending { it.publishedMs }.take(MAX_HEADLINES).map { n ->
+        val headlines = news.filter(NewsFilter::isUseful).sortedByDescending { it.publishedMs }.take(MAX_HEADLINES).map { n ->
             TickerItem("news-${n.id}", TickerKind.HEADLINE, n.headline, interests.matches(n), n.publishedMs)
         }
         val all = freshEvents.sortedByDescending { it.timeMs } + live + headlines

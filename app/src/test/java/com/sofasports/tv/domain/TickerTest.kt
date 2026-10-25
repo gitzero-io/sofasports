@@ -32,8 +32,10 @@ class TickerTest {
         assertFalse(TickerBuilder.build(news, emptyList(), emptyList(), TickerInterests(), now).any { it.mine })
     }
 
-    @Test fun `headlines are capped and newest first`() {
-        val items = TickerBuilder.build(news, emptyList(), emptyList(), TickerInterests(), now)
+    @Test fun `headlines are filtered, capped and newest first`() {
+        assertEquals(4, TickerBuilder.build(news, emptyList(), emptyList(), TickerInterests(), now).size)
+        val many = (1..30).map { NewsItem("n$it", "Player $it ruled out", it.toLong(), athleteNames = setOf("P$it"), kind = "HeadlineNews") }
+        val items = TickerBuilder.build(many, emptyList(), emptyList(), TickerInterests(), now)
         assertEquals(TickerBuilder.MAX_HEADLINES, items.size)
         assertTrue(items.zipWithNext().all { (a, b) -> a.timeMs >= b.timeMs })
     }

@@ -118,3 +118,7 @@ One line per judgment call, with the reason.
 - No provider offers a public link that opens a specific game or channel, so we open the app (the user picks the channel) or ask Google TV search for "Away vs Home", whose results list where it's live.
 - Routing: games on TV networks (CBS, Fox, NBC, ABC, ESPN, NFL Net) open the live TV app the user picked (Settings → Watch games, chosen from installed TV apps); streaming exclusives (Prime Video, Peacock, Netflix, YouTube, Disney+, Paramount+, NFL+) open that app when installed. ESPN's full broadcasts list is kept as `Game.networks`.
 - Package visibility: the manifest `<queries>` asks only for home-screen (LEANBACK_LAUNCHER) apps and the global search action, not all packages.
+
+## Ticker: bettor/fantasy news only
+- Headlines must be ESPN "HeadlineNews" (not Story/Media), tag at least one player, and read as a status change (out, questionable, IR, activated, starting, returning, traded, injury terms). Everything else (rankings, betting guides, uniforms, features, team off-field news) is dropped. Scoring plays and live scores are unchanged.
+- The feed request went from 25 to 50 items because roughly a third survive the filter.

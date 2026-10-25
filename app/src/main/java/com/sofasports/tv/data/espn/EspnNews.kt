@@ -22,6 +22,8 @@ import javax.inject.Singleton
 private data class ArticleDto(
     val id: JsonElement? = null,
     val headline: String? = null,
+    /** "HeadlineNews" (short news), "Story" (articles, rankings), "Media" (video). */
+    val type: String? = null,
     val published: String? = null,
     val categories: List<CategoryDto> = emptyList(),
 )
@@ -49,6 +51,7 @@ object EspnNewsParser {
                 teamAbbrs = a.categories.filter { it.type == "team" }.mapNotNull { it.team?.abbreviation }.toSet(),
                 athleteIds = athletes.mapNotNull { (it.athleteId as? JsonPrimitive)?.contentOrNull }.toSet(),
                 athleteNames = athletes.mapNotNull { it.description }.toSet(),
+                kind = a.type,
             )
         }
 }
@@ -60,7 +63,7 @@ interface NewsProvider {
 @Singleton
 class EspnNewsProvider @Inject constructor(private val http: HttpClient, private val bases: ApiBases) : NewsProvider {
     override suspend fun headlines(): List<NewsItem> {
-        val res = http.get("${bases.espnNflBase}/news?limit=25")
+        val res = http.get("${bases.espnNflBase}/news?limit=50")
         if (!res.status.isSuccess()) error("ESPN news HTTP ${res.status.value}")
         return EspnNewsParser.parse(res.bodyAsText())
     }
