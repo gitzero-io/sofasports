@@ -5,6 +5,8 @@ import com.sofasports.tv.data.espn.EspnNewsParser
 import com.sofasports.tv.data.espn.EspnParser
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -54,6 +56,18 @@ class TickerTest {
         assertEquals(listOf(TickerKind.SCORE_EVENT, TickerKind.LIVE_SCORE), items.map { it.kind })
         assertTrue(items.all { it.mine })
         assertEquals("HOU 34  JAX 31 · 3rd 6:19", items[1].text)
+    }
+
+    @Test fun `play text is only attached when it is the scoring play`() {
+        val before = game.copy(state = GameState.LIVE, away = game.away.copy(score = 17), home = game.home.copy(score = 14))
+        val jaxTd = before.copy(home = before.home.copy(score = 21), situation = Situation(null, null, false, "C.Stroud pass short left to D.Schultz for 6 yards."))
+        assertEquals("TD JAX · HOU 17–21 JAX", TickerBuilder.scoreEvents(listOf(before), listOf(jaxTd), now).single().text)
+        assertNull(TickerBuilder.scoringPlayText("TD", "K.Fairbairn kicks 65 yards from HOU 35 to end zone, Touchback."))
+        assertEquals("K.Fairbairn 45 yard field goal is GOOD", TickerBuilder.scoringPlayText("FG", "K.Fairbairn 45 yard field goal is GOOD. Center-J.Weeks."))
+        assertNull(TickerBuilder.scoringPlayText("FG", "K.Fairbairn 52 yard field goal is No Good, Wide Right."))
+        assertNotNull(TickerBuilder.scoringPlayText("2 PTS", "T.Etienne tackled in end zone for a SAFETY"))
+        assertNull(TickerBuilder.scoringPlayText("+4", "anything"))
+        assertNull(TickerBuilder.scoringPlayText("TD", null))
     }
 
     @Test fun `long play text is trimmed to its first sentence`() {

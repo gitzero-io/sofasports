@@ -22,6 +22,8 @@ data class VersionInfo(
     /** Builds below this must update (shown as a required update). */
     val minSupportedVersionCode: Int = 0,
     val apkUrl: String = "",
+    /** Optional; when set, the in-app installer checks the download against it. */
+    val apkSha256: String = "",
     val notes: String = "",
 )
 
@@ -43,7 +45,7 @@ object UpdateRules {
     }
 }
 
-/** Checks [BuildConfig.VERSION_URL]. No auto-install: sideloaded TV apps update by downloading the new APK. */
+/** Checks [BuildConfig.VERSION_URL]. Installing is [UpdateInstaller], and only when the user asks. */
 @Singleton
 class UpdateChecker @Inject constructor(
     private val http: HttpClient,

@@ -38,7 +38,7 @@ Open in Android Studio, or:
 
 Optional settings go in `local.properties` (never committed): `sentry.dsn`, `sofa.configUrl`, `sofa.versionUrl`, `sofa.feedbackUrl`, and the `release.*` signing keys. The app runs fine without any of them. Debug builds include offline fixtures (Settings → Data source → Fixtures).
 
-`release-assets/config.json` (remote config and kill switch) and `release-assets/version.json` (update check) are read by the app straight from this repo's `main` branch.
+`release-assets/config.json` (remote config and kill switch) and `release-assets/version.json` (update check and the in-app "Install update" button, from 0.2.1) are read by the app straight from this repo's `main` branch.
 
 ## Notes
 

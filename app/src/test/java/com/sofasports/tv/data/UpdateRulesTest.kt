@@ -1,5 +1,6 @@
 package com.sofasports.tv.data
 
+import com.sofasports.tv.BuildConfig
 import com.sofasports.tv.data.update.UpdateRules
 import com.sofasports.tv.data.update.UpdateStatus
 import com.sofasports.tv.data.update.VersionInfo
@@ -12,10 +13,10 @@ import java.io.File
 class UpdateRulesTest {
     private val url = "https://example.com/a.apk"
 
-    @Test fun `sample version json parses and says up to date for version 1`() {
+    @Test fun `published version json parses and never announces a build newer than this one`() {
         val info = UpdateRules.parse(File("../release-assets/version.json").readText())!!
-        assertEquals(1, info.latestVersionCode)
-        assertEquals(UpdateStatus.UpToDate, UpdateRules.evaluate(info, 1))
+        assertTrue(info.apkUrl.startsWith("https://"))
+        assertEquals(UpdateStatus.UpToDate, UpdateRules.evaluate(info, BuildConfig.VERSION_CODE))
     }
 
     @Test fun `newer build is available, optional`() {

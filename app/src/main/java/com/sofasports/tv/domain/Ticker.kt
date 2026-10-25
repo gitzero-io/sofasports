@@ -50,7 +50,7 @@ object TickerBuilder {
             val delta = (scorer.score ?: 0) - (old.side(scorer.abbr)?.score ?: 0)
             val what = scoreLabel(delta)
             val score = "${g.away.abbr} ${g.away.score ?: 0}–${g.home.score ?: 0} ${g.home.abbr}"
-            val play = g.situation?.lastPlay?.takeIf { it.isNotBlank() }?.let { trimPlay(it) }
+            val play = scoringPlayText(what, g.situation?.lastPlay)
             TickerItem(
                 key = "ev-${g.id}-${g.away.score}-${g.home.score}",
                 kind = TickerKind.SCORE_EVENT,
@@ -68,6 +68,24 @@ object TickerBuilder {
         2 -> "2 PTS"
         1 -> "XP"
         else -> "+$delta"
+    }
+
+    /**
+     * The scoreboard's "last play" is often already the kickoff or the other team's next snap by the
+     * time we poll, so it's only shown when it reads like the score that just happened.
+     */
+    internal fun scoringPlayText(label: String, text: String?): String? {
+        val t = text?.takeIf { it.isNotBlank() } ?: return null
+        val lower = t.lowercase()
+        val good = "no good" !in lower
+        val matches = when (label) {
+            "TD" -> "touchdown" in lower
+            "FG" -> "field goal" in lower && good
+            "XP" -> "extra point" in lower && good
+            "2 PTS" -> "safety" in lower || ("two-point" in lower && "succeeds" in lower)
+            else -> false
+        }
+        return if (matches) trimPlay(t) else null
     }
 
     /** ESPN play text can run long; keep the first sentence. */
