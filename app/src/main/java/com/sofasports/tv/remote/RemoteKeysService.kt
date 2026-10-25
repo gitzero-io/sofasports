@@ -4,7 +4,9 @@ import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.KeyEvent
+import com.sofasports.tv.BuildConfig
 import android.view.accessibility.AccessibilityEvent
 import com.sofasports.tv.MainActivity
 import com.sofasports.tv.data.prefs.OverlayPrefs
@@ -51,12 +53,14 @@ class RemoteKeysService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        if (BuildConfig.DEBUG) Log.d(TAG, "connected, flags=${serviceInfo?.flags}")
         prefsJob = scope.launch { settings.settings.collect { prefs = it.overlay } }
         remoteKeys.setConnected(true)
     }
 
     override fun onKeyEvent(event: KeyEvent): Boolean {
         val code = event.keyCode
+        if (BuildConfig.DEBUG) Log.d(TAG, "key $code action ${event.action} learning=${remoteKeys.learning.value}")
         if (remoteKeys.learning.value != null) {
             if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) learn(code)
             return true
@@ -139,6 +143,8 @@ class RemoteKeysService : AccessibilityService() {
         cleanup()
         super.onDestroy()
     }
+
+    private companion object { const val TAG = "SofaRemote" }
 
     private fun cleanup() {
         gestures.reset()

@@ -6,7 +6,8 @@ NFL scores, fantasy and a live score overlay for Android TV / Google TV.
 - **Game Center**: win probability, box score, play-by-play and DraftKings lines.
 - **Fantasy**: your Sleeper (username only) and ESPN Fantasy leagues, with a live matchup card.
 - **Picks**: track PrizePicks and DraftKings picks you enter on the TV, live from ESPN box scores.
-- **Overlay**: a small corner card over whatever you're watching (your matchup, a pinned game, your picks), plus an optional news ticker.
+- **Overlay**: a small card over whatever you're watching, with pages you flip through (your matchup, your game, around the league, picks, or a one-line pill), plus an optional news ticker. Size, opacity and position are adjustable, and smart mode pops it up on big moments.
+- **Remote buttons**: pick a spare button on your remote to show, hide and flip the overlay without leaving your video (uses an accessibility service that only listens for that button).
 
 Blue is always you (your team, your fantasy side) and red is the opponent.
 

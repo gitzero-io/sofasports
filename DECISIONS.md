@@ -91,3 +91,16 @@ One line per judgment call, with the reason.
 - Over-video ticker is a setting with Off / Corner card line / Bottom bar / Both; default Corner card line (adds no screen area beyond the existing card). The bottom bar is a second NOT_FOCUSABLE overlay window; a bottom-corner card is lifted above it.
 - Ticker bars keep their text inside the TV overscan-safe area (48dp sides, extra bottom inset in-app); the background runs edge to edge.
 - The ticker's "NFL" label is neutral grey, not blue → blue stays reserved for "me".
+
+## Overlay controls and customization (after v0.1.0)
+- Remote control uses an AccessibilityService that only filters key events (`flagRequestFilterKeyEvents`, `canRetrieveWindowContent=false`) → it's the only way for a sideloaded app to react to remote buttons while another app (YouTube etc.) has focus. Every key other than the 1–2 the user picked is passed straight through.
+- Buttons are learned ("press the button you want") instead of hard-coded → works on any remote, not just the onn 4K Pro. D-pad, OK, Back, Home, volume, power and play/pause can't be bound.
+- Show/hide button: press = show/hide, double = next page, hold = open Sofa Sports. Optional next-page button: press = next, double = previous, hold = show/hide. A single press waits 350 ms to rule out a double press.
+- A press while the overlay is off turns it on (if the overlay permission is granted).
+- Hidden = the card's window is removed → on the emulator a window that shrank to 0 px kept its last frame on screen.
+- Pages: My matchup, My game, Around the league, Picks, Minimized pill. Pages with nothing to show are skipped; at least one page must stay enabled. Auto-rotate never goes to Minimized.
+- Smart automatic mode is one switch (default off) that gates everything the overlay does by itself: pop on big moments, minimize when quiet, live games only, quiet hours → per user request, pop only runs in smart mode. Pop is on by default once smart mode is on.
+- Big moments are found by diffing consecutive overlay states (score in my game, a starter gaining ≥ 4 fantasy points between polls, fantasy lead flips, a pick settling, a game turning close). Each pops once for 8 s, max 3 queued; quiet hours drop them.
+- A show/hide press overrides smart mode's rules until those rules change their answer (e.g. games start or end), so it never sticks forever.
+- Size is a density multiplier (0.85 / 1 / 1.25) so text and spacing scale together; opacity applies to the background only.
+- `adb shell input keyevent` bypasses Android's accessibility key filter, so remote-button tests on the emulator use a `uinput` virtual remote (real key events).

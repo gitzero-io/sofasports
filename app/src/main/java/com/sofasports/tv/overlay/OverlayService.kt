@@ -63,11 +63,12 @@ class OverlayService : LifecycleService(), SavedStateRegistryOwner {
         super.onCreate()
         startAsForeground()
         val barShown = combine(feed.state, overlayDisplay.rendered) { s, d -> s.barTicker && d.visible }.distinctUntilChanged()
-        // The card's window stays attached while hidden (it just draws nothing), so a remote press shows it instantly.
+        // Hidden = window removed: a window that shrinks to nothing can keep its last frame on screen.
+        val cardShown = combine(appVisibility.inForeground, overlayDisplay.rendered) { appShown, d -> !appShown && d.visible }
         lifecycleScope.launch {
-            combine(settings.settings.map { it.overlayCorner to it.overlay.edge }, appVisibility.inForeground, barShown) { place, appShown, bar -> Triple(place, appShown, bar) }
+            combine(settings.settings.map { it.overlayCorner to it.overlay.edge }, cardShown, barShown) { place, shown, bar -> Triple(place, shown, bar) }
                 .distinctUntilChanged()
-                .collect { (place, appShown, bar) -> if (appShown) removeView() else show(place.first, place.second, liftAboveBar = bar) }
+                .collect { (place, shown, bar) -> if (shown) show(place.first, place.second, liftAboveBar = bar) else removeView() }
         }
         lifecycleScope.launch {
             combine(appVisibility.inForeground, barShown) { appShown, bar -> !appShown && bar }
