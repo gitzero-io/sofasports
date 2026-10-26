@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -106,7 +108,11 @@ fun FavoritesPicker(
     var tab by rememberSaveable { mutableStateOf(teamLeagues.first().id) }
     // Start on the league tabs, not the app's top bar.
     val tabFocus = remember { FocusRequester() }
-    LaunchedEffect(Unit) { runCatching { tabFocus.requestFocus() } }
+    LaunchedEffect(Unit) {
+        // Wait a frame: navigation hands focus back to the top bar after the first composition.
+        kotlinx.coroutines.android.awaitFrame()
+        runCatching { tabFocus.requestFocus() }
+    }
     val league = teamLeagues.firstOrNull { it.id == tab } ?: teamLeagues.first()
     val loads by vm.teams.collectAsStateWithLifecycle()
     LaunchedEffect(league) { vm.load(league) }
@@ -114,8 +120,9 @@ fun FavoritesPicker(
 
     Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (teamLeagues.size > 1) {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(vertical = 4.dp)) {
-                rowItems(teamLeagues, key = { it.id }) { l ->
+            // A plain scrolling Row (not lazy) so the selected tab exists when focus is requested.
+            Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 6.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                teamLeagues.forEach { l ->
                     val n = Favorites.inLeague(selected, l).size
                     SofaButton(
                         if (n > 0) "${l.label} ($n)" else l.label, onClick = { tab = l.id }, selected = l == league,

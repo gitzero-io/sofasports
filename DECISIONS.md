@@ -147,3 +147,11 @@ One line per judgment call, with the reason.
 - Fixtures: a real scoreboard per league saved 2026-10-25/26, plus NBA, NHL, EPL and MLB summaries. Fixture mode replays LAL @ UTAH's fourth quarter so non-football live paths can be seen offline.
 - Fantasy, the picks tracker and ESPN news-to-fantasy matching remain NFL-only.
 - MLB and NHL send a competitor's `record` as a plain string, and soccer sends `"odds":[null]`; both made whole scoreboards fail to parse until the DTOs accepted them. Caught by parsing every saved scoreboard in a test.
+
+## Multi-sport, round 2 (2026-10-26, branch `multi-sport-2`)
+- Fighters and drivers can be favorites. Their key is the full name ("ufc:Alexander Volkanovski", "f1:Lando Norris"), not an id: TheSportsDB boxing has no athlete ids, and names read well in Settings. Keys compare case-insensitively; commas are stripped because favorites are stored comma-joined.
+- Fighter list = everyone on UFC cards from 150 days back to 90 ahead (one ESPN date-range request, ~380 fighters), or the boxers TheSportsDB returns. Driver list = the current race weekend's entry list. Both sort by last name with accents ignored, so "Álvarez" files under A.
+- A favorite fighter's bout is the one shown on their card's tile and counts as "your game" on Home and in the overlay. A favorite driver gets a blue line with their position on race cards and pages (even outside the top three).
+- Races can be pinned. With nothing pinned and no favorite game on, the overlay's "my game" page shows a favorite driver's race while a session is live or starts within 12 h.
+- Fixture mode replays one game each in the NHL, MLB and Premier League as well, and runs the UFC main event and the F1 race live for the first ten minutes.
+- Not done: fantasy for other sports (Sleeper has NBA leagues). It touches the player cache, projections, the live-projection model and the matchup card, all NFL-shaped today, and there's no NBA league to test against.
