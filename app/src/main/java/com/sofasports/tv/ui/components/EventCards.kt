@@ -46,14 +46,19 @@ fun FightCardTile(card: FightCard, nowMs: Long, onClick: () -> Unit, modifier: M
 private fun FighterLine(bout: Game, side: com.sofasports.tv.domain.TeamSide) {
     val lost = bout.state == GameState.FINAL && bout.winnerSide?.let { it.id != side.id } == true
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        TeamLogo(side.logoUrl, side.name, size = 28.dp)
-        Spacer(Modifier.width(10.dp))
-        Text(
-            side.name, style = MaterialTheme.typography.titleMedium,
-            color = if (lost) SofaColors.TextMuted else SofaColors.TextPrimary,
-            maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
-        )
-        side.record?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted) }
+        // Boxing has no flags or photos; don't leave a gap for one.
+        side.logoUrl?.let {
+            TeamLogo(it, side.name, size = 28.dp)
+            Spacer(Modifier.width(10.dp))
+        }
+        Column(Modifier.weight(1f)) {
+            Text(
+                side.name, style = MaterialTheme.typography.titleMedium,
+                color = if (lost) SofaColors.TextMuted else SofaColors.TextPrimary,
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+            )
+            side.record?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted) }
+        }
         if (side.winner == true) {
             Spacer(Modifier.width(8.dp))
             Badge("WIN", SofaColors.Positive)

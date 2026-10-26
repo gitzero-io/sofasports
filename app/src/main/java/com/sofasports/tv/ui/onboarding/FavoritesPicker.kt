@@ -19,6 +19,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -189,9 +192,11 @@ private fun TeamGrid(teams: List<TeamInfo>, selected: List<String>, onToggle: (S
     }
 }
 
-/** Every league, grouped by sport; selected ones are blue and numbered in follow order. */
+/** Every league, grouped by sport; selected ones are blue and numbered in follow order. The first card takes focus. */
 @Composable
 fun LeaguePicker(selected: List<League>, onToggle: (League) -> Unit, modifier: Modifier = Modifier) {
+    val first = remember { FocusRequester() }
+    LaunchedEffect(Unit) { runCatching { first.requestFocus() } }
     LazyVerticalGrid(
         columns = GridCells.Fixed(6),
         modifier = modifier,
@@ -206,11 +211,19 @@ fun LeaguePicker(selected: List<League>, onToggle: (League) -> Unit, modifier: M
             items(leagues, key = { it.id }) { l ->
                 val order = selected.indexOf(l)
                 val on = order >= 0
-                SofaCard(onClick = { onToggle(l) }, containerColor = if (on) SofaColors.BlueDim else SofaColors.Surface, contentPadding = PaddingValues(14.dp)) {
+                SofaCard(
+                    onClick = { onToggle(l) },
+                    modifier = if (l == League.entries.first()) Modifier.focusRequester(first) else Modifier,
+                    containerColor = if (on) SofaColors.BlueDim else SofaColors.Surface,
+                    contentPadding = PaddingValues(14.dp),
+                ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(l.label, style = MaterialTheme.typography.headlineSmall, color = if (on) SofaColors.BlueBright else SofaColors.TextPrimary, maxLines = 1)
-                            Text(l.fullName, style = MaterialTheme.typography.labelSmall, color = SofaColors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(
+                                l.fullName.takeIf { it != l.label } ?: l.sport.label,
+                                style = MaterialTheme.typography.labelSmall, color = SofaColors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            )
                         }
                         if (on) {
                             Box(Modifier.background(SofaColors.Blue, CircleShape).padding(horizontal = 8.dp, vertical = 2.dp)) {
@@ -222,5 +235,18 @@ fun LeaguePicker(selected: List<League>, onToggle: (League) -> Unit, modifier: M
             }
         }
         item(span = { GridItemSpan(maxLineSpan) }) { Box(Modifier.height(24.dp)) }
+    }
+}
+
+/**
+ * Title, a line of help, and the action buttons on their own row underneath, left-aligned so
+ * pressing Up from any card reaches them (buttons parked at the far right were unreachable).
+ */
+@Composable
+fun PickerHeader(title: String, subtitle: String?, buttons: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(title, style = MaterialTheme.typography.headlineMedium, color = SofaColors.TextPrimary)
+        subtitle?.let { Text(it, style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary) }
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically, content = buttons)
     }
 }

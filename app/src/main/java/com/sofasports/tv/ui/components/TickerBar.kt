@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.sofasports.tv.domain.TickerBuilder
 import com.sofasports.tv.domain.TickerItem
 import com.sofasports.tv.domain.TickerKind
 import com.sofasports.tv.ui.theme.SofaColors
@@ -45,7 +46,7 @@ fun TickerCrawl(
     if (items.isEmpty()) return
     Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.background(SofaColors.SurfaceFocused).padding(horizontal = 10.dp, vertical = 4.dp)) {
-            Text("NFL", style = MaterialTheme.typography.labelMedium, color = SofaColors.TextPrimary)
+            Text(TickerBuilder.label(items), style = MaterialTheme.typography.labelMedium, color = SofaColors.TextPrimary)
         }
         Spacer(Modifier.width(12.dp))
         Row(

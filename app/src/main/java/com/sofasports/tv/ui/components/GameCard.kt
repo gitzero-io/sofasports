@@ -108,13 +108,16 @@ private fun TeamRow(team: TeamSide, game: Game, favorites: List<String>) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.width(6.dp).size(width = 6.dp, height = 36.dp).background(color, MaterialTheme.shapes.small))
         Spacer(Modifier.width(10.dp))
-        TeamLogo(team.logoUrl, team.name, size = 40.dp)
-        Spacer(Modifier.width(10.dp))
+        // Boxers have no flag or photo; don't leave a gap for one.
+        if (team.logoUrl != null || !fight) {
+            TeamLogo(team.logoUrl, team.name, size = 40.dp)
+            Spacer(Modifier.width(10.dp))
+        }
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     if (fight) team.name else team.abbr,
-                    style = if (fight) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineSmall,
+                    style = if (fight) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineSmall,
                     color = if (dim) SofaColors.TextMuted else SofaColors.TextPrimary,
                     maxLines = 1, overflow = TextOverflow.Ellipsis,
                 )

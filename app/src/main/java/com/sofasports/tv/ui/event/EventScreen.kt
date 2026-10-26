@@ -12,7 +12,12 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -104,6 +109,8 @@ fun EventScreen(vm: EventViewModel = hiltViewModel()) {
 @Composable
 private fun FightCardContent(card: FightCard, pinnedKey: String?, onPin: (GameRef) -> Unit) {
     val now = rememberNowMs(1_000)
+    val first = remember { FocusRequester() }
+    LaunchedEffect(Unit) { runCatching { first.requestFocus() } }
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
@@ -144,6 +151,7 @@ private fun FightCardContent(card: FightCard, pinnedKey: String?, onPin: (GameRe
                     closeRule = CloseGameRule(),
                     nowMs = if (bout.state == GameState.PRE) now else 0L,
                     onClick = { selected = bout.ref.key },
+                    modifier = if (i == 0) Modifier.focusRequester(first) else Modifier,
                 )
             }
         }
@@ -152,7 +160,9 @@ private fun FightCardContent(card: FightCard, pinnedKey: String?, onPin: (GameRe
 
 @Composable
 private fun RaceContent(race: Race) {
-    var session by rememberSaveable(race.id) { mutableStateOf(race.sessions.indexOfFirst { it.name == race.session }.coerceAtLeast(0)) }
+    val first = remember { FocusRequester() }
+    LaunchedEffect(Unit) { runCatching { first.requestFocus() } }
+    var session by rememberSaveable(race.id) { mutableIntStateOf(race.sessions.indexOfFirst { it.name == race.session }.coerceAtLeast(0)) }
     val s = race.sessions.getOrNull(session)
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -170,7 +180,9 @@ private fun RaceContent(race: Race) {
                 )
                 if (race.sessions.size > 1) {
                     SpacedRow {
-                        race.sessions.forEachIndexed { i, rs -> SofaButton(rs.name, onClick = { session = i }, selected = i == session) }
+                        race.sessions.forEachIndexed { i, rs ->
+                            SofaButton(rs.name, onClick = { session = i }, selected = i == session, modifier = if (i == session) Modifier.focusRequester(first) else Modifier)
+                        }
                     }
                 }
                 Spacer(Modifier.padding(4.dp))
@@ -186,7 +198,9 @@ private fun RaceContent(race: Race) {
             }
         } else {
             items(s.results, key = { "${s.id}-${it.driverId}" }) { e ->
-                RaceEntryLine(e, Modifier.focusableRow().padding(horizontal = 16.dp, vertical = 8.dp))
+                // One-session weekends (NASCAR, IndyCar) have no session buttons to start focus on.
+                val focus = if (race.sessions.size <= 1 && e == s.results.first()) Modifier.focusRequester(first) else Modifier
+                RaceEntryLine(e, focus.focusableRow().padding(horizontal = 16.dp, vertical = 8.dp))
             }
         }
     }

@@ -3,24 +3,19 @@ package com.sofasports.tv.ui.onboarding
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Text
 import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.domain.Favorites
 import com.sofasports.tv.domain.League
@@ -66,7 +61,7 @@ internal fun List<String>.leagues() = mapNotNull(League::fromId)
  */
 @Composable
 fun OnboardingScreen(onDone: () -> Unit, vm: OnboardingViewModel = hiltViewModel()) {
-    var step by rememberSaveable { mutableStateOf(0) }
+    var step by rememberSaveable { mutableIntStateOf(0) }
     var leagueIds by rememberSaveable { mutableStateOf(League.DEFAULT_FOLLOWED.ids()) }
     var selected by rememberSaveable { mutableStateOf(listOf<String>()) }
     val leagues = leagueIds.leagues()
@@ -75,18 +70,11 @@ fun OnboardingScreen(onDone: () -> Unit, vm: OnboardingViewModel = hiltViewModel
         Modifier.fillMaxSize().background(SofaColors.Background).padding(top = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text(
-                    if (step == 0) "What do you watch?" else "Who do you root for?",
-                    style = MaterialTheme.typography.displaySmall, color = SofaColors.TextPrimary,
-                )
-                Text(
-                    if (step == 0) "Pick the leagues you want scores for. The first one opens first on Scores."
-                    else "Pick up to ${Favorites.MAX_PER_LEAGUE} per league. Your teams show first and are always blue.",
-                    style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary,
-                )
-            }
+        PickerHeader(
+            if (step == 0) "What do you watch?" else "Who do you root for?",
+            if (step == 0) "Pick the leagues you want scores for. The first one you pick opens first on Scores."
+            else "Pick up to ${Favorites.MAX_PER_LEAGUE} per league. Your teams show first and are always blue.",
+        ) {
             if (step == 0) {
                 SofaButton(
                     if (leagues.isEmpty()) "Next" else "Next (${leagues.size})",
@@ -94,15 +82,13 @@ fun OnboardingScreen(onDone: () -> Unit, vm: OnboardingViewModel = hiltViewModel
                     selected = leagues.isNotEmpty(),
                 )
             } else {
-                SofaButton("Back", onClick = { step = 0 })
-                Spacer(Modifier.padding(6.dp))
-                SofaButton("Skip", onClick = { vm.finish(leagues, emptyList(), onDone) })
-                Spacer(Modifier.padding(6.dp))
                 SofaButton(
                     if (selected.isEmpty()) "Done" else "Done (${selected.size})",
                     onClick = { vm.finish(leagues, selected, onDone) },
                     selected = selected.isNotEmpty(),
                 )
+                SofaButton("Skip", onClick = { vm.finish(leagues, emptyList(), onDone) })
+                SofaButton("Back", onClick = { step = 0 })
             }
         }
         if (step == 0) {

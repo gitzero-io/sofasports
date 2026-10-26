@@ -97,7 +97,12 @@ fun WatchRow(game: Game, options: List<WatchOption>, onWatch: (WatchOption) -> U
     SpacedRow(modifier) {
         val networks = game.networks.ifEmpty { listOfNotNull(game.broadcast) }
         if (networks.isNotEmpty()) {
-            Text("On ${networks.joinToString(" · ")}", style = MaterialTheme.typography.titleSmall, color = SofaColors.TextSecondary)
+            // NBA and MLB games can list five regional networks; keep the buttons on screen.
+            Text(
+                "On ${networks.take(3).joinToString(" · ")}${if (networks.size > 3) " +${networks.size - 3}" else ""}",
+                style = MaterialTheme.typography.titleSmall, color = SofaColors.TextSecondary,
+                maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false),
+            )
         }
         options.forEachIndexed { i, o -> SofaButton("Watch on ${o.label}", onClick = { onWatch(o) }, selected = i == 0) }
         SofaButton("Find on Google TV", onClick = onSearch)

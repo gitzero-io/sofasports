@@ -46,6 +46,7 @@ data class TickerItem(
     /** About my teams, fantasy players or picks: shown first and starred. */
     val mine: Boolean,
     val timeMs: Long,
+    val league: League = League.NFL,
 )
 
 /**
@@ -65,6 +66,9 @@ data class TickerInterests(
 }
 
 object TickerBuilder {
+    /** The crawl's source tag: the league when everything is from one ("NFL"), else "SPORTS". */
+    fun label(items: List<TickerItem>): String = items.map { it.league }.distinct().singleOrNull()?.label ?: "SPORTS"
+
     const val EVENT_TTL_MS = 15 * 60_000L
     const val MAX_HEADLINES = 15
 
@@ -92,6 +96,7 @@ object TickerBuilder {
                 text = listOfNotNull(leaguePrefix(g), "$what ${scorer.abbr}", play, score).joinToString(" · "),
                 mine = false,
                 timeMs = nowMs,
+                league = g.league,
             )
         }
     }
@@ -140,6 +145,7 @@ object TickerBuilder {
         },
         mine = false,
         timeMs = g.startEpochMs,
+        league = g.league,
     )
 
     fun build(
@@ -156,7 +162,7 @@ object TickerBuilder {
         }
         val live = games.filter { it.state == GameState.LIVE }.map { g -> liveScore(g).copy(mine = interests.matches(g)) }
         val headlines = news.filter(NewsFilter::isUseful).sortedByDescending { it.publishedMs }.take(MAX_HEADLINES).map { n ->
-            TickerItem("news-${n.id}", TickerKind.HEADLINE, n.headline, interests.matches(n), n.publishedMs)
+            TickerItem("news-${n.league.id}-${n.id}", TickerKind.HEADLINE, n.headline, interests.matches(n), n.publishedMs, n.league)
         }
         val all = freshEvents.sortedByDescending { it.timeMs } + live + headlines
         // Mine first (keeping each group's order), then the rest.

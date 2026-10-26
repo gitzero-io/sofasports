@@ -48,5 +48,6 @@ object WatchPlanner {
     }
 
     /** What Google TV search is asked for: "Houston Texans vs Jacksonville Jaguars". */
-    fun searchQuery(game: Game) = "${game.away.name} vs ${game.home.name}"
+    /** Fights search by card ("UFC 333"), since the apps list the event, not the bout. */
+    fun searchQuery(game: Game) = game.eventName?.takeIf { game.league.format == EventFormat.FIGHT } ?: "${game.away.name} vs ${game.home.name}"
 }
