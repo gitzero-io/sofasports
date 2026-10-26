@@ -96,19 +96,32 @@ enum class League(
 }
 
 /**
- * A team the user follows: "nba:LAL". Keys without a league are from NFL-only builds and mean NFL,
- * so old favorites keep working after the upgrade.
+ * A team, fighter or driver the user follows. Teams are keyed by abbreviation ("nba:LAL"); fighters
+ * and drivers by full name ("ufc:Alexander Volkanovski", "f1:Lando Norris"), because boxing data has
+ * no stable ids and a name reads well in Settings. Keys without a league are from NFL-only builds
+ * and mean NFL, so old favorites keep working after the upgrade. Compare keys ignoring case.
  */
 object TeamKey {
-    fun of(league: League, abbr: String) = "${league.id}:${abbr.uppercase()}"
+    /** Commas would break the comma-joined favorites setting. */
+    fun of(league: League, id: String): String = "${league.id}:${clean(league, id)}"
 
     fun league(key: String): League? =
         if (':' in key) League.fromId(key.substringBefore(':')) else League.NFL
 
+    /** The abbreviation, or the athlete's name. */
     fun abbr(key: String): String = key.substringAfter(':')
 
-    /** Old bare "KC" → "nfl:KC"; already-qualified keys are kept as they are. */
-    fun normalize(key: String): String = if (':' in key) key.lowercase().substringBefore(':') + ":" + abbr(key).uppercase() else of(League.NFL, key)
+    /** Old bare "KC" → "nfl:KC"; already-qualified keys are tidied but otherwise kept. */
+    fun normalize(key: String): String {
+        if (':' !in key) return of(League.NFL, key)
+        val league = league(key) ?: return key
+        return of(league, abbr(key))
+    }
+
+    private fun clean(league: League, id: String): String {
+        val t = id.replace(",", "").trim()
+        return if (league.hasTeams) t.uppercase() else t
+    }
 }
 
 /**
@@ -128,7 +141,10 @@ data class GameRef(val league: League, val id: String) {
     }
 }
 
-/** A team in the favorites picker. [group] is the division or conference when known. */
+/**
+ * A team, fighter or driver in the favorites picker. [group] is the division or conference when
+ * known. For athletes [abbr] is the full name (their [TeamKey]) and [sortName] the last name.
+ */
 data class TeamInfo(
     val league: League,
     val abbr: String,
@@ -136,6 +152,7 @@ data class TeamInfo(
     val shortName: String,
     val logoUrl: String?,
     val group: String? = null,
+    val sortName: String = name,
 ) {
     val key: String get() = TeamKey.of(league, abbr)
 }

@@ -154,4 +154,33 @@ class MultiSportParserTest {
         assertEquals("nba:ATL", teams.first().key)
         assertTrue(teams.all { it.logoUrl != null })
     }
+
+    @Test fun `fighters are followed by name, any case`() {
+        val main = FightCards.group(EspnParser.parseScoreboard(Fixtures.read("espn/ufc/scoreboard.json"), League.UFC).games).single().mainEvent
+        assertEquals("ufc:Alexander Volkanovski", main.keyOf(main.away))
+        assertTrue(main.involves("ufc:alexander volkanovski"))
+        assertTrue(!main.involves("boxing:Alexander Volkanovski"))
+        val card = FightCards.group(EspnParser.parseScoreboard(Fixtures.read("espn/ufc/scoreboard.json"), League.UFC).games).single()
+        val undercard = card.bouts.last()
+        assertEquals(undercard, card.favoriteBout(listOf(undercard.keyOf(undercard.home))))
+    }
+
+    @Test fun `favorite drivers are found in the race and its sessions`() {
+        val race = EspnParser.parseScoreboard(Fixtures.read("espn/f1/scoreboard.json"), League.F1).races.single()
+        val mine = race.favorites(listOf("f1:Lando Norris", "nba:LAL", "f1:Nobody"))
+        assertEquals(listOf("Lando Norris"), mine.map { it.name })
+        assertEquals(5, race.positionOf(mine.single()))
+        assertTrue(race.involvesAny(listOf("f1:lando norris")))
+        val upcoming = race.copy(state = GameState.PRE, results = emptyList())
+        assertTrue("the entry list still knows who's racing", upcoming.involvesAny(listOf("f1:Lando Norris")))
+    }
+
+    @Test fun `overlay picks a favorite driver's race when it's live or soon`() {
+        val race = EspnParser.parseScoreboard(Fixtures.read("espn/f1/scoreboard.json"), League.F1).races.single()
+        val now = race.startEpochMs
+        val live = race.copy(state = GameState.LIVE)
+        assertEquals(live, com.sofasports.tv.overlay.OverlayFeed.pickRace(listOf(live), listOf("f1:Lando Norris"), now))
+        assertNull(com.sofasports.tv.overlay.OverlayFeed.pickRace(listOf(live), listOf("f1:Nobody"), now))
+        assertNull("finished races don't take the overlay", com.sofasports.tv.overlay.OverlayFeed.pickRace(listOf(race), listOf("f1:Lando Norris"), now))
+    }
 }

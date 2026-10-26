@@ -87,13 +87,13 @@ fun ScoresScreen(onOpenGame: (String) -> Unit, onOpenEvent: (GameRef) -> Unit, v
             if (ui.fightCards.isNotEmpty()) {
                 item(span = { GridItemSpan(maxLineSpan) }, key = "h-fights") { RowLabel("Fight cards", Modifier.padding(top = 12.dp)) }
                 items(ui.fightCards, key = { "fc-${it.ref.key}" }) { card ->
-                    FightCardTile(card, if (card.state == GameState.PRE) now else 0L, onClick = { onOpenEvent(card.ref) }, showLeague = ui.showLeagueTags)
+                    FightCardTile(card, if (card.state == GameState.PRE) now else 0L, onClick = { onOpenEvent(card.ref) }, showLeague = ui.showLeagueTags, favorites = ui.favorites)
                 }
             }
             if (ui.races.isNotEmpty()) {
                 item(span = { GridItemSpan(maxLineSpan) }, key = "h-races") { RowLabel("Racing", Modifier.padding(top = 12.dp)) }
                 items(ui.races, key = { "r-${it.ref.key}" }) { race ->
-                    RaceCard(race, if (race.state == GameState.PRE) now else 0L, onClick = { onOpenEvent(race.ref) }, showLeague = ui.showLeagueTags)
+                    RaceCard(race, if (race.state == GameState.PRE) now else 0L, onClick = { onOpenEvent(race.ref) }, showLeague = ui.showLeagueTags, favorites = ui.favorites)
                 }
             }
         }

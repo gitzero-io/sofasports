@@ -93,9 +93,16 @@ data class FightCard(val eventId: String, val league: League, val name: String, 
             else -> GameState.OTHER
         }
     val ref: GameRef get() = GameRef(league, eventId)
+
+    /** The first bout with a favorite fighter ([TeamKey]s), if any. */
+    fun favoriteBout(keys: List<String>): Game? = bouts.firstOrNull { b -> keys.any { b.involves(it) } }
 }
 
 object FightCards {
+    /** Cards with a favorite fighter first, then live, upcoming, finished. */
+    fun group(games: List<Game>, favorites: List<String>): List<FightCard> =
+        group(games).sortedBy { if (it.favoriteBout(favorites) != null) 0 else 1 }
+
     fun group(games: List<Game>): List<FightCard> =
         games.filter { it.league.format == EventFormat.FIGHT }
             .groupBy { it.league to (it.eventId ?: it.id) }

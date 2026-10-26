@@ -87,4 +87,25 @@ class FixtureReplayTest {
             assertNotNull("${l.id} has no fixture", replay.scoreboard(l, t0))
         }
     }
+
+    @Test fun `nhl, mlb and epl replays are live with their own clock text`() {
+        fun live(l: com.sofasports.tv.domain.League, id: String) = replay.scoreboard(l, t0)!!.games.single { it.id == id }
+        val nhl = live(com.sofasports.tv.domain.League.NHL, "401892578")
+        assertEquals(GameState.LIVE, nhl.state)
+        val mlb = live(com.sofasports.tv.domain.League.MLB, "401908043")
+        assertEquals(GameState.LIVE, mlb.state)
+        assertEquals(true, mlb.shortDetail.startsWith("Top ") || mlb.shortDetail.startsWith("Bot "))
+        val epl = live(com.sofasports.tv.domain.League.EPL, "401879254")
+        assertEquals(GameState.LIVE, epl.state)
+        assertEquals(true, epl.shortDetail.endsWith("'"))
+    }
+
+    @Test fun `ufc main event and f1 race are live at first, final later`() {
+        val ufc = replay.scoreboard(com.sofasports.tv.domain.League.UFC, t0)!!.games
+        assertEquals(1, ufc.count { it.state == GameState.LIVE })
+        val f1 = replay.scoreboard(com.sofasports.tv.domain.League.F1, t0)!!.races.single()
+        assertEquals(GameState.LIVE, f1.state)
+        val later = replay.scoreboard(com.sofasports.tv.domain.League.F1, t0 + FixtureReplay.LIVE_EVENT_MS + 1)!!.races.single()
+        assertEquals(GameState.FINAL, later.state)
+    }
 }

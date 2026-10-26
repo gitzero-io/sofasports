@@ -64,6 +64,7 @@ data class EventUi(
     val card: FightCard? = null,
     val race: Race? = null,
     val pinnedKey: String? = null,
+    val favorites: List<String> = emptyList(),
 )
 
 /** A fight card or a race weekend, straight from the shared scoreboard (ESPN has no detail feed worth more). */
@@ -84,13 +85,14 @@ class EventViewModel @Inject constructor(
             card = if (r.league.format == EventFormat.FIGHT) FightCards.group(board?.games.orEmpty()).firstOrNull { it.eventId == r.id } else null,
             race = if (r.league.format == EventFormat.RACE) s.race(r) else null,
             pinnedKey = prefs.pinnedGameId,
+            favorites = prefs.favoriteTeams,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EventUi())
 
-    /** Pins one bout (a race can't be pinned: the overlay draws two-sided games). */
-    fun togglePin(bout: GameRef) = viewModelScope.launch {
-        val pin = ui.value.pinnedKey != bout.key
-        settings.setPinnedGame(if (pin) bout else null)
+    /** Pins one bout, or a race weekend, to the overlay. */
+    fun togglePin(ref: GameRef) = viewModelScope.launch {
+        val pin = ui.value.pinnedKey != ref.key
+        settings.setPinnedGame(if (pin) ref else null)
         if (pin) usage.track(UsageEvent.GamePinned)
     }
 }
@@ -99,15 +101,15 @@ class EventViewModel @Inject constructor(
 fun EventScreen(vm: EventViewModel = hiltViewModel()) {
     val ui by vm.ui.collectAsStateWithLifecycle()
     when {
-        ui.card != null -> FightCardContent(ui.card!!, ui.pinnedKey, vm::togglePin)
-        ui.race != null -> RaceContent(ui.race!!)
+        ui.card != null -> FightCardContent(ui.card!!, ui.pinnedKey, ui.favorites, vm::togglePin)
+        ui.race != null -> RaceContent(ui.race!!, ui.pinnedKey, ui.favorites, vm::togglePin)
         ui.loading -> MessageBox("Loading…")
         else -> MessageBox("This event is no longer on the scoreboard")
     }
 }
 
 @Composable
-private fun FightCardContent(card: FightCard, pinnedKey: String?, onPin: (GameRef) -> Unit) {
+private fun FightCardContent(card: FightCard, pinnedKey: String?, favorites: List<String>, onPin: (GameRef) -> Unit) {
     val now = rememberNowMs(1_000)
     val first = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { first.requestFocus() } }
@@ -147,7 +149,7 @@ private fun FightCardContent(card: FightCard, pinnedKey: String?, onPin: (GameRe
             item(key = bout.ref.key) {
                 GameCard(
                     game = bout,
-                    favorites = emptyList(),
+                    favorites = favorites,
                     closeRule = CloseGameRule(),
                     nowMs = if (bout.state == GameState.PRE) now else 0L,
                     onClick = { selected = bout.ref.key },
@@ -159,7 +161,9 @@ private fun FightCardContent(card: FightCard, pinnedKey: String?, onPin: (GameRe
 }
 
 @Composable
-private fun RaceContent(race: Race) {
+private fun RaceContent(race: Race, pinnedKey: String?, favorites: List<String>, onPin: (GameRef) -> Unit) {
+    val mine = race.favorites(favorites).map { it.driverId }.toSet()
+    val pinned = pinnedKey == race.ref.key
     val first = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { first.requestFocus() } }
     var session by rememberSaveable(race.id) { mutableIntStateOf(race.sessions.indexOfFirst { it.name == race.session }.coerceAtLeast(0)) }
@@ -178,12 +182,16 @@ private fun RaceContent(race: Race) {
                     listOfNotNull(race.league.fullName, race.venue, race.broadcast).joinToString(" · "),
                     style = MaterialTheme.typography.titleSmall, color = SofaColors.TextSecondary,
                 )
-                if (race.sessions.size > 1) {
-                    SpacedRow {
+                SpacedRow {
+                    if (race.sessions.size > 1) {
                         race.sessions.forEachIndexed { i, rs ->
                             SofaButton(rs.name, onClick = { session = i }, selected = i == session, modifier = if (i == session) Modifier.focusRequester(first) else Modifier)
                         }
                     }
+                    SofaButton(
+                        if (pinned) "Pinned to overlay ✓" else "Pin to overlay", onClick = { onPin(race.ref) }, selected = pinned,
+                        modifier = if (race.sessions.size <= 1) Modifier.focusRequester(first) else Modifier,
+                    )
                 }
                 Spacer(Modifier.padding(4.dp))
             }
@@ -198,9 +206,7 @@ private fun RaceContent(race: Race) {
             }
         } else {
             items(s.results, key = { "${s.id}-${it.driverId}" }) { e ->
-                // One-session weekends (NASCAR, IndyCar) have no session buttons to start focus on.
-                val focus = if (race.sessions.size <= 1 && e == s.results.first()) Modifier.focusRequester(first) else Modifier
-                RaceEntryLine(e, focus.focusableRow().padding(horizontal = 16.dp, vertical = 8.dp))
+                RaceEntryLine(e, Modifier.focusableRow().padding(horizontal = 16.dp, vertical = 8.dp), mine = e.driverId in mine)
             }
         }
     }

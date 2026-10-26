@@ -80,7 +80,8 @@ class HomeViewModel @Inject constructor(
     val ui: StateFlow<HomeUi> = combine(fantasy.state, scores.state, settings.settings, config.config, picks.progress) { f, s, prefs, cfg, pk ->
         val games = s.games
         val teamGames = games.filter { it.league.format == EventFormat.TEAMS }
-        val mine = GameSorting.sorted(teamGames.filter { Perspective.involvesFavorite(it, prefs.favoriteTeams) }, prefs.favoriteTeams)
+        // Favorite fighters' bouts count as "your games" too.
+        val mine = GameSorting.sorted(games.filter { Perspective.involvesFavorite(it, prefs.favoriteTeams) }, prefs.favoriteTeams)
         val now = System.currentTimeMillis()
         val soon = { state: GameState, start: Long -> state == GameState.LIVE || (state == GameState.PRE && start - now < DAY_MS) }
         HomeUi(
@@ -98,8 +99,8 @@ class HomeViewModel @Inject constructor(
             picks = if (cfg.features.picks) pk else emptyList(),
             watchApp = prefs.watchApp,
             games = s.nfl?.games.orEmpty(),
-            fightCards = FightCards.group(games).filter { soon(it.state, it.startEpochMs) },
-            races = s.races.filter { soon(it.state, it.startEpochMs) },
+            fightCards = FightCards.group(games, prefs.favoriteTeams).filter { soon(it.state, it.startEpochMs) },
+            races = s.races.filter { soon(it.state, it.startEpochMs) }.sortedBy { if (it.involvesAny(prefs.favoriteTeams)) 0 else 1 },
             multiLeague = s.leagues.size > 1,
             weeklyOnly = s.leagues.all { it.weekly },
         )

@@ -139,10 +139,10 @@ fun HomeScreen(
                     RowLabel("Fights & racing")
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(20.dp), contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp)) {
                         items(ui.fightCards, key = { "fc-${it.ref.key}" }) { c ->
-                            FightCardTile(c, if (c.state == GameState.PRE) now else 0L, onClick = { onOpenEvent(c.ref) }, modifier = Modifier.width(420.dp), showLeague = true)
+                            FightCardTile(c, if (c.state == GameState.PRE) now else 0L, onClick = { onOpenEvent(c.ref) }, modifier = Modifier.width(420.dp), showLeague = true, favorites = ui.favorites)
                         }
                         items(ui.races, key = { "r-${it.ref.key}" }) { r ->
-                            RaceCard(r, if (r.state == GameState.PRE) now else 0L, onClick = { onOpenEvent(r.ref) }, modifier = Modifier.width(420.dp), showLeague = true)
+                            RaceCard(r, if (r.state == GameState.PRE) now else 0L, onClick = { onOpenEvent(r.ref) }, modifier = Modifier.width(420.dp), showLeague = true, favorites = ui.favorites)
                         }
                     }
                 }

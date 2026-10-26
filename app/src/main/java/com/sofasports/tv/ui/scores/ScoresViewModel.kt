@@ -73,8 +73,9 @@ class ScoresViewModel @Inject constructor(
             leagues = leagues,
             selected = selected,
             sections = GameSorting.sections(games.filter { it.league.format == EventFormat.TEAMS }, prefs.favoriteTeams),
-            fightCards = FightCards.group(games),
-            races = shown.flatMap { s.board(it)?.races.orEmpty() }.sortedWith(compareBy<Race> { raceRank(it.state) }.thenBy { it.startEpochMs }),
+            fightCards = FightCards.group(games, prefs.favoriteTeams),
+            races = shown.flatMap { s.board(it)?.races.orEmpty() }
+                .sortedWith(compareBy<Race> { if (it.involvesAny(prefs.favoriteTeams)) 0 else 1 }.thenBy { raceRank(it.state) }.thenBy { it.startEpochMs }),
             favorites = prefs.favoriteTeams,
             closeRule = cfg.closeGame,
             title = when {

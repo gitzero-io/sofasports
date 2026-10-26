@@ -79,7 +79,7 @@ class OverlayDisplay @Inject constructor(private val feed: OverlayFeed) {
             prefs = s.prefs,
             available = OverlayPages.available(s, s.prefs.pages, now),
             withContent = OverlayPages.withContent(s, now),
-            anyLive = s.games.any { it.state == GameState.LIVE },
+            anyLive = s.games.any { it.state == GameState.LIVE } || s.race?.state == GameState.LIVE,
             hour = Calendar.getInstance().apply { timeInMillis = now }.get(Calendar.HOUR_OF_DAY),
             nowMs = now,
         )

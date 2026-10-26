@@ -16,10 +16,10 @@ object OverlayPages {
 
     fun hasContent(page: OverlayPage, s: OverlayState, nowMs: Long): Boolean = when (page) {
         OverlayPage.MATCHUP -> s.matchup != null
-        OverlayPage.MY_GAME -> s.game != null
+        OverlayPage.MY_GAME -> s.game != null || s.race != null
         OverlayPage.LEAGUE -> leagueGames(s, nowMs).isNotEmpty()
         OverlayPage.PICKS -> s.picks.isNotEmpty()
-        OverlayPage.MINI -> s.matchup != null || s.game != null || s.picks.isNotEmpty()
+        OverlayPage.MINI -> s.matchup != null || s.game != null || s.race != null || s.picks.isNotEmpty()
     }
 
     /** Pages with content, regardless of what the user enabled (a pop may show any of them). */

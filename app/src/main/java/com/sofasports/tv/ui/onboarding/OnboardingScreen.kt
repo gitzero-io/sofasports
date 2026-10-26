@@ -65,7 +65,6 @@ fun OnboardingScreen(onDone: () -> Unit, vm: OnboardingViewModel = hiltViewModel
     var leagueIds by rememberSaveable { mutableStateOf(League.DEFAULT_FOLLOWED.ids()) }
     var selected by rememberSaveable { mutableStateOf(listOf<String>()) }
     val leagues = leagueIds.leagues()
-    val hasTeams = leagues.any { it.hasTeams }
     Column(
         Modifier.fillMaxSize().background(SofaColors.Background).padding(top = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -73,12 +72,12 @@ fun OnboardingScreen(onDone: () -> Unit, vm: OnboardingViewModel = hiltViewModel
         PickerHeader(
             if (step == 0) "What do you watch?" else "Who do you root for?",
             if (step == 0) "Pick the leagues you want scores for. The first one you pick opens first on Scores."
-            else "Pick up to ${Favorites.MAX_PER_LEAGUE} per league. Your teams show first and are always blue.",
+            else "Teams, fighters and drivers: up to ${Favorites.MAX_PER_LEAGUE} per league. Yours show first and are always blue.",
         ) {
             if (step == 0) {
                 SofaButton(
                     if (leagues.isEmpty()) "Next" else "Next (${leagues.size})",
-                    onClick = { if (hasTeams) step = 1 else vm.finish(leagues, emptyList(), onDone) },
+                    onClick = { if (leagues.isNotEmpty()) step = 1 },
                     selected = leagues.isNotEmpty(),
                 )
             } else {

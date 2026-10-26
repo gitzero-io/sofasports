@@ -20,8 +20,10 @@ import javax.inject.Singleton
  *   HOU @ JAX starts late in the 3rd quarter so the close-game badge shows within minutes.
  * - The rest of week 6 shows as final.
  * - Week 7's schedule is shifted so the first kickoff is a few minutes away (countdown).
- * - Other leagues show a real scoreboard saved on 2026-10-25/26 (`espn/<league id>/scoreboard.json`);
- *   in the NBA, LAL @ UTAH replays its fourth quarter the same way, so non-football live paths can be tested.
+ * - Other leagues show a real scoreboard saved on 2026-10-25/26 (`espn/<league id>/scoreboard.json`).
+ *   One game each in the NBA, NHL, MLB and Premier League replays its closing stretch the same way,
+ *   so every sport's live path can be tested.
+ * - UFC's main event and the F1 race are live for the first [LIVE_EVENT_MS], then final.
  */
 @Singleton
 class FixtureReplay @Inject constructor(private val source: FixtureSource) {
@@ -50,7 +52,35 @@ class FixtureReplay @Inject constructor(private val source: FixtureSource) {
         val board = source.read("espn/${league.id}/scoreboard.json")?.let { json ->
             if (league == League.BOXING) com.sofasports.tv.data.sportsdb.SportsDbParser.parseBoxing(json) else EspnParser.parseScoreboard(json, league)
         } ?: return null
-        return board.copy(games = board.games.map { g -> if (g.id in summaries) liveGame(g.id, nowMs) ?: g else g })
+        val replayed = board.copy(games = board.games.map { g -> if (g.id in summaries) liveGame(g.id, nowMs) ?: g else g })
+        if (nowMs - startMs >= LIVE_EVENT_MS) return replayed
+        return when (league) {
+            League.UFC -> replayed.copy(games = liveMainEvent(replayed.games, nowMs))
+            League.F1 -> replayed.copy(races = replayed.races.map { liveRace(it, nowMs) })
+            else -> replayed
+        }
+    }
+
+    /** The last bout on each card, in round 1–3 with no winner yet. */
+    private fun liveMainEvent(games: List<Game>, nowMs: Long): List<Game> {
+        val mains = games.groupBy { it.eventId }.values.map { b -> b.maxBy { it.order }.id }.toSet()
+        val sec = ((nowMs - startMs) / 1000).toInt()
+        val round = (sec / 200 + 1).coerceAtMost(3)
+        val left = 300 - sec % 200 * 300 / 200
+        return games.map { g ->
+            if (g.id !in mains) g
+            else g.copy(
+                state = GameState.LIVE, period = round, clock = "${left / 60}:${(left % 60).toString().padStart(2, '0')}",
+                shortDetail = "R$round ${left / 60}:${(left % 60).toString().padStart(2, '0')}",
+                home = g.home.copy(winner = null), away = g.away.copy(winner = null),
+            )
+        }
+    }
+
+    /** The race session running, a lap every few seconds. */
+    private fun liveRace(r: com.sofasports.tv.domain.Race, nowMs: Long): com.sofasports.tv.domain.Race {
+        val lap = ((nowMs - startMs) / 1000 / SECONDS_PER_PLAY).toInt() + 30
+        return r.copy(state = GameState.LIVE, shortDetail = "Lap ${lap.coerceAtMost(55)} of 56", results = r.results.map { it.copy(winner = false) })
     }
 
     fun scoreboard(nowMs: Long = System.currentTimeMillis()): Scoreboard {
@@ -105,7 +135,8 @@ class FixtureReplay @Inject constructor(private val source: FixtureSource) {
             state = GameState.LIVE,
             period = play.period,
             clock = play.clock,
-            shortDetail = "${periodName(play.period, g.league)} ${play.clock}",
+            // Soccer plays carry the minute ("67'") and baseball the half inning ("Bot 8th") as their label.
+            shortDetail = play.periodLabel ?: "${periodName(play.period, g.league)} ${play.clock}",
             home = g.home.copy(score = play.homeScore, winner = null),
             away = g.away.copy(score = play.awayScore, winner = null),
             situation = Situation(detail = null, possessionTeamId = possessionId, isRedZone = false, lastPlay = play.text),
@@ -119,13 +150,23 @@ class FixtureReplay @Inject constructor(private val source: FixtureSource) {
         const val SECONDS_PER_PLAY = 4L
         const val FIRST_KICKOFF_DELAY_MS = 3 * 60 * 1000L
         /** Game id → play index the replay starts at. */
-        val REPLAYS = linkedMapOf("401872996" to 120, "401873006" to 0, "401909861" to 380)
+        const val LIVE_EVENT_MS = 10 * 60 * 1000L
+        val REPLAYS = linkedMapOf(
+            "401872996" to 120, "401873006" to 0, "401909861" to 380,
+            "401892578" to 250, "401908043" to 470, "401879254" to 3,
+        )
         val SUMMARY_FILES = mapOf(
             "401872996" to "espn/summary_401872996_hou_jax.json",
             "401873006" to "espn/summary_401873006_lac_kc.json",
             "401909861" to "espn/nba/summary_401909861_lal_utah.json",
+            "401892578" to "espn/nhl/summary_401892578.json",
+            "401908043" to "espn/mlb/summary_401908043.json",
+            "401879254" to "espn/epl/summary_401879254.json",
         )
-        /** Replays outside the NFL. */
-        val REPLAY_LEAGUES = mapOf("401909861" to League.NBA)
+        /** Replays outside the NFL: LAL @ UTAH, FLA @ CHI, TB @ MIL, NEW @ CRY. */
+        val REPLAY_LEAGUES = mapOf(
+            "401909861" to League.NBA, "401892578" to League.NHL,
+            "401908043" to League.MLB, "401879254" to League.EPL,
+        )
     }
 }

@@ -47,6 +47,7 @@ import com.sofasports.tv.domain.Perspective
 import com.sofasports.tv.domain.PickEvaluator
 import com.sofasports.tv.domain.PickProgress
 import com.sofasports.tv.domain.PickType
+import com.sofasports.tv.domain.Race
 import com.sofasports.tv.ui.picks.bookColor
 import com.sofasports.tv.ui.picks.sortForDisplay
 import com.sofasports.tv.ui.picks.statusColor
@@ -90,9 +91,15 @@ fun OverlayWidget(state: OverlayState, display: RenderedDisplay) {
                     MatchupRows(m, state.games)
                     if (OverlayRow.PLAYING_NOW in prefs.rows) PlayingNowRows(OverlayPages.playingNow(state))
                 }
-                OverlayPage.MY_GAME -> state.game?.let { g ->
-                    PageHeader(if (state.gamePinned) "Pinned game" else "My game", display)
-                    GameRows(g, state)
+                OverlayPage.MY_GAME -> {
+                    state.game?.let { g ->
+                        PageHeader(if (state.gamePinned) "Pinned game" else "My game", display)
+                        GameRows(g, state)
+                    }
+                    if (state.game == null) state.race?.let { r ->
+                        PageHeader(if (state.gamePinned) "Pinned race" else "My race", display)
+                        RaceRows(r, state.favorites)
+                    }
                 }
                 OverlayPage.LEAGUE -> {
                     PageHeader("Around the league", display)
@@ -148,6 +155,7 @@ private fun MomentBanner(m: Moment) {
 internal fun miniText(s: OverlayState): String = listOfNotNull(
     s.matchup?.let { m -> "★ " + formatPoints(m.me.points) + (m.opponent?.let { "–" + formatPoints(it.points) } ?: "") },
     s.game?.let { g -> "${g.away.abbr} ${g.away.score ?: 0}–${g.home.score ?: 0} ${g.home.abbr}" + if (g.state == GameState.LIVE) " · ${g.shortDetail}" else "" },
+    s.race?.takeIf { s.game == null }?.let { r -> raceMini(r, s.favorites) },
     s.picks.takeIf { it.isNotEmpty() }?.let { "Picks ${PickEvaluator.hitting(it)}/${it.size}" },
 ).joinToString("  ·  ").ifEmpty { "SOFA SPORTS" }
 
@@ -281,6 +289,47 @@ private fun GameRows(g: Game, state: OverlayState) {
     }
     if (OverlayRow.LAST_PLAY in state.prefs.rows) g.situation?.lastPlay?.takeIf { it.isNotBlank() && g.state == GameState.LIVE }?.let {
         Text(TickerBuilder.trimPlay(it), style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted, maxLines = 2, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+/** "F1 · P1 Antonelli · P5 Norris" (favorites after the leader), or the start time. */
+internal fun raceMini(r: Race, favorites: List<String>): String {
+    if (r.results.isEmpty()) return "${r.league.label} · ${r.session} ${r.shortDetail}"
+    val leader = r.results.first()
+    val mine = r.favorites(favorites).mapNotNull { e -> r.positionOf(e)?.takeIf { it != 1 }?.let { "P$it ${e.name.substringAfterLast(' ')}" } }
+    return (listOf(r.league.label, "P1 ${leader.name.substringAfterLast(' ')}") + mine).joinToString(" · ")
+}
+
+/** Race status, then the top three and any favorite drivers further back, favorites in blue. */
+@Composable
+private fun RaceRows(r: Race, favorites: List<String>) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        when (r.state) {
+            GameState.LIVE -> {
+                Badge("LIVE", SofaColors.Live)
+                Text(r.shortDetail, style = MaterialTheme.typography.labelMedium, color = SofaColors.TextPrimary, maxLines = 1)
+            }
+            GameState.PRE -> {
+                val now = rememberNowMs(Countdown.tickMs(System.currentTimeMillis(), r.startEpochMs))
+                Text("${r.session} ${Countdown.format(now, r.startEpochMs, "Starts") ?: r.shortDetail}", style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1)
+            }
+            else -> Text("${r.session} · Final", style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1)
+        }
+    }
+    Text(r.name, style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    val mine = r.favorites(favorites).map { it.driverId }.toSet()
+    val top = r.results.take(3)
+    (top + r.results.filter { it.driverId in mine && it !in top }).forEach { e ->
+        val isMine = e.driverId in mine
+        OverlayScoreRow(
+            e.name, "P${e.position}",
+            if (isMine) SofaColors.Blue else SofaColors.Outline,
+            leading = e.position == 1,
+            pulseValue = null,
+        )
+    }
+    if (r.results.isEmpty() && mine.isNotEmpty()) {
+        Text("Racing: ${r.favorites(favorites).joinToString(", ") { it.name }}", style = MaterialTheme.typography.labelMedium, color = SofaColors.BlueBright, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 

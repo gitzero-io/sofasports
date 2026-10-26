@@ -21,20 +21,38 @@ import com.sofasports.tv.domain.Race
 import com.sofasports.tv.domain.RaceEntry
 import com.sofasports.tv.ui.theme.SofaColors
 
-/** One fight card on the scoreboard: the bout in the cage when live, else the main event. */
+/** One fight card on the scoreboard: the bout in the cage when live, else a favorite's bout, else the main event. */
 @Composable
-fun FightCardTile(card: FightCard, nowMs: Long, onClick: () -> Unit, modifier: Modifier = Modifier, showLeague: Boolean = false) {
-    val shown = card.live ?: card.mainEvent
+fun FightCardTile(
+    card: FightCard,
+    nowMs: Long,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    showLeague: Boolean = false,
+    favorites: List<String> = emptyList(),
+) {
+    val mine = card.favoriteBout(favorites)
+    val shown = card.live ?: mine ?: card.mainEvent
     SofaCard(onClick = onClick, modifier = modifier) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             EventStatus(card.state, card.startEpochMs, nowMs, if (card.live != null) shown.shortDetail else null, shown.broadcast, card.league.label.takeIf { showLeague })
             Text(card.name, style = MaterialTheme.typography.titleMedium, color = SofaColors.TextPrimary, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Text(
-                listOfNotNull(if (card.live != null) "In the cage" else "Main event", shown.note).joinToString(" · "),
+                listOfNotNull(
+                    when {
+                        card.live != null -> "In the cage"
+                        mine != null && mine.ref != card.mainEvent.ref -> "Your fighter"
+                        else -> "Main event"
+                    },
+                    shown.note,
+                ).joinToString(" · "),
                 style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1,
             )
-            FighterLine(shown, shown.away)
-            FighterLine(shown, shown.home)
+            FighterLine(shown, shown.away, favorites)
+            FighterLine(shown, shown.home, favorites)
+            if (mine != null && card.live != null && mine.ref != card.live?.ref) {
+                Text("Your fighter: ${mine.away.name} vs ${mine.home.name}", style = MaterialTheme.typography.labelMedium, color = SofaColors.BlueBright, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
             if (card.bouts.size > 1) {
                 Text("${card.bouts.size} fights", style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted)
             }
@@ -43,8 +61,9 @@ fun FightCardTile(card: FightCard, nowMs: Long, onClick: () -> Unit, modifier: M
 }
 
 @Composable
-private fun FighterLine(bout: Game, side: com.sofasports.tv.domain.TeamSide) {
+private fun FighterLine(bout: Game, side: com.sofasports.tv.domain.TeamSide, favorites: List<String>) {
     val lost = bout.state == GameState.FINAL && bout.winnerSide?.let { it.id != side.id } == true
+    val mine = favorites.any { bout.keyOf(side).equals(it, ignoreCase = true) }
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         // Boxing has no flags or photos; don't leave a gap for one.
         side.logoUrl?.let {
@@ -54,7 +73,11 @@ private fun FighterLine(bout: Game, side: com.sofasports.tv.domain.TeamSide) {
         Column(Modifier.weight(1f)) {
             Text(
                 side.name, style = MaterialTheme.typography.titleMedium,
-                color = if (lost) SofaColors.TextMuted else SofaColors.TextPrimary,
+                color = when {
+                    mine -> SofaColors.BlueBright
+                    lost -> SofaColors.TextMuted
+                    else -> SofaColors.TextPrimary
+                },
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
             side.record?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted) }
@@ -66,9 +89,17 @@ private fun FighterLine(bout: Game, side: com.sofasports.tv.domain.TeamSide) {
     }
 }
 
-/** One race weekend: the current session and its top three (or the start time). */
+/** One race weekend: the current session, its top three (or the start time), and where favorite drivers are. */
 @Composable
-fun RaceCard(race: Race, nowMs: Long, onClick: () -> Unit, modifier: Modifier = Modifier, showLeague: Boolean = false) {
+fun RaceCard(
+    race: Race,
+    nowMs: Long,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    showLeague: Boolean = false,
+    favorites: List<String> = emptyList(),
+) {
+    val mine = race.favorites(favorites)
     SofaCard(onClick = onClick, modifier = modifier) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             EventStatus(race.state, race.startEpochMs, nowMs, race.shortDetail.takeIf { race.state == GameState.LIVE }, race.broadcast, race.league.label.takeIf { showLeague })
@@ -76,20 +107,29 @@ fun RaceCard(race: Race, nowMs: Long, onClick: () -> Unit, modifier: Modifier = 
             Text(race.session, style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1)
             if (race.results.isEmpty()) {
                 race.venue?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = SofaColors.TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                if (mine.isNotEmpty()) {
+                    Text("Racing: ${mine.joinToString(", ") { it.name }}", style = MaterialTheme.typography.labelMedium, color = SofaColors.BlueBright, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
             } else {
-                race.results.take(3).forEach { RaceEntryLine(it) }
+                val top = race.results.take(3)
+                top.forEach { RaceEntryLine(it, mine = mine.any { m -> m.driverId == it.driverId }) }
+                // Favorites outside the top three still get a line.
+                mine.filter { m -> top.none { it.driverId == m.driverId } }.forEach { m ->
+                    race.results.firstOrNull { it.driverId == m.driverId }?.let { RaceEntryLine(it, mine = true) }
+                }
             }
         }
     }
 }
 
+/** "1  🇮🇹  Kimi Antonelli"; a favorite driver ([mine]) is blue. */
 @Composable
-fun RaceEntryLine(e: RaceEntry, modifier: Modifier = Modifier) {
+fun RaceEntryLine(e: RaceEntry, modifier: Modifier = Modifier, mine: Boolean = false) {
     Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text("${e.position}", style = MaterialTheme.typography.titleMedium, color = if (e.position == 1) SofaColors.Close else SofaColors.TextSecondary, modifier = Modifier.width(36.dp))
+        Text("${e.position}", style = MaterialTheme.typography.titleMedium, color = if (e.position == 1) SofaColors.Close else SofaColors.TextSecondary, modifier = Modifier.width(44.dp))
         TeamLogo(e.flagUrl, null, size = 22.dp)
         Spacer(Modifier.width(10.dp))
-        Text(e.name, style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(e.name, style = MaterialTheme.typography.bodyLarge, color = if (mine) SofaColors.BlueBright else SofaColors.TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 

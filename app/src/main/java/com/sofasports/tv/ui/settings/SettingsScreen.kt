@@ -205,7 +205,7 @@ private fun LazyListScope.teamItems(settings: UserSettings, onEditFavorites: () 
         }
     }
     item(key = "favorites") {
-        SettingsSection("Favorite teams") {
+        SettingsSection("Favorites") {
             SpacedRow {
                 if (settings.favoriteTeams.isEmpty()) {
                     Text("None yet", style = MaterialTheme.typography.titleMedium, color = SofaColors.TextSecondary)
@@ -216,7 +216,7 @@ private fun LazyListScope.teamItems(settings: UserSettings, onEditFavorites: () 
                     SpacedRow(gap = 6) {
                         league.logoUrl(abbr)?.let { TeamLogo(it, abbr, size = 36.dp) }
                         Text(
-                            if (settings.followedLeagues.size > 1 || league != League.NFL) "${league.label} $abbr" else abbr,
+                            if (settings.followedLeagues.size > 1 || league != League.NFL) "${league.label} ${if (league.hasTeams) abbr else abbr.substringAfterLast(' ')}" else abbr,
                             style = MaterialTheme.typography.headlineSmall, color = SofaColors.BlueBright,
                         )
                     }

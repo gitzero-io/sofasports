@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,6 +38,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.sofasports.tv.data.provider.TeamsProvider
+import com.sofasports.tv.domain.EventFormat
 import com.sofasports.tv.domain.Favorites
 import com.sofasports.tv.domain.League
 import com.sofasports.tv.domain.TeamInfo
@@ -84,8 +87,8 @@ class TeamsViewModel @Inject constructor(private val provider: TeamsProvider) : 
 private const val LETTER_FILTER_MIN = 60
 
 /**
- * Pick favorite teams league by league. [leagues] are the followed team-sport leagues (one tab each).
- * Selected teams turn blue ("mine") and show their pick order within their league.
+ * Pick favorite teams, fighters and drivers league by league ([leagues] are the followed ones, one
+ * tab each). Selected ones turn blue ("mine") and show their pick order within their league.
  */
 @Composable
 fun FavoritesPicker(
@@ -95,9 +98,9 @@ fun FavoritesPicker(
     modifier: Modifier = Modifier,
     vm: TeamsViewModel = hiltViewModel(),
 ) {
-    val teamLeagues = leagues.filter { it.hasTeams }
+    val teamLeagues = leagues
     if (teamLeagues.isEmpty()) {
-        MessageBox("No teams to pick", "Fights and races don't have teams. Add a team sport to pick favorites.", modifier)
+        MessageBox("Nothing to pick yet", "Follow a league first.", modifier)
         return
     }
     var tab by rememberSaveable { mutableStateOf(teamLeagues.first().id) }
@@ -116,13 +119,17 @@ fun FavoritesPicker(
             }
         }
         Text(
-            "${league.fullName}: up to ${Favorites.MAX_PER_LEAGUE} teams. Your teams show first and are always blue.",
+            "${league.fullName}: up to ${Favorites.MAX_PER_LEAGUE} ${noun(league)}. " + when (league.format) {
+                EventFormat.TEAMS -> "Your teams show first and are always blue."
+                EventFormat.FIGHT -> "Their fights show first, and in the overlay when they're on."
+                EventFormat.RACE -> "Their position shows on every race card."
+            },
             style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary,
         )
         when (val load = loads[league]) {
             is TeamsLoad.Loaded -> {
                 val all = load.teams
-                val letters = all.mapNotNull { it.name.firstOrNull()?.uppercaseChar() }.distinct().sorted()
+                val letters = all.mapNotNull { it.sortName.firstOrNull()?.uppercaseChar() }.distinct().sorted()
                 val useLetters = all.size >= LETTER_FILTER_MIN
                 if (useLetters) {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp), contentPadding = PaddingValues(vertical = 2.dp)) {
@@ -133,26 +140,42 @@ fun FavoritesPicker(
                 val shown = when {
                     !useLetters -> all
                     letter == null -> all.filter { it.key in selected }
-                    else -> all.filter { it.name.firstOrNull()?.uppercaseChar() == letter }
+                    else -> all.filter { it.sortName.firstOrNull()?.uppercaseChar() == letter }
                 }
                 if (useLetters && letter == null && shown.isEmpty()) {
-                    Text("Pick a letter to find your team.", style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextMuted)
+                    Text(
+                        if (league.hasTeams) "Pick a letter to find your team." else "Pick a letter (last name) to find them.",
+                        style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextMuted,
+                    )
+                }
+                if (all.isEmpty()) {
+                    Text(
+                        "No ${noun(league)} on the schedule right now. Check back closer to the next event.",
+                        style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextMuted,
+                    )
                 }
                 TeamGrid(shown, selected, onToggle, grouped = !useLetters, Modifier.weight(1f))
             }
             TeamsLoad.Failed -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Couldn't load ${league.label} teams.", style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary)
+                Text("Couldn't load ${league.label} ${noun(league)}.", style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary)
                 SofaButton("Try again", onClick = { vm.retry(league) })
             }
-            else -> Text("Loading ${league.label} teams…", style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary)
+            else -> Text("Loading ${league.label} ${noun(league)}…", style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary)
         }
     }
 }
 
+private fun noun(league: League) = when (league.format) {
+    EventFormat.TEAMS -> "teams"
+    EventFormat.FIGHT -> "fighters"
+    EventFormat.RACE -> "drivers"
+}
+
 @Composable
 private fun TeamGrid(teams: List<TeamInfo>, selected: List<String>, onToggle: (String) -> Unit, grouped: Boolean, modifier: Modifier) {
+    val athletes = teams.firstOrNull()?.league?.hasTeams == false
     LazyVerticalGrid(
-        columns = GridCells.Fixed(8),
+        columns = GridCells.Fixed(if (athletes) 4 else 8),
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -166,7 +189,7 @@ private fun TeamGrid(teams: List<TeamInfo>, selected: List<String>, onToggle: (S
                 }
             }
             items(list, key = { it.key }) { team ->
-                val order = selected.filter { it.substringBefore(':') == team.league.id }.indexOf(team.key)
+                val order = selected.filter { it.substringBefore(':') == team.league.id }.indexOfFirst { it.equals(team.key, ignoreCase = true) }
                 val isSelected = order >= 0
                 SofaCard(
                     onClick = { onToggle(team.key) },
@@ -174,10 +197,21 @@ private fun TeamGrid(teams: List<TeamInfo>, selected: List<String>, onToggle: (S
                     contentPadding = PaddingValues(10.dp),
                 ) {
                     Box(Modifier.fillMaxWidth()) {
-                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                            TeamLogo(team.logoUrl, team.name, size = 56.dp)
-                            Text(team.abbr, style = MaterialTheme.typography.headlineSmall, color = if (isSelected) SofaColors.BlueBright else SofaColors.TextPrimary, maxLines = 1)
-                            Text(team.shortName, style = MaterialTheme.typography.labelSmall, color = SofaColors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        if (athletes) {
+                            Row(Modifier.fillMaxWidth().padding(end = 28.dp), verticalAlignment = Alignment.CenterVertically) {
+                                team.logoUrl?.let { TeamLogo(it, null, size = 32.dp); Spacer(Modifier.width(10.dp)) }
+                                Text(
+                                    team.name, style = MaterialTheme.typography.titleMedium,
+                                    color = if (isSelected) SofaColors.BlueBright else SofaColors.TextPrimary,
+                                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        } else {
+                            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                                TeamLogo(team.logoUrl, team.name, size = 56.dp)
+                                Text(team.abbr, style = MaterialTheme.typography.headlineSmall, color = if (isSelected) SofaColors.BlueBright else SofaColors.TextPrimary, maxLines = 1)
+                                Text(team.shortName, style = MaterialTheme.typography.labelSmall, color = SofaColors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            }
                         }
                         if (isSelected) {
                             Box(

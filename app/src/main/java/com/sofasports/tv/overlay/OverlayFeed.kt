@@ -15,6 +15,7 @@ import com.sofasports.tv.domain.FantasyMatchup
 import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameSorting
 import com.sofasports.tv.domain.GameState
+import com.sofasports.tv.domain.Race
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +33,9 @@ import javax.inject.Singleton
 data class OverlayState(
     val matchup: FantasyMatchup? = null,
     val game: Game? = null,
-    /** True when [game] is the user's pinned game (vs. a favorite we picked automatically). */
+    /** Shown on the "my game" page when there's no [game]: a pinned race, or a favorite driver's. */
+    val race: Race? = null,
+    /** True when [game] (or [race]) is the user's pin (vs. a favorite we picked automatically). */
     val gamePinned: Boolean = false,
     /** Favorite teams, so the game is coloured from "my" side. */
     val favorites: List<String> = emptyList(),
@@ -77,10 +80,13 @@ class OverlayFeed @Inject constructor(
             combine(fantasy.state, scores.state, settings.settings, config.config, combine(picks.progress, tickerFeed) { a, b -> a to b }) { f, s, prefs, cfg, (pk, tk) ->
                 val games = s.games
                 val pinned = prefs.pinnedGame?.let(s::game)
+                val pinnedRace = prefs.pinnedGame?.let(s::race)
+                val game = pinned ?: if (pinnedRace == null) pickGame(games, prefs.favoriteTeams) else null
                 OverlayState(
                     matchup = f.matchup.takeIf { cfg.features.fantasy },
-                    game = pinned ?: pickGame(games, prefs.favoriteTeams),
-                    gamePinned = pinned != null,
+                    game = game,
+                    race = pinnedRace ?: if (game == null) pickRace(s.races, prefs.favoriteTeams) else null,
+                    gamePinned = pinned != null || pinnedRace != null,
                     favorites = prefs.favoriteTeams,
                     closeRule = cfg.closeGame,
                     showOdds = cfg.features.odds && prefs.showOdds,
@@ -106,6 +112,12 @@ class OverlayFeed @Inject constructor(
                         (g.state == GameState.PRE && g.startEpochMs - nowMs < 12 * 3_600_000L) ||
                         (g.state == GameState.FINAL && nowMs - g.startEpochMs < 6 * 3_600_000L)
                     )
+            }
+
+        /** No game to show: a favorite driver's race weekend while a session is live or one starts within 12 h. */
+        fun pickRace(races: List<Race>, favorites: List<String>, nowMs: Long = System.currentTimeMillis()): Race? =
+            races.filter { it.involvesAny(favorites) }.firstOrNull { r ->
+                r.state == GameState.LIVE || (r.state == GameState.PRE && r.startEpochMs - nowMs in 0..12 * 3_600_000L)
             }
     }
 }

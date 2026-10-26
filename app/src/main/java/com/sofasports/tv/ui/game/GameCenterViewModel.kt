@@ -89,7 +89,7 @@ class GameCenterViewModel @Inject constructor(
                 val result = runCatching { stats.summary(game.league, game.id) }
                 result.onSuccess { s -> _ui.update { it.copy(summary = s, error = null) } }
                 result.onFailure { e ->
-                    val msg = if (e is FixtureUnavailableException) "Game detail isn't in the fixture set. Try HOU @ JAX, LAC @ KC or LAL @ UTAH."
+                    val msg = if (e is FixtureUnavailableException) "Game detail isn't in the fixture set. Try the live games: HOU @ JAX, LAC @ KC, LAL @ UTAH, FLA @ CHI, TB @ MIL or NEW @ CRY."
                     else "Couldn't load game detail. Retrying…"
                     _ui.update { it.copy(error = if (it.summary == null) msg else null) }
                     if (e is FixtureUnavailableException) return@launch

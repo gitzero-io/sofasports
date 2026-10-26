@@ -14,10 +14,7 @@ data class TeamSide(
     val timeouts: Int? = null,
     /** Set once a result is in. Fights have no score, so this is the only way to tell who won. */
     val winner: Boolean? = null,
-) {
-    /** Which "<league>:<abbr>" favorite key this side matches; see [TeamKey]. */
-    fun key(league: League) = TeamKey.of(league, abbr)
-}
+)
 
 /** Live game state beyond the score. Only football fills possession and red zone. */
 data class Situation(
@@ -57,14 +54,17 @@ data class Game(
     val teams get() = listOf(away, home)
     val ref: GameRef get() = GameRef(league, id)
 
-    /** True when [team] is this game's side: a "<league>:<abbr>" key (see [TeamKey]), or a bare abbreviation within the same league. */
+    /** The favorite key for [side]: "<league>:<abbr>" for teams, "<league>:<name>" for fighters (see [TeamKey]). */
+    fun keyOf(side: TeamSide): String = TeamKey.of(league, if (league.format == EventFormat.FIGHT) side.name else side.abbr)
+
+    /** True when [team] is this game's side: a favorite key (see [TeamKey]), or a bare abbreviation within the same league. */
     fun involves(team: String) = side(team) != null
 
     fun side(team: String): TeamSide? {
         if (':' in team) {
             if (TeamKey.league(team) != league) return null
-            val abbr = TeamKey.abbr(team)
-            return teams.firstOrNull { it.abbr.equals(abbr, ignoreCase = true) }
+            val key = TeamKey.normalize(team)
+            return teams.firstOrNull { keyOf(it).equals(key, ignoreCase = true) }
         }
         return teams.firstOrNull { it.abbr == team }
     }
@@ -130,6 +130,20 @@ data class Race(
 ) {
     val ref: GameRef get() = GameRef(league, id)
     val winner: RaceEntry? get() = results.firstOrNull { it.winner } ?: results.firstOrNull().takeIf { state == GameState.FINAL }
+
+    /** Everyone entered this weekend: the current running order, else any session's entry list. */
+    val entrants: List<RaceEntry> get() = results.ifEmpty { sessions.firstOrNull { it.results.isNotEmpty() }?.results.orEmpty() }
+
+    /** Favorite drivers ([TeamKey]s) racing this weekend, in favorites order. */
+    fun favorites(keys: List<String>): List<RaceEntry> = keys.mapNotNull { k ->
+        if (TeamKey.league(k) != league) return@mapNotNull null
+        entrants.firstOrNull { it.key(league).equals(TeamKey.normalize(k), ignoreCase = true) }
+    }
+
+    fun involvesAny(keys: List<String>) = favorites(keys).isNotEmpty()
+
+    /** Where a favorite driver is now, when they're in [results]; null before the session runs. */
+    fun positionOf(entry: RaceEntry): Int? = results.firstOrNull { it.driverId == entry.driverId }?.position
 }
 
 data class RaceSession(val id: String, val name: String, val startEpochMs: Long, val state: GameState, val results: List<RaceEntry>)
@@ -142,7 +156,9 @@ data class RaceEntry(
     /** Country flag; ESPN has no driver photos on the scoreboard. */
     val flagUrl: String?,
     val winner: Boolean = false,
-)
+) {
+    fun key(league: League) = TeamKey.of(league, name)
+}
 
 data class WinProbPoint(val playId: String, val homeWinPct: Double, val tiePct: Double)
 

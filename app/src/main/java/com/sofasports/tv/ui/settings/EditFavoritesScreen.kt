@@ -30,7 +30,7 @@ fun EditFavoritesScreen(onDone: () -> Unit, settingsVm: SettingsViewModel = hilt
     LaunchedEffect(settings.favoriteTeams) { if (selected == null && settings.onboardingDone) selected = settings.favoriteTeams }
     val current = selected ?: settings.favoriteTeams
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        PickerHeader("Favorite teams", null) {
+        PickerHeader("Favorites", "Teams, fighters and drivers.") {
             SofaButton("Save", onClick = { vm.finish(current, onDone) }, selected = true)
             SofaButton("Cancel", onClick = onDone)
         }
