@@ -24,7 +24,10 @@
   },
   "endpoints": {
     "espnNflBase": "https://site.api.espn.com/apis/site/v2/sports/football/nfl",
-    "sleeperBase": "https://api.sleeper.app/v1"
+    "sleeperBase": "https://api.sleeper.app/v1",
+    "espnSportsBase": "https://site.api.espn.com/apis/site/v2/sports",
+    "sportsDbBase": "https://www.thesportsdb.com/api/v1/json/123"
   },
+  "disabledLeagues": [],
   "announcement": null
 }

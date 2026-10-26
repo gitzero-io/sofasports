@@ -379,7 +379,7 @@ private fun LazyListScope.developerItems(settings: UserSettings, vm: SettingsVie
 }
 
 const val NOT_AFFILIATED =
-    "Sofa Sports is an independent app. It is not affiliated with, endorsed by, or sponsored by the NFL, its teams, ESPN, or Sleeper. " +
+    "Sofa Sports is an independent app. It is not affiliated with, endorsed by, or sponsored by any league, team, governing body, ESPN, TheSportsDB, or Sleeper. " +
         "Team names and logos are trademarks of their owners and are shown for identification only. Scores may be delayed."
 
 @Composable

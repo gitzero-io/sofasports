@@ -129,3 +129,21 @@ One line per judgment call, with the reason.
 - Live projection per player = points + projection × share of his game left (from period and clock); finished players count their points. Win probability = normal model with each remaining projection's spread at 50% of itself; settled when no game time is left.
 - Photos: ESPN headshots by athlete id, Sleeper thumbnails by player id; defenses show the team logo.
 - Sleeper's trimmed player cache gained injury status (file renamed to _v2 so old caches refresh).
+
+## Multi-sport groundwork (2026-10-26, branch `multi-sport`)
+- Leagues are one enum (`domain/Leagues.kt`): NFL, NCAAF, NBA, NCAAM, MLB, NHL, EPL, MLS, Champions League, LaLiga, Serie A, Bundesliga, Ligue 1, Liga MX, UFC, Boxing, F1, NASCAR Cup, IndyCar. A league's `id` is stored in settings, favorites and pins, so it must never change.
+- Three event shapes, not one: team games stay `Game` (home/away + score); fights reuse `Game` (two athletes, no score, `winner`, grouped into a card by `eventId`); races are a separate `Race` (a field in finishing order, one per weekend with its sessions). Forcing races into home/away would have broken every screen.
+- Data: ESPN's site API for every league (same shapes as NFL). Boxing isn't on ESPN at all, so it comes from TheSportsDB's free test key ("123"), which returns only the next and the last fight; base URL is remote-configurable for a paid key later.
+- College asks for the whole division (`groups=80` FBS, `groups=50` D-I) because ESPN's default college scoreboard is a featured handful, which would hide most favorites.
+- Favorites are league-scoped keys, `"nba:LAL"` (`TeamKey`): ESPN reuses abbreviations across sports (DAL is the Cowboys, Mavericks and Stars). Bare keys from NFL-only builds read back as NFL, so upgrades keep their teams with no migration write. Up to 4 per league, 12 overall.
+- Pins and Game Center routes carry a `GameRef` key, `"nba:401909861"`: ESPN ids are only unique within a sport. A bare pinned id is NFL.
+- Followed leagues are a setting (default NFL only, so existing users see no change until they opt in). Each followed league polls on its own with the same PollPolicy; NFL is also polled when Sleeper is linked or a pick is tracked, since fantasy and picks are NFL-only.
+- A PRE event whose start passed more than 3 h ago no longer forces 30 s polling (a boxing card with no result yet would otherwise poll all night).
+- Close-game rules per sport, counted from the end of regulation: football keeps the remote rule; basketball last period within 6; hockey 3rd period within 1; baseball 8th inning on within 2; soccer 2nd half within 1. Overtime/extras/extra time are always close. Fights and races are never "close".
+- Basketball scoring isn't news: no ticker score events, no overlay pops and no "scoring plays" list (every basket would be one). Football, soccer, hockey and baseball keep them ("GOAL", "2 RUNS").
+- Game Center works for every ESPN team sport: flat play-by-play where there are no drives, soccer key events with a running score, baseball "Top 9th", and box-score columns trimmed to what fits a TV row per sport. Fights and races open a lighter detail page from the scoreboard instead (ESPN's MMA summary endpoint returns an error).
+- The team picker loads teams from ESPN's `/teams` per league (NFL stays built in, grouped by division). Lists of 60+ teams (college) get an A–Z filter.
+- Remote config gained `disabledLeagues` (kill one league's feed without a release) and `espnSportsBase` / `sportsDbBase`.
+- Fixtures: a real scoreboard per league saved 2026-10-25/26, plus NBA, NHL, EPL and MLB summaries. Fixture mode replays LAL @ UTAH's fourth quarter so non-football live paths can be seen offline.
+- Fantasy, the picks tracker and ESPN news-to-fantasy matching remain NFL-only.
+- MLB and NHL send a competitor's `record` as a plain string, and soccer sends `"odds":[null]`; both made whole scoreboards fail to parse until the DTOs accepted them. Caught by parsing every saved scoreboard in a test.

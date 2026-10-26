@@ -1,11 +1,12 @@
 # Sofa Sports
 
-NFL scores, fantasy and a live score overlay for Android TV / Google TV.
+Live scores, NFL fantasy and a score overlay for Android TV / Google TV.
 
-- **Scores**: your favorite teams first, then live, upcoming and final games, updated every 30 s while games are live. Close games are flagged.
-- **Game Center**: win probability, box score, play-by-play and DraftKings lines.
-- **Fantasy**: your Sleeper (username only) and ESPN Fantasy leagues, with a live matchup card.
-- **Picks**: track PrizePicks and DraftKings picks you enter on the TV, live from ESPN box scores.
+- **Sports**: NFL, college football, NBA, men's college basketball, MLB, NHL, soccer (Premier League, MLS, Champions League, LaLiga, Serie A, Bundesliga, Ligue 1, Liga MX), UFC, boxing, F1, NASCAR and IndyCar. Pick the leagues you follow; NFL is the default.
+- **Scores**: your favorite teams first, then live, upcoming and final games, one league at a time or all together, updated every 30 s while games are live. Close games are flagged. Fight cards and race weekends get their own pages.
+- **Game Center**: win probability, box score, play-by-play and DraftKings lines, for every team sport.
+- **Fantasy** (NFL): your Sleeper (username only) and ESPN Fantasy leagues, with a live matchup card.
+- **Picks** (NFL): track PrizePicks and DraftKings picks you enter on the TV, live from ESPN box scores.
 - **Overlay**: a small card over whatever you're watching, with pages you flip through (your matchup, your game, around the league, picks, or a one-line pill), plus an optional news ticker. Size, opacity and position are adjustable, and smart mode pops it up on big moments.
 - **Remote buttons**: pick a spare button on your remote to show, hide and flip the overlay without leaving your video (uses an accessibility service that only listens for that button).
 
@@ -42,4 +43,4 @@ Optional settings go in `local.properties` (never committed): `sentry.dsn`, `sof
 
 ## Notes
 
-Not affiliated with or endorsed by the NFL, ESPN, Sleeper, DraftKings or PrizePicks. Data comes from public ESPN and Sleeper endpoints, some of them unofficial, and can break without notice. Fonts: Barlow Condensed and Inter (SIL OFL, see `licenses/`).
+Not affiliated with or endorsed by the NFL, NBA, MLB, NHL, NCAA, UFC, Formula 1, NASCAR, IndyCar, any soccer league, ESPN, TheSportsDB, Sleeper, DraftKings or PrizePicks. Data comes from public ESPN, TheSportsDB and Sleeper endpoints, some of them unofficial, and can break without notice. Fonts: Barlow Condensed and Inter (SIL OFL, see `licenses/`).
