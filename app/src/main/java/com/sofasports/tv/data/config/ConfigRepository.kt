@@ -38,6 +38,8 @@ class ConfigRepository @Inject constructor(
     override val espnNflBase: String get() = _config.value.endpoints.espnNflBase
     override val sleeperBase: String get() = _config.value.endpoints.sleeperBase
     override val espnFantasyBase: String get() = _config.value.endpoints.espnFantasyBase
+    override val espnSportsBase: String get() = _config.value.endpoints.espnSportsBase
+    override val sportsDbBase: String get() = _config.value.endpoints.sportsDbBase
 
     /** Returns true if a new config was applied. */
     suspend fun refresh(): Boolean = withContext(Dispatchers.IO) {

@@ -9,6 +9,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.sofasports.tv.domain.GameRef
+import com.sofasports.tv.domain.League
+import com.sofasports.tv.domain.TeamKey
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -25,13 +28,16 @@ enum class OverlayTicker(val label: String) { OFF("Off"), CORNER("Corner card li
 
 data class UserSettings(
     val onboardingDone: Boolean = false,
-    /** Favorite team abbreviations in the order the user picked them. */
+    /** Favorite teams as "<league>:<abbr>" keys ([TeamKey]), in the order the user picked them. */
     val favoriteTeams: List<String> = emptyList(),
+    /** Leagues shown on Scores, Home and the overlay, in the user's order. */
+    val followedLeagues: List<League> = League.DEFAULT_FOLLOWED,
     val sleeperUsername: String? = null,
     val sleeperUserId: String? = null,
     val selectedLeagueId: String? = null,
     val overlayEnabled: Boolean = false,
     val overlayCorner: OverlayCorner = OverlayCorner.TOP_RIGHT,
+    /** The game (or race) pinned to the overlay, as a [GameRef] key ("nba:401909861"). */
     val pinnedGameId: String? = null,
     val usageEventsOptOut: Boolean = false,
     /** User chose "Skip for now" on the Home link prompt; linking is still available in Settings. */
@@ -43,7 +49,9 @@ data class UserSettings(
     val overlay: OverlayPrefs = OverlayPrefs(),
     /** Package of the user's live TV app (YouTube TV, Hulu…), opened by "Watch". Null = not chosen. */
     val watchApp: String? = null,
-)
+) {
+    val pinnedGame: GameRef? get() = GameRef.parse(pinnedGameId)
+}
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -54,6 +62,7 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
     private object Keys {
         val onboardingDone = booleanPreferencesKey("onboarding_done")
         val favorites = stringPreferencesKey("favorite_teams")
+        val leagues = stringPreferencesKey("followed_leagues")
         val sleeperUsername = stringPreferencesKey("sleeper_username")
         val sleeperUserId = stringPreferencesKey("sleeper_user_id")
         val selectedLeague = stringPreferencesKey("selected_league_id")
@@ -112,13 +121,15 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
     val settings: Flow<UserSettings> = store.data.map { p ->
         UserSettings(
             onboardingDone = p[Keys.onboardingDone] ?: false,
-            favoriteTeams = p[Keys.favorites]?.split(',')?.filter { it.isNotBlank() }.orEmpty(),
+            // NFL-only builds stored bare abbreviations ("KC"); they read back as "nfl:KC".
+            favoriteTeams = p[Keys.favorites]?.split(',')?.filter { it.isNotBlank() }?.map(TeamKey::normalize)?.distinct().orEmpty(),
+            followedLeagues = p[Keys.leagues]?.split(',')?.mapNotNull(League::fromId)?.distinct()?.ifEmpty { null } ?: League.DEFAULT_FOLLOWED,
             sleeperUsername = p[Keys.sleeperUsername],
             sleeperUserId = p[Keys.sleeperUserId],
             selectedLeagueId = p[Keys.selectedLeague],
             overlayEnabled = p[Keys.overlayEnabled] ?: false,
             overlayCorner = p[Keys.overlayCorner]?.let { runCatching { OverlayCorner.valueOf(it) }.getOrNull() } ?: OverlayCorner.TOP_RIGHT,
-            pinnedGameId = p[Keys.pinnedGame],
+            pinnedGameId = p[Keys.pinnedGame]?.let { GameRef.parse(it)?.key },
             usageEventsOptOut = p[Keys.usageOptOut] ?: false,
             fantasyPromptSkipped = p[Keys.fantasySkipped] ?: false,
             showOdds = p[Keys.showOdds] ?: true,
@@ -133,7 +144,19 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
     suspend fun current(): UserSettings = settings.first()
 
     suspend fun setFavorites(teams: List<String>) = store.edit {
-        it[Keys.favorites] = teams.joinToString(",")
+        it[Keys.favorites] = teams.map(TeamKey::normalize).distinct().joinToString(",")
+        it[Keys.onboardingDone] = true
+    }
+
+    /** At least one league is always followed; an empty pick keeps the default. */
+    suspend fun setFollowedLeagues(leagues: List<League>) = store.edit {
+        it[Keys.leagues] = leagues.distinct().ifEmpty { League.DEFAULT_FOLLOWED }.joinToString(",") { l -> l.id }
+    }
+
+    /** First run: leagues and favorites together. */
+    suspend fun finishOnboarding(leagues: List<League>, teams: List<String>) = store.edit {
+        it[Keys.leagues] = leagues.distinct().ifEmpty { League.DEFAULT_FOLLOWED }.joinToString(",") { l -> l.id }
+        it[Keys.favorites] = teams.map(TeamKey::normalize).distinct().joinToString(",")
         it[Keys.onboardingDone] = true
     }
 
@@ -153,8 +176,8 @@ class SettingsStore @Inject constructor(@ApplicationContext context: Context) {
 
     suspend fun setOverlayEnabled(enabled: Boolean) = store.edit { it[Keys.overlayEnabled] = enabled }
     suspend fun setOverlayCorner(corner: OverlayCorner) = store.edit { it[Keys.overlayCorner] = corner.name }
-    suspend fun setPinnedGame(gameId: String?) = store.edit {
-        if (gameId == null) it.remove(Keys.pinnedGame) else it[Keys.pinnedGame] = gameId
+    suspend fun setPinnedGame(game: GameRef?) = store.edit {
+        if (game == null) it.remove(Keys.pinnedGame) else it[Keys.pinnedGame] = game.key
     }
     suspend fun setUsageEventsOptOut(optOut: Boolean) = store.edit { it[Keys.usageOptOut] = optOut }
     suspend fun setFantasyPromptSkipped(skipped: Boolean) = store.edit { it[Keys.fantasySkipped] = skipped }

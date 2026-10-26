@@ -75,8 +75,8 @@ class OverlayFeed @Inject constructor(
                 if (m == OverlayTicker.OFF) flowOf(m to emptyList()) else ticker.items.map { m to it }
             }
             combine(fantasy.state, scores.state, settings.settings, config.config, combine(picks.progress, tickerFeed) { a, b -> a to b }) { f, s, prefs, cfg, (pk, tk) ->
-                val games = s.scoreboard?.games.orEmpty()
-                val pinned = prefs.pinnedGameId?.let { id -> games.firstOrNull { it.id == id } }
+                val games = s.games
+                val pinned = prefs.pinnedGame?.let(s::game)
                 OverlayState(
                     matchup = f.matchup.takeIf { cfg.features.fantasy },
                     game = pinned ?: pickGame(games, prefs.favoriteTeams),
@@ -96,8 +96,8 @@ class OverlayFeed @Inject constructor(
 
     companion object {
         /**
-         * No pinned game: show my first favorite's game if it's live or today (within 12 h);
-         * otherwise nothing, so the overlay stays small.
+         * No pinned game: show my highest-priority favorite's game (any league) if it's live or
+         * today (within 12 h); otherwise nothing, so the overlay stays small.
          */
         fun pickGame(games: List<Game>, favorites: List<String>, nowMs: Long = System.currentTimeMillis()): Game? =
             GameSorting.sections(games, favorites).firstOrNull()?.second?.firstOrNull { g ->

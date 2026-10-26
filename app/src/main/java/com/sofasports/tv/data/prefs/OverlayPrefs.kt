@@ -21,7 +21,7 @@ enum class OverlayEdge(val label: String, val factor: Float) { NORMAL("Normal", 
 /** Optional rows on the full pages. */
 enum class OverlayRow(val label: String) {
     DK_LINE("DraftKings line"),
-    DOWN_DISTANCE("Down & distance"),
+    DOWN_DISTANCE("Down & distance, count & outs"),
     LAST_PLAY("Last play"),
     PLAYING_NOW("My players playing now"),
 }

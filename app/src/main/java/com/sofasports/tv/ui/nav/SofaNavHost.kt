@@ -58,6 +58,9 @@ import com.sofasports.tv.ui.settings.SettingsScreen
 import com.sofasports.tv.ui.settings.SettingsViewModel
 import com.sofasports.tv.ui.overlaysettings.OverlaySettingsScreen
 import com.sofasports.tv.ui.overlaysettings.RemoteButtonsScreen
+import com.sofasports.tv.ui.event.EventScreen
+import com.sofasports.tv.ui.settings.EditLeaguesScreen
+import com.sofasports.tv.domain.GameRef
 import com.sofasports.tv.ui.theme.SofaColors
 import com.sofasports.tv.ui.update.UpdateSection
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -75,15 +78,20 @@ object Routes {
     const val HOME = "home"
     const val SCORES = "scores"
     const val SETTINGS = "settings"
+    /** [gameId] is a GameRef key: "nba:401909861". */
     const val GAME = "game/{gameId}"
+    /** A fight card or race weekend, by GameRef key. */
+    const val EVENT = "event/{ref}"
     const val EDIT_FAVORITES = "favorites"
+    const val EDIT_LEAGUES = "leagues"
     const val ADD_ESPN = "espn-add"
     const val PICKS = "picks"
     const val FANTASY = "fantasy"
     const val ADD_PICK = "picks-add"
     const val OVERLAY_SETTINGS = "overlay-settings"
     const val REMOTE_BUTTONS = "remote-buttons"
-    fun game(id: String) = "game/$id"
+    fun game(refKey: String) = "game/$refKey"
+    fun event(ref: GameRef) = "event/${ref.key}"
 }
 
 private data class Tab(val route: String, val label: String)
@@ -168,6 +176,7 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
                     composable(Routes.HOME) {
                         HomeScreen(
                             onOpenGame = { nav.navigate(Routes.game(it)) },
+                            onOpenEvent = { nav.navigate(Routes.event(it)) },
                             onOpenScores = { nav.navigate(Routes.SCORES) { launchSingleTop = true } },
                             onAddEspnLeague = { nav.navigate(Routes.ADD_ESPN) },
                             onOpenPicks = { nav.navigate(Routes.PICKS) { launchSingleTop = true } },
@@ -177,10 +186,12 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
                     composable(Routes.FANTASY) { FantasyScreen(onLink = { nav.navigate(Routes.SETTINGS) { launchSingleTop = true } }) }
                     composable(Routes.PICKS) { PicksScreen(onAddPick = { nav.navigate(Routes.ADD_PICK) }) }
                     composable(Routes.ADD_PICK) { AddPickScreen(onDone = { nav.popBackStack() }) }
-                    composable(Routes.SCORES) { ScoresScreen(onOpenGame = { nav.navigate(Routes.game(it)) }) }
+                    composable(Routes.SCORES) { ScoresScreen(onOpenGame = { nav.navigate(Routes.game(it)) }, onOpenEvent = { nav.navigate(Routes.event(it)) }) }
                     composable(Routes.GAME) { GameCenterScreen() }
+                    composable(Routes.EVENT) { EventScreen() }
                     composable(Routes.SETTINGS) { SettingsScreen(
                             onEditFavorites = { nav.navigate(Routes.EDIT_FAVORITES) },
+                            onEditLeagues = { nav.navigate(Routes.EDIT_LEAGUES) },
                             onAddEspnLeague = { nav.navigate(Routes.ADD_ESPN) },
                             onCustomizeOverlay = { nav.navigate(Routes.OVERLAY_SETTINGS) },
                             onRemoteButtons = { nav.navigate(Routes.REMOTE_BUTTONS) },
@@ -193,6 +204,7 @@ fun SofaNavHost(nav: NavHostController = rememberNavController(), vm: RootViewMo
                     composable(Routes.REMOTE_BUTTONS) { RemoteButtonsScreen(onDone = { nav.popBackStack() }) }
                     composable(Routes.ADD_ESPN) { AddEspnLeagueScreen(onDone = { nav.popBackStack() }) }
                     composable(Routes.EDIT_FAVORITES) { EditFavoritesScreen(onDone = { nav.popBackStack() }) }
+                    composable(Routes.EDIT_LEAGUES) { EditLeaguesScreen(onDone = { nav.popBackStack() }) }
                 }
             }
         }

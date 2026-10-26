@@ -10,6 +10,7 @@ import com.sofasports.tv.domain.FantasyStarter
 import com.sofasports.tv.domain.FantasyTeam
 import com.sofasports.tv.domain.FantasyUser
 import com.sofasports.tv.domain.GameSummary
+import com.sofasports.tv.domain.League
 import com.sofasports.tv.domain.Scoreboard
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,14 +19,15 @@ class FixtureUnavailableException(what: String) : IllegalStateException("$what i
 
 @Singleton
 class FixtureScoresProvider @Inject constructor(private val replay: FixtureReplay) : ScoresProvider {
-    override suspend fun currentScoreboard(): Scoreboard = replay.scoreboard()
+    override suspend fun scoreboard(league: League): Scoreboard =
+        replay.scoreboard(league) ?: throw FixtureUnavailableException("${league.label} scores")
 }
 
 @Singleton
 class FixtureGameStatsProvider @Inject constructor(
     private val replay: FixtureReplay,
 ) : GameStatsProvider {
-    override suspend fun summary(gameId: String): GameSummary =
+    override suspend fun summary(league: League, gameId: String): GameSummary =
         replay.summary(gameId) ?: throw FixtureUnavailableException("Game detail for this game")
 }
 

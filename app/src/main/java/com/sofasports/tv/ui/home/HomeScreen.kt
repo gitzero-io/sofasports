@@ -38,10 +38,14 @@ import com.sofasports.tv.ui.update.UpdateBanner
 import com.sofasports.tv.domain.PickEvaluator
 import com.sofasports.tv.ui.picks.PickRow
 import com.sofasports.tv.ui.picks.sortForDisplay
+import com.sofasports.tv.domain.GameRef
+import com.sofasports.tv.ui.components.FightCardTile
+import com.sofasports.tv.ui.components.RaceCard
 
 @Composable
 fun HomeScreen(
     onOpenGame: (String) -> Unit,
+    onOpenEvent: (GameRef) -> Unit,
     onOpenScores: () -> Unit,
     onAddEspnLeague: () -> Unit,
     onOpenPicks: () -> Unit,
@@ -72,16 +76,18 @@ fun HomeScreen(
                             when {
                                 ui.scoresLoading -> "Loading scores…"
                                 ui.favorites.isEmpty() -> "No favorite teams yet. Pick some in Settings."
-                                else -> "Your teams don't play this week."
+                                ui.weeklyOnly -> "Your teams don't play this week."
+                                else -> "None of your teams are playing today."
                             },
                             style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary,
                         )
                     } else {
                         GameCard(
                             hero, ui.favorites, ui.closeRule, if (hero.state == GameState.PRE) now else 0L,
-                            onClick = { if (ui.gameCenterEnabled) onOpenGame(hero.id) },
+                            onClick = { if (ui.gameCenterEnabled && hero.league.hasGameCenter) onOpenGame(hero.ref.key) },
                             modifier = if (fantasyLinked) Modifier.fillMaxWidth() else Modifier.width(520.dp),
                             showOdds = ui.showOdds,
+                            showLeague = ui.multiLeague,
                         )
                         if (hero.state != GameState.FINAL) {
                             // Just the best option here; Game Center lists every way to watch.
@@ -125,6 +131,21 @@ fun HomeScreen(
         if (ui.aroundLeague.games.isNotEmpty()) {
             item(key = "league") {
                 GameRow(if (ui.aroundLeague.live) "Live now" else "Up next", ui.aroundLeague.games, ui, now, onOpenGame)
+            }
+        }
+        if (ui.fightCards.isNotEmpty() || ui.races.isNotEmpty()) {
+            item(key = "events") {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    RowLabel("Fights & racing")
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(20.dp), contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp)) {
+                        items(ui.fightCards, key = { "fc-${it.ref.key}" }) { c ->
+                            FightCardTile(c, if (c.state == GameState.PRE) now else 0L, onClick = { onOpenEvent(c.ref) }, modifier = Modifier.width(420.dp), showLeague = true)
+                        }
+                        items(ui.races, key = { "r-${it.ref.key}" }) { r ->
+                            RaceCard(r, if (r.state == GameState.PRE) now else 0L, onClick = { onOpenEvent(r.ref) }, modifier = Modifier.width(420.dp), showLeague = true)
+                        }
+                    }
+                }
             }
         }
         item(key = "all") { SofaButton("All scores", onClick = onOpenScores) }
@@ -186,12 +207,13 @@ private fun GameRow(title: String, games: List<Game>, ui: HomeUi, now: Long, onO
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         RowLabel(title, trailing = games.size.takeIf { it > 1 }?.toString())
         LazyRow(horizontalArrangement = Arrangement.spacedBy(20.dp), contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp)) {
-            items(games, key = { it.id }) { g ->
+            items(games, key = { it.ref.key }) { g ->
                 GameCard(
                     g, ui.favorites, ui.closeRule, if (g.state == GameState.PRE) now else 0L,
-                    onClick = { if (ui.gameCenterEnabled) onOpenGame(g.id) },
+                    onClick = { if (ui.gameCenterEnabled && g.league.hasGameCenter) onOpenGame(g.ref.key) },
                     modifier = Modifier.width(420.dp),
                     showOdds = ui.showOdds,
+                    showLeague = ui.multiLeague,
                 )
             }
         }

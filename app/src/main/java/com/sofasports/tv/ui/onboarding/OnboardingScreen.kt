@@ -22,7 +22,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.sofasports.tv.data.prefs.SettingsStore
-import com.sofasports.tv.domain.NflTeams
+import com.sofasports.tv.domain.Favorites
+import com.sofasports.tv.domain.League
 import com.sofasports.tv.telemetry.UsageEvent
 import com.sofasports.tv.telemetry.UsageEvents
 import com.sofasports.tv.ui.components.SofaButton
@@ -38,32 +39,80 @@ class OnboardingViewModel @Inject constructor(private val store: SettingsStore, 
         usage.track(UsageEvent.FavoritesSaved(favorites.size))
         then()
     }
+
+    fun finish(leagues: List<League>, favorites: List<String>, then: () -> Unit) = viewModelScope.launch {
+        // Favorites only make sense in leagues the user follows.
+        val kept = favorites.filter { key -> leagues.any { it.id == key.substringBefore(':') } }
+        store.finishOnboarding(leagues, kept)
+        usage.track(UsageEvent.LeaguesSaved(leagues.size))
+        usage.track(UsageEvent.FavoritesSaved(kept.size))
+        then()
+    }
+
+    fun saveLeagues(leagues: List<League>, then: () -> Unit) = viewModelScope.launch {
+        store.setFollowedLeagues(leagues)
+        usage.track(UsageEvent.LeaguesSaved(leagues.size))
+        then()
+    }
 }
 
-/** First run: pick up to [NflTeams.MAX_FAVORITES] teams. Skippable; editable later in Settings. */
+/** Saveable form of a league list (enum names). */
+internal fun List<League>.ids() = map { it.id }
+internal fun List<String>.leagues() = mapNotNull(League::fromId)
+
+/**
+ * First run: 1) which sports and leagues to follow, 2) favorite teams in those leagues.
+ * Both are skippable and editable later in Settings.
+ */
 @Composable
 fun OnboardingScreen(onDone: () -> Unit, vm: OnboardingViewModel = hiltViewModel()) {
+    var step by rememberSaveable { mutableStateOf(0) }
+    var leagueIds by rememberSaveable { mutableStateOf(League.DEFAULT_FOLLOWED.ids()) }
     var selected by rememberSaveable { mutableStateOf(listOf<String>()) }
+    val leagues = leagueIds.leagues()
+    val hasTeams = leagues.any { it.hasTeams }
     Column(
         Modifier.fillMaxSize().background(SofaColors.Background).padding(top = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text("Who do you root for?", style = MaterialTheme.typography.displaySmall, color = SofaColors.TextPrimary)
                 Text(
-                    "Pick up to ${NflTeams.MAX_FAVORITES}. Your teams show first and are always blue.",
+                    if (step == 0) "What do you watch?" else "Who do you root for?",
+                    style = MaterialTheme.typography.displaySmall, color = SofaColors.TextPrimary,
+                )
+                Text(
+                    if (step == 0) "Pick the leagues you want scores for. The first one opens first on Scores."
+                    else "Pick up to ${Favorites.MAX_PER_LEAGUE} per league. Your teams show first and are always blue.",
                     style = MaterialTheme.typography.bodyLarge, color = SofaColors.TextSecondary,
                 )
             }
-            SofaButton("Skip", onClick = { vm.finish(emptyList(), onDone) })
-            Spacer(Modifier.padding(6.dp))
-            SofaButton(
-                if (selected.isEmpty()) "Done" else "Done (${selected.size})",
-                onClick = { vm.finish(selected, onDone) },
-                selected = selected.isNotEmpty(),
-            )
+            if (step == 0) {
+                SofaButton(
+                    if (leagues.isEmpty()) "Next" else "Next (${leagues.size})",
+                    onClick = { if (hasTeams) step = 1 else vm.finish(leagues, emptyList(), onDone) },
+                    selected = leagues.isNotEmpty(),
+                )
+            } else {
+                SofaButton("Back", onClick = { step = 0 })
+                Spacer(Modifier.padding(6.dp))
+                SofaButton("Skip", onClick = { vm.finish(leagues, emptyList(), onDone) })
+                Spacer(Modifier.padding(6.dp))
+                SofaButton(
+                    if (selected.isEmpty()) "Done" else "Done (${selected.size})",
+                    onClick = { vm.finish(leagues, selected, onDone) },
+                    selected = selected.isNotEmpty(),
+                )
+            }
         }
-        FavoritesPicker(selected = selected, onToggle = { selected = NflTeams.toggle(selected, it) }, modifier = Modifier.weight(1f))
+        if (step == 0) {
+            LeaguePicker(
+                selected = leagues,
+                onToggle = { l -> leagueIds = if (l.id in leagueIds) leagueIds - l.id else leagueIds + l.id },
+                modifier = Modifier.weight(1f),
+            )
+        } else {
+            FavoritesPicker(leagues = leagues, selected = selected, onToggle = { selected = Favorites.toggle(selected, it) }, modifier = Modifier.weight(1f))
+        }
     }
 }

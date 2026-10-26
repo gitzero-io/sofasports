@@ -20,6 +20,8 @@ import com.sofasports.tv.data.provider.SleeperPlayerCache
 import com.sofasports.tv.data.provider.SwitchingFantasyProvider
 import com.sofasports.tv.data.provider.SwitchingGameStatsProvider
 import com.sofasports.tv.data.provider.SwitchingScoresProvider
+import com.sofasports.tv.data.provider.EspnTeamsProvider
+import com.sofasports.tv.data.provider.TeamsProvider
 import com.sofasports.tv.telemetry.AppUsageEvents
 import com.sofasports.tv.telemetry.LogcatUsageSink
 import com.sofasports.tv.telemetry.UsageEvents
@@ -43,6 +45,7 @@ import javax.inject.Singleton
 abstract class ProviderModule {
     @Binds abstract fun scores(impl: SwitchingScoresProvider): ScoresProvider
     @Binds abstract fun gameStats(impl: SwitchingGameStatsProvider): GameStatsProvider
+    @Binds abstract fun teams(impl: EspnTeamsProvider): TeamsProvider
     @Binds abstract fun fantasy(impl: SwitchingFantasyProvider): FantasyProvider
     @Binds abstract fun players(impl: SleeperPlayerCache): PlayerDirectory
     @Binds abstract fun fixtures(impl: AssetFixtureSource): FixtureSource

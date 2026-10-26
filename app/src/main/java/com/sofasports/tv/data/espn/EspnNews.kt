@@ -4,6 +4,7 @@ import com.sofasports.tv.data.SofaJson
 import com.sofasports.tv.data.fixture.FixtureSource
 import com.sofasports.tv.data.provider.ApiBases
 import com.sofasports.tv.data.provider.DataModeSource
+import com.sofasports.tv.domain.League
 import com.sofasports.tv.domain.NewsItem
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -38,9 +39,9 @@ private data class CategoryDto(
 
 @Serializable private data class TeamRefDto(val abbreviation: String? = null)
 
-/** ESPN NFL news feed → headlines. Headlines only: article bodies are never fetched or shown. */
+/** ESPN league news feed → headlines. Headlines only: article bodies are never fetched or shown. */
 object EspnNewsParser {
-    fun parse(json: String): List<NewsItem> =
+    fun parse(json: String, league: League = League.NFL): List<NewsItem> =
         SofaJson.decodeFromString(NewsDto.serializer(), json).articles.mapNotNull { a ->
             val headline = a.headline?.trim()?.takeIf { it.isNotEmpty() } ?: return@mapNotNull null
             val athletes = a.categories.filter { it.type == "athlete" }
@@ -52,26 +53,30 @@ object EspnNewsParser {
                 athleteIds = athletes.mapNotNull { (it.athleteId as? JsonPrimitive)?.contentOrNull }.toSet(),
                 athleteNames = athletes.mapNotNull { it.description }.toSet(),
                 kind = a.type,
+                league = league,
             )
         }
 }
 
 interface NewsProvider {
-    suspend fun headlines(): List<NewsItem>
+    suspend fun headlines(league: League): List<NewsItem>
 }
 
 @Singleton
 class EspnNewsProvider @Inject constructor(private val http: HttpClient, private val bases: ApiBases) : NewsProvider {
-    override suspend fun headlines(): List<NewsItem> {
-        val res = http.get("${bases.espnNflBase}/news?limit=50")
+    override suspend fun headlines(league: League): List<NewsItem> {
+        if (league.espnPath == null) return emptyList()
+        val res = http.get("${bases.espnBase(league)}/news?limit=50")
         if (!res.status.isSuccess()) error("ESPN news HTTP ${res.status.value}")
-        return EspnNewsParser.parse(res.bodyAsText())
+        return EspnNewsParser.parse(res.bodyAsText(), league)
     }
 }
 
+/** Only the NFL has a saved news feed. */
 @Singleton
 class FixtureNewsProvider @Inject constructor(private val source: FixtureSource) : NewsProvider {
-    override suspend fun headlines() = source.read("espn/news.json")?.let(EspnNewsParser::parse).orEmpty()
+    override suspend fun headlines(league: League) =
+        if (league != League.NFL) emptyList() else source.read("espn/news.json")?.let { EspnNewsParser.parse(it) }.orEmpty()
 }
 
 @Singleton
@@ -80,5 +85,5 @@ class SwitchingNewsProvider @Inject constructor(
     private val live: EspnNewsProvider,
     private val fixture: FixtureNewsProvider,
 ) : NewsProvider {
-    override suspend fun headlines() = (if (mode.useFixtures()) fixture else live).headlines()
+    override suspend fun headlines(league: League) = (if (mode.useFixtures()) fixture else live).headlines(league)
 }

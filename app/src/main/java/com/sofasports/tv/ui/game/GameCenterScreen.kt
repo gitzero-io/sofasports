@@ -36,7 +36,9 @@ import com.sofasports.tv.domain.GameOdds
 import com.sofasports.tv.domain.GameState
 import com.sofasports.tv.domain.WatchOption
 import com.sofasports.tv.domain.GameSummary
+import com.sofasports.tv.domain.Periods
 import com.sofasports.tv.domain.Play
+import com.sofasports.tv.domain.Sport
 import com.sofasports.tv.domain.TeamSide
 import com.sofasports.tv.domain.WinProbability
 import com.sofasports.tv.ui.components.Badge
@@ -75,7 +77,7 @@ fun GameCenterScreen(vm: GameCenterViewModel = hiltViewModel()) {
                 SofaButton(t.label, onClick = { tab = t }, selected = tab == t, modifier = if (t == GameTab.SUMMARY) Modifier.focusRequester(firstTab) else Modifier)
             }
             Spacer(Modifier.weight(1f))
-            val pinned = ui.pinnedGameId == summary.game.id
+            val pinned = ui.pinnedGameId == summary.game.ref.key
             SofaButton(if (pinned) "Pinned to overlay ✓" else "Pin to overlay", onClick = vm::togglePin, selected = pinned)
         }
         LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -115,13 +117,14 @@ private fun GameHeader(game: Game, favorites: List<String>) {
                 GameState.PRE -> {
                     val now = rememberNowMs(1_000)
                     Text(formatKickoff(game.startEpochMs), style = MaterialTheme.typography.titleLarge, color = SofaColors.TextSecondary)
-                    Countdown.format(now, game.startEpochMs)?.let {
-                        Text("Kickoff $it", style = MaterialTheme.typography.headlineMedium, color = SofaColors.TextPrimary)
+                    val word = Countdown.startWord(game.league)
+                    Countdown.format(now, game.startEpochMs, word)?.let {
+                        Text("$word $it", style = MaterialTheme.typography.headlineMedium, color = SofaColors.TextPrimary)
                     }
                 }
                 else -> Text(game.shortDetail.ifBlank { "Final" }, style = MaterialTheme.typography.titleLarge, color = SofaColors.TextSecondary)
             }
-            game.situation?.downDistance?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary) }
+            game.situation?.detail?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary) }
         }
         HeaderTeam(game.home, game, favorites, Modifier.weight(1f), alignEnd = true)
     }
@@ -165,9 +168,12 @@ private fun LazyListScope.summaryTab(s: GameSummary, favorites: List<String>, sh
     s.game.situation?.lastPlay?.takeIf { s.game.state == GameState.LIVE }?.let { last ->
         item(key = "last") { InfoRow("Last play", last) }
     }
-    item(key = "scoring-h") { SubHeader("Scoring plays") }
-    if (s.scoringPlays.isEmpty()) item(key = "noscore") { InfoRow("", "No scoring yet") }
-    items(s.scoringPlays, key = { "sp-${it.id}" }) { PlayRow(it, s.game) }
+    // Basketball has no scoring-play list (every basket would be on it).
+    if (s.game.league.sport != Sport.BASKETBALL) {
+        item(key = "scoring-h") { SubHeader(scoringTitle(s.game.league.sport)) }
+        if (s.scoringPlays.isEmpty()) item(key = "noscore") { InfoRow("", "No scoring yet") }
+        items(s.scoringPlays, key = { "sp-${it.id}" }) { PlayRow(it, s.game) }
+    }
     s.venue?.let { v -> item(key = "venue") { InfoRow("Venue", v) } }
 }
 
@@ -191,14 +197,22 @@ private fun LazyListScope.boxTab(s: GameSummary) {
         }
     }
     s.playerStats.forEach { table ->
+        // Basketball and hockey box scores are 12+ columns wide; keep the ones that fit a TV row.
+        val cols = boxColumns(s.game.league.sport, table.labels)
         item(key = "pt-${table.teamAbbr}-${table.category}") { SubHeader("${table.teamAbbr} · ${table.category}") }
-        item(key = "pl-${table.teamAbbr}-${table.category}") { StatLine("", table.labels, header = true) }
-        items(table.rows.take(6), key = { "pr-${table.teamAbbr}-${table.category}-${it.name}" }) { StatLine(it.name, it.stats) }
+        item(key = "pl-${table.teamAbbr}-${table.category}") { StatLine("", cols.map { table.labels[it] }, header = true) }
+        items(table.rows.take(rowsFor(s.game.league.sport)), key = { "pr-${table.teamAbbr}-${table.category}-${it.name}" }) { r ->
+            StatLine(r.name, cols.map { r.stats.getOrElse(it) { "" } })
+        }
     }
 }
 
 private fun LazyListScope.playsTab(s: GameSummary) {
     val drives = s.drives.asReversed()
+    if (drives.isEmpty() && s.plays.isNotEmpty()) {
+        items(s.plays.asReversed(), key = { "p-${it.id}" }) { PlayRow(it, s.game) }
+        return
+    }
     if (drives.isEmpty()) {
         item { InfoRow("", "Play-by-play appears once the game starts.") }
         return
@@ -227,7 +241,10 @@ private fun InfoRow(label: String, value: String) {
 @Composable
 private fun PlayRow(play: Play, game: Game) {
     Row(Modifier.fillMaxWidth().focusableRow().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text("${if (play.period <= 4) "Q${play.period}" else "OT"} ${play.clock}", style = MaterialTheme.typography.labelLarge, color = SofaColors.TextMuted, modifier = Modifier.width(110.dp))
+        Text(
+            "${play.periodLabel ?: Periods.label(game.league, play.period)} ${play.clock}".trim(),
+            style = MaterialTheme.typography.labelLarge, color = SofaColors.TextMuted, modifier = Modifier.width(110.dp),
+        )
         Text(
             play.text,
             style = MaterialTheme.typography.bodyMedium,
@@ -283,6 +300,27 @@ private fun LineCard(o: GameOdds, game: Game) {
             Text(listOfNotNull("Total ${Betting.formatNumber(ou)}", word).joinToString("   "), style = MaterialTheme.typography.titleMedium, color = SofaColors.TextPrimary)
         }
     }
+}
+
+private fun scoringTitle(sport: Sport) = if (sport == Sport.SOCCER || sport == Sport.HOCKEY) "Goals" else "Scoring plays"
+
+/** Columns worth showing per sport, by label; everything when the sport isn't listed or labels don't match. */
+private val preferredColumns = mapOf(
+    Sport.BASKETBALL to listOf("MIN", "PTS", "REB", "AST", "FG", "3PT", "FT", "STL", "BLK", "TO", "+/-"),
+    Sport.HOCKEY to listOf("G", "A", "+/-", "SOG", "HT", "BS", "TOI", "PIM", "GA", "SA", "SV", "SV%"),
+    Sport.BASEBALL to listOf("H-AB", "R", "H", "RBI", "HR", "BB", "K", "AVG", "IP", "ER", "PC-ST", "ERA"),
+)
+
+private fun boxColumns(sport: Sport, labels: List<String>): List<Int> {
+    val wanted = preferredColumns[sport] ?: return labels.indices.toList()
+    val picked = wanted.mapNotNull { w -> labels.indexOf(w).takeIf { it >= 0 } }
+    return picked.ifEmpty { labels.indices.take(10) }
+}
+
+private fun rowsFor(sport: Sport) = when (sport) {
+    Sport.FOOTBALL -> 6
+    Sport.BASEBALL -> 10
+    else -> 12
 }
 
 private fun statusWord(s: BetStatus) = when (s) {

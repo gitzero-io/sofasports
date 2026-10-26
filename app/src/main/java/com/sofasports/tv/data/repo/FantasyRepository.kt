@@ -152,7 +152,7 @@ class FantasyRepository @Inject constructor(
             }
             state = state.copy(loading = false)
             emit(state)
-            val anyLive = scores.state.value.scoreboard?.games?.any { it.state == GameState.LIVE } == true
+            val anyLive = scores.state.value.nfl?.games?.any { it.state == GameState.LIVE } == true
             val cfg = config.config.value
             val wait = if (anyLive || state.error != null) cfg.pollIntervalLiveSec * 1000L else cfg.pollIntervalIdleSec * 1000L
             withTimeoutOrNull(wait) { refreshSignal.first() }

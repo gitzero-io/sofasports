@@ -3,19 +3,24 @@ package com.sofasports.tv.domain
 import com.sofasports.tv.data.config.CloseGameRule
 import kotlin.math.abs
 
-/** Close-game rule: live, in period >= minPeriod, and within maxPointDiff. Overtime is always close. */
+/**
+ * Close-game rule: live, in period >= minPeriod, and within maxPointDiff. Overtime is always close.
+ * [rule] is the football rule from remote config; other sports use [SportRules.closeRule].
+ */
 object CloseGame {
     fun isClose(game: Game, rule: CloseGameRule = CloseGameRule()): Boolean {
-        if (game.state != GameState.LIVE) return false
+        if (game.state != GameState.LIVE || game.league.format != EventFormat.TEAMS) return false
         val home = game.home.score ?: return false
         val away = game.away.score ?: return false
-        if (game.period >= 5) return true
-        return game.period >= rule.minPeriod && abs(home - away) <= rule.maxPointDiff
+        if (game.inOvertime) return true
+        val r = SportRules.closeRule(game.league, rule)
+        return game.period >= r.minPeriod && abs(home - away) <= r.maxPointDiff
     }
 }
 
 /** Who is "me" (blue) in a game: my highest-priority favorite if playing, otherwise the home team. */
 object Perspective {
+    /** [favorites] are "<league>:<abbr>" keys (see [TeamKey]); a key only matches games in its league. */
     fun mySide(game: Game, favorites: List<String>): TeamSide =
         favorites.firstNotNullOfOrNull { game.side(it) } ?: game.home
 
@@ -36,7 +41,7 @@ object GameSorting {
         val favSorted = fav.sortedWith(
             compareBy<Game> { g -> favorites.indexOfFirst { g.involves(it) } }.thenBy { stateRank(it) }.thenBy { it.startEpochMs }
         )
-        val live = rest.filter { it.state == GameState.LIVE }.sortedWith(compareBy<Game>({ -it.period }, { it.startEpochMs }))
+        val live = rest.filter { it.state == GameState.LIVE }.sortedWith(compareBy<Game>({ -progress(it) }, { it.startEpochMs }))
         val upcoming = rest.filter { it.state == GameState.PRE }.sortedBy { it.startEpochMs }
         val final = rest.filter { it.state == GameState.FINAL || it.state == GameState.OTHER }.sortedBy { it.startEpochMs }
         return listOf(
@@ -58,10 +63,14 @@ object GameSorting {
     fun aroundLeague(games: List<Game>, favorites: List<String>, rule: CloseGameRule, max: Int = 8): AroundLeague {
         val rest = games.filterNot { Perspective.involvesFavorite(it, favorites) }
         val live = rest.filter { it.state == GameState.LIVE }
-            .sortedWith(compareByDescending<Game> { CloseGame.isClose(it, rule) }.thenBy { -it.period }.thenBy { it.startEpochMs })
+            .sortedWith(compareByDescending<Game> { CloseGame.isClose(it, rule) }.thenBy { -progress(it) }.thenBy { it.startEpochMs })
         if (live.isNotEmpty()) return AroundLeague(true, live.take(max))
         return AroundLeague(false, rest.filter { it.state == GameState.PRE }.sortedBy { it.startEpochMs }.take(max))
     }
+
+    /** How far through regulation a game is, 0..1+, so a 9th inning and a 4th quarter sort alike. */
+    private fun progress(g: Game): Double =
+        if (g.league.regulationPeriods > 0) g.period.toDouble() / g.league.regulationPeriods else 0.0
 
     private fun stateRank(g: Game) = when (g.state) {
         GameState.LIVE -> 0
@@ -76,11 +85,11 @@ object Countdown {
      * - more than 24h away: null (caller shows the date instead)
      * - 1h..24h: "in 5h 07m"
      * - under 1h: "in 42:05"
-     * - at/after kickoff but not live yet: "Kickoff soon"
+     * - at/after kickoff but not live yet: "Kickoff soon" ([startWord] "Starting" for fights and races)
      */
-    fun format(nowMs: Long, kickoffMs: Long): String? {
+    fun format(nowMs: Long, kickoffMs: Long, startWord: String = "Kickoff"): String? {
         val diff = kickoffMs - nowMs
-        if (diff <= 0) return "Kickoff soon"
+        if (diff <= 0) return "$startWord soon"
         val totalSec = diff / 1000
         val h = totalSec / 3600
         val m = (totalSec % 3600) / 60
@@ -94,6 +103,15 @@ object Countdown {
 
     /** How often the UI needs to tick for this countdown. */
     fun tickMs(nowMs: Long, kickoffMs: Long): Long = if (kickoffMs - nowMs < 3_600_000) 1_000 else 30_000
+
+    /** "Kickoff" for football and soccer, "Tip-off", "First pitch", "Puck drop", else "Start". */
+    fun startWord(league: League): String = when (league.sport) {
+        Sport.FOOTBALL, Sport.SOCCER -> "Kickoff"
+        Sport.BASKETBALL -> "Tip-off"
+        Sport.BASEBALL -> "First pitch"
+        Sport.HOCKEY -> "Puck drop"
+        else -> "Starts"
+    }
 }
 
 /** Win probability shown as "<TEAM> 73%" from my side's perspective. */

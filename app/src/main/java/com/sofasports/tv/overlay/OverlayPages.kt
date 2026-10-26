@@ -2,9 +2,11 @@ package com.sofasports.tv.overlay
 
 import com.sofasports.tv.data.prefs.OverlayPage
 import com.sofasports.tv.domain.CloseGame
+import com.sofasports.tv.domain.EventFormat
 import com.sofasports.tv.domain.FantasyStarter
 import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameState
+import com.sofasports.tv.domain.League
 import com.sofasports.tv.domain.NflTeams
 
 /** Which overlay pages have something to show, and how the remote moves between them. */
@@ -40,19 +42,23 @@ object OverlayPages {
         return pages[(i + if (forward) 1 else pages.size - 1) % pages.size]
     }
 
-    /** "Around the league": live games (close ones first), then today's kickoffs, then recent finals. */
+    /**
+     * "Around the league": live games (close ones first), then today's kickoffs, then recent finals,
+     * across every followed team-sport league. Fights and races don't fit the one-line score rows.
+     */
     fun leagueGames(s: OverlayState, nowMs: Long): List<Game> {
-        val live = s.games.filter { it.state == GameState.LIVE }
+        val games = s.games.filter { it.league.format == EventFormat.TEAMS }
+        val live = games.filter { it.state == GameState.LIVE }
             .sortedWith(compareByDescending<Game> { CloseGame.isClose(it, s.closeRule) }.thenBy { it.startEpochMs })
-        val upcoming = s.games.filter { it.state == GameState.PRE && it.startEpochMs - nowMs in 0..12 * HOUR }.sortedBy { it.startEpochMs }
-        val finals = s.games.filter { it.state == GameState.FINAL && nowMs - it.startEpochMs < 6 * HOUR }.sortedByDescending { it.startEpochMs }
+        val upcoming = games.filter { it.state == GameState.PRE && it.startEpochMs - nowMs in 0..12 * HOUR }.sortedBy { it.startEpochMs }
+        val finals = games.filter { it.state == GameState.FINAL && nowMs - it.startEpochMs < 6 * HOUR }.sortedByDescending { it.startEpochMs }
         return (live + upcoming + finals).take(LEAGUE_MAX)
     }
 
     /** My fantasy starters whose NFL game is live right now, highest points first. */
     fun playingNow(s: OverlayState): List<FantasyStarter> {
         val m = s.matchup ?: return emptyList()
-        val liveTeams = s.games.filter { it.state == GameState.LIVE }.flatMap { g -> g.teams.map { it.abbr } }.toSet()
+        val liveTeams = s.games.filter { it.league == League.NFL && it.state == GameState.LIVE }.flatMap { g -> g.teams.map { it.abbr } }.toSet()
         if (liveTeams.isEmpty()) return emptyList()
         return m.me.starters.filter { st -> st.player.team?.let { teamAbbr(it) in liveTeams } == true }
             .sortedByDescending { it.points }

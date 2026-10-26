@@ -38,6 +38,8 @@ import com.sofasports.tv.domain.BetStatus
 import com.sofasports.tv.domain.Betting
 import com.sofasports.tv.domain.CloseGame
 import com.sofasports.tv.domain.Countdown
+import com.sofasports.tv.domain.EventFormat
+import com.sofasports.tv.domain.League
 import com.sofasports.tv.domain.FantasyMatchup
 import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameState
@@ -211,14 +213,15 @@ private fun PlayingNowRows(players: List<FantasyStarter>) {
     }
 }
 
-/** Compact scoreboard: "HOU 24  21 JAX   Q4 2:13", favorites' side in blue. */
+/** Compact scoreboard: "HOU 24  21 JAX   Q4 2:13", favorites' side in blue; other leagues are labelled. */
 @Composable
 private fun LeagueRows(games: List<Game>, state: OverlayState) {
     games.forEach { g ->
         val mine = state.favorites.any { g.involves(it) }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             Box(Modifier.width(4.dp).height(16.dp).background(if (mine) SofaColors.Blue else SofaColors.Outline, RoundedCornerShape(2.dp)))
-            val score = if (g.state == GameState.PRE) "${g.away.abbr} @ ${g.home.abbr}" else "${g.away.abbr} ${g.away.score ?: 0}  ${g.home.score ?: 0} ${g.home.abbr}"
+            val score = (if (g.league == League.NFL) "" else "${g.league.label}  ") +
+                if (g.state == GameState.PRE) "${g.away.abbr} @ ${g.home.abbr}" else "${g.away.abbr} ${g.away.score ?: 0}  ${g.home.score ?: 0} ${g.home.abbr}"
             Text(score, style = MaterialTheme.typography.labelLarge, color = if (mine) SofaColors.BlueBright else SofaColors.TextPrimary, maxLines = 1, modifier = Modifier.weight(1f).scorePulse(g.teams.sumOf { it.score ?: 0 }.toDouble(), if (mine) SofaColors.Blue else SofaColors.TextSecondary))
             val detail = if (g.state == GameState.PRE) {
                 Countdown.format(System.currentTimeMillis(), g.startEpochMs) ?: g.shortDetail
@@ -241,7 +244,8 @@ private fun GameRows(g: Game, state: OverlayState) {
             }
             GameState.PRE -> {
                 val now = rememberNowMs(Countdown.tickMs(System.currentTimeMillis(), g.startEpochMs))
-                Text(Countdown.format(now, g.startEpochMs)?.let { "Kickoff $it" } ?: g.shortDetail, style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1)
+                val word = Countdown.startWord(g.league)
+                Text(Countdown.format(now, g.startEpochMs, word)?.let { "$word $it" } ?: g.shortDetail, style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1)
             }
             else -> Text(g.shortDetail.ifBlank { "Final" }, style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1)
         }
@@ -254,19 +258,24 @@ private fun GameRows(g: Game, state: OverlayState) {
             style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis,
         )
     }
+    if (g.league.format == EventFormat.FIGHT) {
+        g.eventName?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+    }
     g.teams.forEach { t ->
         val other = if (t.id == g.home.id) g.away else g.home
+        val fight = g.league.format == EventFormat.FIGHT
         OverlayScoreRow(
-            t.abbr, t.score?.toString() ?: "–",
+            if (fight) t.name else t.abbr,
+            if (fight) (if (t.winner == true) "W" else "") else t.score?.toString() ?: "–",
             if (t.id == me.id) SofaColors.Blue else SofaColors.Red,
-            leading = (t.score ?: 0) > (other.score ?: 0),
+            leading = if (fight) t.winner == true else (t.score ?: 0) > (other.score ?: 0),
             pulseValue = t.score?.toDouble(),
         )
     }
     val sit = g.situation?.takeIf { g.state == GameState.LIVE }
     if (sit != null && OverlayRow.DOWN_DISTANCE in state.prefs.rows) {
         val ball = g.teams.firstOrNull { it.id == sit.possessionTeamId }
-        listOfNotNull(ball?.let { "${it.abbr} ball" }, sit.downDistance, if (sit.isRedZone) "RED ZONE" else null)
+        listOfNotNull(ball?.let { "${it.abbr} ball" }, sit.detail, if (sit.isRedZone) "RED ZONE" else null)
             .takeIf { it.isNotEmpty() }
             ?.let { Text(it.joinToString(" · "), style = MaterialTheme.typography.labelMedium, color = if (sit.isRedZone) SofaColors.Live else SofaColors.TextSecondary, maxLines = 1) }
     }

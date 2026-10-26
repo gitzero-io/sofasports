@@ -23,6 +23,7 @@ import com.sofasports.tv.data.config.CloseGameRule
 import com.sofasports.tv.domain.Betting
 import com.sofasports.tv.domain.CloseGame
 import com.sofasports.tv.domain.Countdown
+import com.sofasports.tv.domain.EventFormat
 import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameOdds
 import com.sofasports.tv.domain.GameState
@@ -43,11 +44,18 @@ fun GameCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     showOdds: Boolean = false,
+    /** Small league tag ("NBA") in the status line, for rows that mix leagues. */
+    showLeague: Boolean = false,
 ) {
     val isClose = CloseGame.isClose(game, closeRule)
     SofaCard(onClick = onClick, modifier = modifier, containerColor = if (isClose) SofaColors.SurfaceRaised else SofaColors.Surface) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            StatusLine(game, isClose, nowMs)
+            StatusLine(game, isClose, nowMs, showLeague)
+            if (game.league.format == EventFormat.FIGHT) {
+                listOfNotNull(game.note, game.eventName.takeIf { showLeague }).takeIf { it.isNotEmpty() }?.let {
+                    Text(it.joinToString(" · "), style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+            }
             TeamRow(game.away, game, favorites)
             TeamRow(game.home, game, favorites)
             val last = game.situation?.lastPlay
@@ -60,21 +68,22 @@ fun GameCard(
 }
 
 @Composable
-private fun StatusLine(game: Game, isClose: Boolean, nowMs: Long) {
+private fun StatusLine(game: Game, isClose: Boolean, nowMs: Long, showLeague: Boolean) {
     val label = MaterialTheme.typography.labelLarge
     SpacedRow(gap = 8) {
+        if (showLeague) Badge(game.league.label, SofaColors.Outline, outlined = true)
         when (game.state) {
             GameState.LIVE -> {
                 Badge("LIVE", SofaColors.Live)
                 Text(game.shortDetail, style = label, color = SofaColors.TextPrimary, maxLines = 1)
                 if (isClose) Badge("CLOSE", SofaColors.Close, outlined = true)
                 Spacer(Modifier.weight(1f))
-                game.situation?.downDistance?.let {
+                game.situation?.detail?.let {
                     Text(it, style = MaterialTheme.typography.labelMedium, color = SofaColors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
             GameState.PRE -> {
-                val countdown = Countdown.format(nowMs, game.startEpochMs)
+                val countdown = Countdown.format(nowMs, game.startEpochMs, Countdown.startWord(game.league))
                 Text(
                     listOfNotNull(formatKickoff(game.startEpochMs), game.broadcast).joinToString(" · "),
                     style = label, color = SofaColors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis,
@@ -93,9 +102,9 @@ private fun StatusLine(game: Game, isClose: Boolean, nowMs: Long) {
 @Composable
 private fun TeamRow(team: TeamSide, game: Game, favorites: List<String>) {
     val color = sideColor(team, game, favorites)
-    val other = if (team.id == game.home.id) game.away else game.home
-    val winning = (team.score ?: 0) > (other.score ?: 0)
-    val dim = game.state == GameState.FINAL && !winning
+    val fight = game.league.format == EventFormat.FIGHT
+    val winner = game.winnerSide
+    val dim = game.state == GameState.FINAL && winner != null && winner.id != team.id
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.width(6.dp).size(width = 6.dp, height = 36.dp).background(color, MaterialTheme.shapes.small))
         Spacer(Modifier.width(10.dp))
@@ -103,7 +112,12 @@ private fun TeamRow(team: TeamSide, game: Game, favorites: List<String>) {
         Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(team.abbr, style = MaterialTheme.typography.headlineSmall, color = if (dim) SofaColors.TextMuted else SofaColors.TextPrimary)
+                Text(
+                    if (fight) team.name else team.abbr,
+                    style = if (fight) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineSmall,
+                    color = if (dim) SofaColors.TextMuted else SofaColors.TextPrimary,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                )
                 if (game.state == GameState.LIVE && game.situation?.possessionTeamId == team.id) {
                     Spacer(Modifier.width(8.dp))
                     Box(Modifier.size(10.dp).background(SofaColors.Live, CircleShape))
@@ -111,12 +125,16 @@ private fun TeamRow(team: TeamSide, game: Game, favorites: List<String>) {
             }
             team.record?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted) }
         }
-        Text(
-            team.score?.toString() ?: "",
-            style = MaterialTheme.typography.displaySmall,
-            color = if (dim) SofaColors.TextMuted else SofaColors.TextPrimary,
-            modifier = Modifier.padding(start = 8.dp).scorePulse(team.score?.toDouble(), color).padding(horizontal = 6.dp),
-        )
+        if (fight) {
+            if (team.winner == true) Badge("WIN", SofaColors.Positive)
+        } else {
+            Text(
+                team.score?.toString() ?: "",
+                style = MaterialTheme.typography.displaySmall,
+                color = if (dim) SofaColors.TextMuted else SofaColors.TextPrimary,
+                modifier = Modifier.padding(start = 8.dp).scorePulse(team.score?.toDouble(), color).padding(horizontal = 6.dp),
+            )
+        }
     }
 }
 

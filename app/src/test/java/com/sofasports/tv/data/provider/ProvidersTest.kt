@@ -2,6 +2,8 @@ package com.sofasports.tv.data.provider
 
 import com.sofasports.tv.Fixtures
 import com.sofasports.tv.data.sleeper.SleeperParser
+import com.sofasports.tv.domain.GameState
+import com.sofasports.tv.domain.League
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -20,6 +22,12 @@ class ProvidersTest {
         val path = req.url.encodedPath
         requested += req.url.toString()
         val fixture = when {
+            path.endsWith("/basketball/nba/scoreboard") -> "espn/nba/scoreboard.json"
+            path.endsWith("/football/college-football/scoreboard") -> "espn/cfb/scoreboard.json"
+            path.endsWith("/racing/f1/scoreboard") -> "espn/f1/scoreboard.json"
+            path.endsWith("/basketball/nba/summary") -> "espn/nba/summary_401909861_lal_utah.json"
+            path.endsWith("/basketball/nba/teams") -> null
+            path.endsWith("eventsnextleague.php") || path.endsWith("eventspastleague.php") -> "espn/boxing/scoreboard.json"
             path.endsWith("/scoreboard") -> "espn/scoreboard_2026_w6_final.json"
             path.endsWith("/summary") -> "espn/summary_401872996_hou_jax.json"
             path.endsWith("/state/nfl") -> "sleeper/state_nfl.json"
@@ -44,15 +52,44 @@ class ProvidersTest {
     }
 
     @Test fun `espn scores provider hits scoreboard and parses`() = runTest {
-        val sb = EspnScoresProvider(client, ApiBases.Default).currentScoreboard()
+        val sb = EspnScoresProvider(client, ApiBases.Default).scoreboard(League.NFL)
         assertEquals(14, sb.games.size)
         assertEquals("${Endpoints.ESPN_NFL_BASE}/scoreboard", requested.single())
     }
 
     @Test fun `espn stats provider passes event id`() = runTest {
-        val s = EspnGameStatsProvider(client, ApiBases.Default).summary("401872996")
+        val s = EspnGameStatsProvider(client, ApiBases.Default).summary(League.NFL, "401872996")
         assertEquals("401872996", s.game.id)
         assertEquals("event=401872996", requested.single().substringAfter('?'))
+    }
+
+    @Test fun `other leagues use their own espn path`() = runTest {
+        val sb = EspnScoresProvider(client, ApiBases.Default).scoreboard(League.NBA)
+        assertEquals("${Endpoints.ESPN_SPORTS_BASE}/basketball/nba/scoreboard", requested.single())
+        assertEquals(League.NBA, sb.league)
+        assertEquals(true, sb.games.isNotEmpty() && sb.games.all { it.league == League.NBA })
+        val s = EspnGameStatsProvider(client, ApiBases.Default).summary(League.NBA, "401909861")
+        assertEquals(League.NBA, s.game.league)
+    }
+
+    @Test fun `college asks for the whole division`() = runTest {
+        EspnScoresProvider(client, ApiBases.Default).scoreboard(League.CFB)
+        assertEquals("groups=80&limit=300", requested.single().substringAfter('?'))
+    }
+
+    @Test fun `racing comes back as races`() = runTest {
+        val sb = EspnScoresProvider(client, ApiBases.Default).scoreboard(League.F1)
+        assertEquals(true, sb.games.isEmpty())
+        assertEquals(1, sb.races.size)
+    }
+
+    @Test fun `boxing reads the next and last fights from TheSportsDB`() = runTest {
+        val sb = EspnScoresProvider(client, ApiBases.Default).scoreboard(League.BOXING)
+        assertEquals(2, requested.size)
+        assertEquals(true, requested.all { it.startsWith(Endpoints.SPORTS_DB_BASE) && it.endsWith("id=4445") })
+        // Both lists come from the same fixture here; duplicates collapse.
+        assertEquals(2, sb.games.size)
+        assertEquals(setOf(GameState.PRE, GameState.FINAL), sb.games.map { it.state }.toSet())
     }
 
     @Test fun `sleeper unknown user is null`() = runTest {

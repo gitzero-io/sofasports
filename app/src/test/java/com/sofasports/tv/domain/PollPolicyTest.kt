@@ -28,7 +28,7 @@ class PollPolicyTest {
         assertEquals(30_000L, PollPolicy.nextDelayMs(listOf(g(GameState.PRE, now - 60_000)), now, 30, 300))
 
     @Test fun `errors retry at live cadence`() {
-        assertEquals(30_000L, PollPolicy.nextDelayMs(null, now, 30, 300))
+        assertEquals(30_000L, PollPolicy.nextDelayMs(null as List<Game>?, now, 30, 300))
         assertEquals(30_000L, PollPolicy.nextDelayMs(listOf(g(GameState.FINAL)), now, 30, 300, lastFetchFailed = true))
     }
 }

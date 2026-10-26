@@ -32,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FantasyViewModel @Inject constructor(private val fantasy: FantasyRepository, scores: ScoresRepository) : ViewModel() {
     val state: StateFlow<FantasyState> = fantasy.state
-    val games: StateFlow<List<Game>> = scores.state.map { it.scoreboard?.games.orEmpty() }
+    val games: StateFlow<List<Game>> = scores.state.map { it.nfl?.games.orEmpty() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     fun selectLeague(id: String) = viewModelScope.launch { fantasy.selectLeague(id) }
 }

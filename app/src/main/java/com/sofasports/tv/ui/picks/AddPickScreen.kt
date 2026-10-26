@@ -108,7 +108,7 @@ class AddPickViewModel @Inject constructor(
 
     /** Games you can still bet on, or are in progress. */
     val games: StateFlow<List<Game>> = scores.state.map { s ->
-        s.scoreboard?.games.orEmpty().filter { it.state == GameState.PRE || it.state == GameState.LIVE }.sortedBy { it.startEpochMs }
+        s.nfl?.games.orEmpty().filter { it.state == GameState.PRE || it.state == GameState.LIVE }.sortedBy { it.startEpochMs }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun chooseBook(b: PickBook) = _ui.update {

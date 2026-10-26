@@ -21,6 +21,9 @@ data class EspnScoreboardDto(
 data class EspnEventDto(
     val id: String,
     val date: String? = null,
+    /** "UFC 333: Volkanovski vs. Evloev", "United States Grand Prix" */
+    val name: String? = null,
+    val shortName: String? = null,
     val week: EspnWeekDto? = null,
     val competitions: List<EspnCompetitionDto> = emptyList(),
     val status: EspnStatusDto? = null,
@@ -30,13 +33,16 @@ data class EspnEventDto(
 data class EspnCompetitionDto(
     val id: String? = null,
     val date: String? = null,
+    /** Fights: weight class ("Featherweight"). Racing: session ("FP1", "Qual", "Race"). */
+    val type: EspnCompetitionTypeDto? = null,
     val competitors: List<EspnCompetitorDto> = emptyList(),
     val status: EspnStatusDto? = null,
     val broadcasts: List<EspnBroadcastDto> = emptyList(),
     val broadcast: String? = null,
     val situation: EspnSituationDto? = null,
     val venue: EspnVenueDto? = null,
-    val odds: List<EspnOddsDto> = emptyList(),
+    /** Soccer sends `[null]` when there's no line. */
+    val odds: List<EspnOddsDto?> = emptyList(),
 )
 
 /**
@@ -54,6 +60,8 @@ data class EspnOddsDto(
     val awayTeamOdds: EspnTeamOddsDto? = null,
 )
 
+@Serializable data class EspnCompetitionTypeDto(val id: String? = null, val abbreviation: String? = null, val text: String? = null)
+
 @Serializable data class EspnOddsProviderDto(val name: String? = null, val displayName: String? = null)
 @Serializable data class EspnMoneylineDto(val home: EspnMoneylineSideDto? = null, val away: EspnMoneylineSideDto? = null)
 @Serializable data class EspnMoneylineSideDto(val close: EspnOddsValueDto? = null, val current: EspnOddsValueDto? = null)
@@ -64,11 +72,16 @@ data class EspnOddsDto(
 data class EspnCompetitorDto(
     val id: String? = null,
     val homeAway: String? = null,
-    val team: EspnTeamDto,
+    /** Team sports. Fights and races have [athlete] instead. */
+    val team: EspnTeamDto? = null,
+    val athlete: EspnCompetitorAthleteDto? = null,
+    /** Fights: 1 and 2. Races: running / finishing position. */
+    val order: Int? = null,
     /** String in both scoreboard and summary header, but be lenient. */
     val score: JsonElement? = null,
     val records: List<EspnRecordDto> = emptyList(),
-    val record: List<EspnRecordDto> = emptyList(),
+    /** A list in football and basketball, but a plain "0-2" (series record) in MLB and NHL. */
+    val record: JsonElement? = null,
     val winner: Boolean? = null,
 )
 
@@ -82,6 +95,15 @@ data class EspnTeamDto(
     val logo: String? = null,
     val logos: List<EspnLogoDto> = emptyList(),
     val color: String? = null,
+)
+
+@Serializable
+data class EspnCompetitorAthleteDto(
+    val displayName: String? = null,
+    val shortName: String? = null,
+    val fullName: String? = null,
+    val flag: EspnLogoDto? = null,
+    val headshot: EspnLogoDto? = null,
 )
 
 @Serializable data class EspnLogoDto(val href: String? = null)
@@ -116,6 +138,13 @@ data class EspnSituationDto(
     val lastPlay: EspnLastPlayDto? = null,
     val homeTimeouts: Int? = null,
     val awayTimeouts: Int? = null,
+    // Baseball
+    val balls: Int? = null,
+    val strikes: Int? = null,
+    val outs: Int? = null,
+    val onFirst: Boolean? = null,
+    val onSecond: Boolean? = null,
+    val onThird: Boolean? = null,
 )
 
 @Serializable data class EspnLastPlayDto(val text: String? = null)
@@ -131,7 +160,11 @@ data class EspnSummaryDto(
     val winprobability: List<EspnWinProbDto> = emptyList(),
     val scoringPlays: List<EspnPlayDto> = emptyList(),
     val gameInfo: EspnGameInfoDto? = null,
-    val pickcenter: List<EspnOddsDto> = emptyList(),
+    val pickcenter: List<EspnOddsDto?> = emptyList(),
+    /** Basketball, baseball, hockey: every play, oldest first (football uses [drives]). */
+    val plays: List<EspnPlayDto> = emptyList(),
+    /** Soccer: goals, cards, subs. */
+    val keyEvents: List<EspnPlayDto> = emptyList(),
 )
 
 @Serializable
@@ -180,6 +213,8 @@ data class EspnBoxPlayersDto(
 data class EspnPlayerCategoryDto(
     val name: String? = null,
     val text: String? = null,
+    /** Baseball: "batting" / "pitching" (no [name]). */
+    val type: String? = null,
     val labels: List<String> = emptyList(),
     val athletes: List<EspnAthleteStatDto> = emptyList(),
 )
@@ -218,8 +253,14 @@ data class EspnPlayDto(
     val period: EspnPeriodDto? = null,
     val clock: EspnClockDto? = null,
     val scoringPlay: Boolean? = null,
+    /** Soccer key events say which team; scores come from the running total instead. */
+    val team: EspnTeamRefDto? = null,
+    val shortText: String? = null,
 )
 
-@Serializable data class EspnPlayTypeDto(val text: String? = null)
-@Serializable data class EspnPeriodDto(val number: Int? = null)
+@Serializable data class EspnTeamRefDto(val id: String? = null, val displayName: String? = null)
+
+@Serializable data class EspnPlayTypeDto(val text: String? = null, val type: String? = null)
+/** Baseball: type "Top"/"Bottom", displayValue "9th Inning". */
+@Serializable data class EspnPeriodDto(val number: Int? = null, val type: String? = null, val displayValue: String? = null)
 @Serializable data class EspnClockDto(@SerialName("displayValue") val display: String? = null)

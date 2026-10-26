@@ -52,8 +52,8 @@ class TickerTest {
 
     @Test fun `events expire, live scores show, favorite game events are mine`() {
         val live = game.copy(state = GameState.LIVE, shortDetail = "3rd 6:19")
-        val ev = TickerItem("ev-${live.id}-24-14", TickerKind.SCORE_EVENT, "TD HOU", false, now - 60_000)
-        val old = ev.copy(key = "ev-${live.id}-17-14", timeMs = now - TickerBuilder.EVENT_TTL_MS - 1)
+        val ev = TickerItem("ev-${live.ref.key}-24-14", TickerKind.SCORE_EVENT, "TD HOU", false, now - 60_000)
+        val old = ev.copy(key = "ev-${live.ref.key}-17-14", timeMs = now - TickerBuilder.EVENT_TTL_MS - 1)
         val items = TickerBuilder.build(emptyList(), listOf(live), listOf(ev, old), TickerInterests(teams = setOf("JAX")), now)
         assertEquals(listOf(TickerKind.SCORE_EVENT, TickerKind.LIVE_SCORE), items.map { it.kind })
         assertTrue(items.all { it.mine })

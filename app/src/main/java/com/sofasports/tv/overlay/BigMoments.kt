@@ -4,8 +4,9 @@ import com.sofasports.tv.data.prefs.MomentKind
 import com.sofasports.tv.data.prefs.OverlayPage
 import com.sofasports.tv.domain.BetStatus
 import com.sofasports.tv.domain.CloseGame
+import com.sofasports.tv.domain.League
 import com.sofasports.tv.domain.Perspective
-import com.sofasports.tv.domain.TickerBuilder
+import com.sofasports.tv.domain.SportRules
 import com.sofasports.tv.ui.fantasy.formatPoints
 
 /** Colour of the moment banner: blue = good for me, red = good for the opponent. */
@@ -31,14 +32,16 @@ object BigMoments {
 
     private fun myGameScore(prev: OverlayState, cur: OverlayState): Moment? {
         val g = cur.game ?: return null
-        val old = prev.game?.takeIf { it.id == g.id } ?: return null
+        // Basketball scores every few seconds; popping up for each basket would be noise.
+        if (!SportRules.scoresAreNews(g.league)) return null
+        val old = prev.game?.takeIf { it.ref == g.ref } ?: return null
         val scorer = g.teams.firstOrNull { t -> (t.score ?: 0) > (old.side(t.abbr)?.score ?: Int.MAX_VALUE) } ?: return null
         val delta = (scorer.score ?: 0) - (old.side(scorer.abbr)?.score ?: 0)
         val mine = Perspective.mySide(g, cur.favorites).id == scorer.id
         val score = "${g.away.abbr} ${g.away.score ?: 0}–${g.home.score ?: 0} ${g.home.abbr}"
         return Moment(
             MomentKind.MY_GAME_SCORE,
-            "${TickerBuilder.scoreLabel(delta)} ${scorer.abbr} · $score",
+            "${SportRules.scoreLabel(g.league, delta)} ${scorer.abbr} · $score",
             OverlayPage.MY_GAME,
             if (mine) MomentTone.MINE else MomentTone.OPPONENT,
             "score-${g.id}-${g.away.score}-${g.home.score}",
@@ -95,17 +98,18 @@ object BigMoments {
     }
 
     private fun closeGames(prev: OverlayState, cur: OverlayState): List<Moment> {
-        val before = prev.games.associateBy { it.id }
+        val before = prev.games.associateBy { it.ref }
         return cur.games.mapNotNull { g ->
-            val old = before[g.id] ?: return@mapNotNull null
+            val old = before[g.ref] ?: return@mapNotNull null
             if (CloseGame.isClose(old, prev.closeRule) || !CloseGame.isClose(g, cur.closeRule)) return@mapNotNull null
-            val page = if (cur.game?.id == g.id) OverlayPage.MY_GAME else OverlayPage.LEAGUE
+            val page = if (cur.game?.ref == g.ref) OverlayPage.MY_GAME else OverlayPage.LEAGUE
+            val league = if (g.league == League.NFL) "" else "${g.league.label} "
             Moment(
                 MomentKind.CLOSE_GAME,
-                "Close game · ${g.away.abbr} ${g.away.score ?: 0}–${g.home.score ?: 0} ${g.home.abbr} · ${g.shortDetail}",
+                "Close game · $league${g.away.abbr} ${g.away.score ?: 0}–${g.home.score ?: 0} ${g.home.abbr} · ${g.shortDetail}",
                 page,
                 MomentTone.NEUTRAL,
-                "close-${g.id}",
+                "close-${g.ref.key}",
             )
         }
     }

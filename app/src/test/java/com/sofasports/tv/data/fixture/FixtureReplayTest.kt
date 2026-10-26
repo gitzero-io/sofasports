@@ -70,4 +70,21 @@ class FixtureReplayTest {
         assertTrue(early in 1 until 312)
         assertTrue(later >= early)
     }
+
+    @Test fun `the nba replay runs live in the fourth quarter`() {
+        val g = replay.scoreboard(com.sofasports.tv.domain.League.NBA, t0)!!.games.single { it.id == "401909861" }
+        assertEquals(GameState.LIVE, g.state)
+        assertEquals(com.sofasports.tv.domain.League.NBA, g.league)
+        assertEquals(null, g.winnerSide)
+        val s = replay.summary("401909861", t0)!!
+        assertEquals(true, s.plays.isNotEmpty() && s.plays.size < 514)
+        val end = replay.scoreboard(com.sofasports.tv.domain.League.NBA, t0 + 3_600_000)!!.games.single { it.id == "401909861" }
+        assertEquals(GameState.FINAL, end.state)
+    }
+
+    @Test fun `other leagues show their saved scoreboard`() {
+        com.sofasports.tv.domain.League.entries.filter { it != com.sofasports.tv.domain.League.NFL }.forEach { l ->
+            assertNotNull("${l.id} has no fixture", replay.scoreboard(l, t0))
+        }
+    }
 }

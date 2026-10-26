@@ -43,7 +43,8 @@ import com.sofasports.tv.BuildConfig
 import com.sofasports.tv.data.prefs.DataMode
 import com.sofasports.tv.data.prefs.OverlayCorner
 import com.sofasports.tv.data.prefs.OverlayTicker
-import com.sofasports.tv.domain.NflTeams
+import com.sofasports.tv.domain.League
+import com.sofasports.tv.domain.TeamKey
 import com.sofasports.tv.overlay.OverlayLayout
 import com.sofasports.tv.remote.RemoteKeys
 import com.sofasports.tv.ui.components.QrCode
@@ -57,6 +58,7 @@ import com.sofasports.tv.ui.theme.focusableRow
 @Composable
 fun SettingsScreen(
     onEditFavorites: () -> Unit,
+    onEditLeagues: () -> Unit = {},
     onAddEspnLeague: () -> Unit,
     onCustomizeOverlay: () -> Unit = {},
     onRemoteButtons: () -> Unit = {},
@@ -87,7 +89,7 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(32.dp),
             contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp),
         ) {
-            settingsPane(category, settings, canDraw, espnLinks, tvApps, vm, onEditFavorites, onAddEspnLeague, onCustomizeOverlay, onRemoteButtons, updateSection)
+            settingsPane(category, settings, canDraw, espnLinks, tvApps, vm, onEditFavorites, onEditLeagues, onAddEspnLeague, onCustomizeOverlay, onRemoteButtons, updateSection)
         }
     }
 }
@@ -95,7 +97,7 @@ fun SettingsScreen(
 /** Left-hand menu; like the top tabs, moving onto a category shows it. */
 enum class SettingsCategory(val label: String) {
     FANTASY("Fantasy"),
-    TEAMS("Favorite teams"),
+    TEAMS("Sports & teams"),
     OVERLAY("Score overlay"),
     WATCH("Watch games"),
     TICKER("Ticker & lines"),
@@ -138,6 +140,7 @@ private fun LazyListScope.settingsPane(
     tvApps: List<InstalledApp>,
     vm: SettingsViewModel,
     onEditFavorites: () -> Unit,
+    onEditLeagues: () -> Unit = {},
     onAddEspnLeague: () -> Unit,
     onCustomizeOverlay: () -> Unit,
     onRemoteButtons: () -> Unit,
@@ -145,7 +148,7 @@ private fun LazyListScope.settingsPane(
 ) {
     when (category) {
         SettingsCategory.FANTASY -> fantasyItems(settings, espnLinks, vm, onAddEspnLeague)
-        SettingsCategory.TEAMS -> teamItems(settings, onEditFavorites)
+        SettingsCategory.TEAMS -> teamItems(settings, onEditFavorites, onEditLeagues)
         SettingsCategory.OVERLAY -> overlayItems(settings, canDraw, vm, onCustomizeOverlay, onRemoteButtons)
         SettingsCategory.WATCH -> watchItems(settings, tvApps, vm)
         SettingsCategory.TICKER -> tickerItems(settings, vm)
@@ -188,17 +191,34 @@ private fun LazyListScope.fantasyItems(settings: UserSettings, espnLinks: List<E
     }
 }
 
-private fun LazyListScope.teamItems(settings: UserSettings, onEditFavorites: () -> Unit) {
+private fun LazyListScope.teamItems(settings: UserSettings, onEditFavorites: () -> Unit, onEditLeagues: () -> Unit) {
+    item(key = "leagues") {
+        SettingsSection("Sports you follow") {
+            SpacedRow {
+                Text(settings.followedLeagues.joinToString(" · ") { it.label }, style = MaterialTheme.typography.titleMedium, color = SofaColors.TextPrimary)
+                SofaButton("Edit", onClick = onEditLeagues)
+            }
+            Text(
+                "Fantasy and the picks tracker are NFL-only for now.",
+                style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted,
+            )
+        }
+    }
     item(key = "favorites") {
         SettingsSection("Favorite teams") {
             SpacedRow {
                 if (settings.favoriteTeams.isEmpty()) {
                     Text("None yet", style = MaterialTheme.typography.titleMedium, color = SofaColors.TextSecondary)
                 }
-                settings.favoriteTeams.mapNotNull(NflTeams::find).forEach { t ->
+                settings.favoriteTeams.forEach { key ->
+                    val league = TeamKey.league(key) ?: League.NFL
+                    val abbr = TeamKey.abbr(key)
                     SpacedRow(gap = 6) {
-                        TeamLogo(t.logoUrl, t.name, size = 36.dp)
-                        Text(t.abbr, style = MaterialTheme.typography.headlineSmall, color = SofaColors.BlueBright)
+                        league.logoUrl(abbr)?.let { TeamLogo(it, abbr, size = 36.dp) }
+                        Text(
+                            if (settings.followedLeagues.size > 1 || league != League.NFL) "${league.label} $abbr" else abbr,
+                            style = MaterialTheme.typography.headlineSmall, color = SofaColors.BlueBright,
+                        )
                     }
                 }
                 SofaButton("Edit", onClick = onEditFavorites)

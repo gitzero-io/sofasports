@@ -2,6 +2,7 @@ package com.sofasports.tv.data.config
 
 import com.sofasports.tv.data.SofaJson
 import com.sofasports.tv.data.provider.Endpoints
+import com.sofasports.tv.domain.League
 import kotlinx.serialization.Serializable
 
 /**
@@ -19,7 +20,11 @@ data class RemoteConfig(
     val endpoints: EndpointConfig = EndpointConfig(),
     /** Optional one-line banner on Home (e.g. "ESPN data delayed today"). */
     val announcement: String? = null,
+    /** League ids ("ufc", "boxing") to hide everywhere, e.g. when a feed breaks. */
+    val disabledLeagues: List<String> = emptyList(),
 ) {
+    fun leagueEnabled(league: League) = league.id !in disabledLeagues
+
     /** Clamp anything that could hurt the device or the APIs if a bad value is pushed. */
     fun sanitized(): RemoteConfig = copy(
         pollIntervalLiveSec = pollIntervalLiveSec.coerceIn(MIN_POLL_SEC, 600),
@@ -32,7 +37,10 @@ data class RemoteConfig(
             espnNflBase = endpoints.espnNflBase.takeIf { it.startsWith("https://") } ?: Endpoints.ESPN_NFL_BASE,
             sleeperBase = endpoints.sleeperBase.takeIf { it.startsWith("https://") } ?: Endpoints.SLEEPER_BASE,
             espnFantasyBase = endpoints.espnFantasyBase.takeIf { it.startsWith("https://") } ?: Endpoints.ESPN_FANTASY_BASE,
+            espnSportsBase = endpoints.espnSportsBase.takeIf { it.startsWith("https://") } ?: Endpoints.ESPN_SPORTS_BASE,
+            sportsDbBase = endpoints.sportsDbBase.takeIf { it.startsWith("https://") } ?: Endpoints.SPORTS_DB_BASE,
         ),
+        disabledLeagues = disabledLeagues.map { it.trim().lowercase() }.filter { it.isNotEmpty() },
         announcement = announcement?.takeIf { it.isNotBlank() }?.take(140),
     )
 
@@ -56,7 +64,10 @@ data class KillSwitch(
     fun appliesTo(versionCode: Int) = enabled && (maxVersionCode == 0 || versionCode <= maxVersionCode)
 }
 
-/** A game is "close" when live, in period >= [minPeriod] and within [maxPointDiff]. Overtime is always close. */
+/**
+ * A game is "close" when live, in period >= [minPeriod] and within [maxPointDiff]. Overtime is always close.
+ * The remote value is football's; other sports use SportRules.closeRule.
+ */
 @Serializable
 data class CloseGameRule(val maxPointDiff: Int = 8, val minPeriod: Int = 4)
 
@@ -81,4 +92,6 @@ data class EndpointConfig(
     val espnNflBase: String = Endpoints.ESPN_NFL_BASE,
     val sleeperBase: String = Endpoints.SLEEPER_BASE,
     val espnFantasyBase: String = Endpoints.ESPN_FANTASY_BASE,
+    val espnSportsBase: String = Endpoints.ESPN_SPORTS_BASE,
+    val sportsDbBase: String = Endpoints.SPORTS_DB_BASE,
 )

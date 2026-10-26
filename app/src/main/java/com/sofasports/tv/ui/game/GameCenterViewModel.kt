@@ -9,7 +9,9 @@ import com.sofasports.tv.data.prefs.SettingsStore
 import com.sofasports.tv.data.provider.GameStatsProvider
 import com.sofasports.tv.data.watch.AppLauncher
 import com.sofasports.tv.domain.Game
+import com.sofasports.tv.domain.GameRef
 import com.sofasports.tv.domain.GameState
+import com.sofasports.tv.domain.League
 import com.sofasports.tv.domain.InstalledApp
 import com.sofasports.tv.domain.LiveTvApps
 import com.sofasports.tv.domain.WatchOption
@@ -31,6 +33,7 @@ data class GameCenterUi(
     val summary: GameSummary? = null,
     val error: String? = null,
     val favorites: List<String> = emptyList(),
+    /** Pinned [GameRef] key. */
     val pinnedGameId: String? = null,
     val showWinProbability: Boolean = true,
     val showOdds: Boolean = false,
@@ -66,7 +69,8 @@ class GameCenterViewModel @Inject constructor(
         launcher.searchGoogleTv(WatchPlanner.searchQuery(game))
     }
 
-    val gameId: String = checkNotNull(savedState["gameId"])
+    /** The route carries a [GameRef] key; a bare id (an old deep link) is an NFL game. */
+    val game: GameRef = GameRef.parse(savedState["gameId"]) ?: GameRef(League.NFL, checkNotNull(savedState["gameId"]))
     private val _ui = MutableStateFlow(GameCenterUi())
     val ui: StateFlow<GameCenterUi> = _ui.asStateFlow()
 
@@ -82,10 +86,10 @@ class GameCenterViewModel @Inject constructor(
         viewModelScope.launch {
             // Poll while the game is live; a finished or not-started game is fetched once (plus retries on error).
             while (true) {
-                val result = runCatching { stats.summary(gameId) }
+                val result = runCatching { stats.summary(game.league, game.id) }
                 result.onSuccess { s -> _ui.update { it.copy(summary = s, error = null) } }
                 result.onFailure { e ->
-                    val msg = if (e is FixtureUnavailableException) "Game detail isn't in the fixture set. Try HOU @ JAX or LAC @ KC."
+                    val msg = if (e is FixtureUnavailableException) "Game detail isn't in the fixture set. Try HOU @ JAX, LAC @ KC or LAL @ UTAH."
                     else "Couldn't load game detail. Retrying…"
                     _ui.update { it.copy(error = if (it.summary == null) msg else null) }
                     if (e is FixtureUnavailableException) return@launch
@@ -98,8 +102,8 @@ class GameCenterViewModel @Inject constructor(
     }
 
     fun togglePin() = viewModelScope.launch {
-        val pin = _ui.value.pinnedGameId != gameId
-        settings.setPinnedGame(if (pin) gameId else null)
+        val pin = _ui.value.pinnedGameId != game.key
+        settings.setPinnedGame(if (pin) game else null)
         if (pin) usage.track(UsageEvent.GamePinned)
     }
 }

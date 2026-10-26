@@ -10,6 +10,7 @@ import com.sofasports.tv.domain.FantasyLeague
 import com.sofasports.tv.domain.FantasyMatchup
 import com.sofasports.tv.domain.FantasyUser
 import com.sofasports.tv.domain.GameSummary
+import com.sofasports.tv.domain.League
 import com.sofasports.tv.domain.Scoreboard
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,8 +27,8 @@ class SwitchingScoresProvider @Inject constructor(
     private val live: EspnScoresProvider,
     private val fixture: FixtureScoresProvider,
 ) : ScoresProvider {
-    override suspend fun currentScoreboard(): Scoreboard =
-        (if (mode.useFixtures()) fixture else live).currentScoreboard()
+    override suspend fun scoreboard(league: League): Scoreboard =
+        (if (mode.useFixtures()) fixture else live).scoreboard(league)
 }
 
 @Singleton
@@ -36,8 +37,8 @@ class SwitchingGameStatsProvider @Inject constructor(
     private val live: EspnGameStatsProvider,
     private val fixture: FixtureGameStatsProvider,
 ) : GameStatsProvider {
-    override suspend fun summary(gameId: String): GameSummary =
-        (if (mode.useFixtures()) fixture else live).summary(gameId)
+    override suspend fun summary(league: League, gameId: String): GameSummary =
+        (if (mode.useFixtures()) fixture else live).summary(league, gameId)
 }
 
 @Singleton

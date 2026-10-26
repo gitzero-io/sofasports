@@ -6,6 +6,7 @@ import com.sofasports.tv.data.repo.ScoresRepository
 import com.sofasports.tv.di.AppScope
 import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameState
+import com.sofasports.tv.domain.League
 import com.sofasports.tv.domain.GameSummary
 import com.sofasports.tv.domain.PickEvaluator
 import com.sofasports.tv.domain.PickProgress
@@ -42,7 +43,7 @@ class PicksRepository @Inject constructor(
 
     private val summaryPoller = flow {
         while (true) {
-            val games = scores.state.value.scoreboard?.games.orEmpty()
+            val games = scores.state.value.nfl?.games.orEmpty()
             val propGames = store.picks.value.filter { it.type == PickType.PROP }
                 .mapNotNull { p -> gameFor(p, games) }
                 .distinctBy { it.id }
@@ -50,7 +51,7 @@ class PicksRepository @Inject constructor(
                 val have = summaries.value[g.id]
                 val needed = g.state == GameState.LIVE || (g.state == GameState.FINAL && have?.game?.state != GameState.FINAL)
                 if (!needed) continue
-                runCatching { stats.summary(g.id) }.onSuccess { s -> summaries.value = summaries.value + (g.id to s) }
+                runCatching { stats.summary(League.NFL, g.id) }.onSuccess { s -> summaries.value = summaries.value + (g.id to s) }
             }
             emit(Unit)
             delay(config.config.value.pollIntervalLiveSec * 1000L)
@@ -59,7 +60,7 @@ class PicksRepository @Inject constructor(
 
     val progress: StateFlow<List<PickProgress>> =
         combine(store.picks, scores.state, summaries, summaryPoller) { picks, s, sums, _ ->
-            val games = s.scoreboard?.games.orEmpty()
+            val games = s.nfl?.games.orEmpty()
             picks.map { p ->
                 val g = gameFor(p, games)
                 // Prefer the box score's game state: it can be fresher than the scoreboard poll.
@@ -85,7 +86,7 @@ class PicksRepository @Inject constructor(
     }
 
     companion object {
-        /** This week's game for the pick's team. */
+        /** This week's NFL game for the pick's team (picks are NFL-only for now). */
         fun gameFor(p: TrackedPick, games: List<Game>): Game? = games.firstOrNull { it.involves(p.teamAbbr) }
     }
 }
