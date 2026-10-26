@@ -4,6 +4,7 @@ import com.sofasports.tv.data.prefs.OverlayPage
 import com.sofasports.tv.domain.CloseGame
 import com.sofasports.tv.domain.EventFormat
 import com.sofasports.tv.domain.FantasyStarter
+import com.sofasports.tv.domain.FantasyTeams
 import com.sofasports.tv.domain.Game
 import com.sofasports.tv.domain.GameState
 import com.sofasports.tv.domain.League
@@ -55,17 +56,17 @@ object OverlayPages {
         return (live + upcoming + finals).take(LEAGUE_MAX)
     }
 
-    /** My fantasy starters whose NFL game is live right now, highest points first. */
+    /** My fantasy starters whose game (in the matchup's sport) is live right now, highest points first. */
     fun playingNow(s: OverlayState): List<FantasyStarter> {
         val m = s.matchup ?: return emptyList()
-        val liveTeams = s.games.filter { it.league == League.NFL && it.state == GameState.LIVE }.flatMap { g -> g.teams.map { it.abbr } }.toSet()
+        val liveTeams = s.games.filter { it.league == m.sport && it.state == GameState.LIVE }.flatMap { g -> g.teams.map { it.abbr } }.toSet()
         if (liveTeams.isEmpty()) return emptyList()
-        return m.me.starters.filter { st -> st.player.team?.let { teamAbbr(it) in liveTeams } == true }
+        return m.me.starters.filter { st -> st.player.team?.let { FantasyTeams.scoreboardAbbr(m.sport, it) in liveTeams } == true }
             .sortedByDescending { it.points }
             .take(PLAYING_NOW_MAX)
     }
 
-    fun teamAbbr(fantasyTeam: String): String = NflTeams.scoreboardAbbr(fantasyTeam)
+    fun teamAbbr(fantasyTeam: String, sport: League = League.NFL): String = FantasyTeams.scoreboardAbbr(sport, fantasyTeam)
 
     private const val HOUR = 3_600_000L
 }

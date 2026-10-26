@@ -62,6 +62,8 @@ data class SleeperRosterSettingsDto(val wins: Int = 0, val losses: Int = 0, val 
 data class SleeperProjectionDto(
     @SerialName("player_id") val playerId: String? = null,
     val stats: Map<String, Double>? = null,
+    /** Basketball: one row per player per game, dated "2026-10-27" (US date). Football rows have none. */
+    val date: String? = null,
 )
 
 @Serializable

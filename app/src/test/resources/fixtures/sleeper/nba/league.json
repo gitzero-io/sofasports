@@ -1,0 +1,31 @@
+{
+ "league_id": "nba-fixture-league",
+ "name": "Fixture Hoops League",
+ "season": "2026",
+ "status": "in_season",
+ "sport": "nba",
+ "total_rosters": 2,
+ "scoring_settings": {
+  "pts": 1.0,
+  "reb": 1.2,
+  "ast": 1.5,
+  "stl": 3.0,
+  "blk": 3.0,
+  "to": -1.0,
+  "dd": 1.5,
+  "td": 3.0,
+  "tpm": 0.5
+ },
+ "roster_positions": [
+  "PG",
+  "SG",
+  "G",
+  "SF",
+  "PF",
+  "F",
+  "C",
+  "UTIL",
+  "BN",
+  "BN"
+ ]
+}

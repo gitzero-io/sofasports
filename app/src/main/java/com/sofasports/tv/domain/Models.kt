@@ -225,7 +225,12 @@ data class FantasyLeague(
     val totalRosters: Int,
     val status: String?,
     val source: FantasySource = FantasySource.SLEEPER,
-)
+    /** NFL, or NBA for Sleeper basketball leagues (experimental). */
+    val sport: League = League.NFL,
+) {
+    /** "Sleeper · Friends League", "Sleeper NBA · Hoops" */
+    val switcherLabel: String get() = "${source.label}${if (sport != League.NFL) " ${sport.label}" else ""} · $name"
+}
 
 data class FantasyPlayer(
     val id: String,
@@ -245,6 +250,12 @@ data class FantasyStarter(
     val projected: Double? = null,
     /** Lineup slot ("QB", "FLEX", "D/ST"…), when the site says. */
     val slot: String? = null,
+    /**
+     * Basketball only: [projected] split into the player's game today and the games after it this
+     * week (a player plays several). Null for football, where the week is one game.
+     */
+    val projectedToday: Double? = null,
+    val projectedLater: Double? = null,
 )
 
 data class FantasyTeam(
@@ -264,4 +275,5 @@ data class FantasyMatchup(
     val me: FantasyTeam,
     /** Null on a bye week / odd number of teams. */
     val opponent: FantasyTeam?,
+    val sport: League = League.NFL,
 )

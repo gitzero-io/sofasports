@@ -8,6 +8,9 @@ import com.sofasports.tv.domain.FantasyLeague
 import com.sofasports.tv.domain.FantasyMatchup
 import com.sofasports.tv.domain.FantasyPlayer
 import com.sofasports.tv.domain.FantasyUser
+import com.sofasports.tv.domain.League
+import java.time.LocalDate
+import java.time.ZoneId
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -44,29 +47,54 @@ class SleeperFantasyProvider @Inject constructor(
         return SleeperParser.parseUser(res.bodyAsText())
     }
 
-    override suspend fun leagues(userId: String): List<FantasyLeague> {
-        val state = SleeperParser.parseState(http.get("${bases.sleeperBase}/state/nfl").bodyAsText())
+    /** NFL leagues, then NBA ones (experimental). An NBA failure never hides the NFL leagues. */
+    override suspend fun leagues(userId: String): List<FantasyLeague> = coroutineScope {
+        val nfl = async { leagues(userId, "nfl") }
+        val nba = async { runCatching { leagues(userId, "nba") }.getOrDefault(emptyList()) }
+        nfl.await() + nba.await()
+    }
+
+    private suspend fun leagues(userId: String, sport: String): List<FantasyLeague> {
+        val state = SleeperParser.parseState(http.get("${bases.sleeperBase}/state/$sport").bodyAsText())
         val season = state.season.ifBlank { null } ?: return emptyList()
-        return SleeperParser.parseLeagues(http.get("${bases.sleeperBase}/user/$userId/leagues/nfl/$season").bodyAsText())
+        return SleeperParser.parseLeagues(http.get("${bases.sleeperBase}/user/$userId/leagues/$sport/$season").bodyAsText())
     }
 
     override suspend fun currentMatchup(leagueId: String, userId: String): FantasyMatchup? = coroutineScope {
         val base = bases.sleeperBase
-        val state = async { SleeperParser.parseState(http.get("$base/state/nfl").bodyAsText()) }
         val league = async { SleeperParser.parseLeagueDto(http.get("$base/league/$leagueId").bodyAsText()) }
         val users = async { SleeperParser.parseLeagueUsers(http.get("$base/league/$leagueId/users").bodyAsText()) }
         val rosters = async { SleeperParser.parseRosters(http.get("$base/league/$leagueId/rosters").bodyAsText()) }
-        val st = state.await()
+        val l = league.await()
+        val sport = SleeperParser.toLeague(l).sport
+        val st = SleeperParser.parseState(http.get("$base/state/${sport.id}").bodyAsText())
         val week = (st.displayWeek ?: st.week).coerceAtLeast(1)
         val matchups = async { SleeperParser.parseMatchups(http.get("$base/league/$leagueId/matchups/$week").bodyAsText()) }
-        val l = league.await()
         // Projections are nice to have: a failure just means no projected totals.
-        val proj = runCatching { projections(st.season, week, l.scoringSettings?.get("rec") ?: 1.0) }.getOrDefault(emptyMap())
+        val proj = if (sport == League.NFL) runCatching { projections(st.season, week, l.scoringSettings?.get("rec") ?: 1.0) }.getOrDefault(emptyMap()) else emptyMap()
+        val weekProj = if (sport == League.NBA) runCatching { nbaProjections(st.season, week, l.scoringSettings.orEmpty()) }.getOrDefault(emptyMap()) else emptyMap()
         SleeperParser.buildMatchup(
             SleeperParser.toLeague(l), week, userId,
-            users.await(), rosters.await(), matchups.await(), players.get(),
-            rosterPositions = l.rosterPositions.orEmpty(), projections = proj,
+            users.await(), rosters.await(), matchups.await(), players.get(sport),
+            rosterPositions = l.rosterPositions.orEmpty(), projections = proj, weekProjections = weekProj,
         )
+    }
+
+    private val nbaCache = mutableMapOf<String, Pair<Long, String>>()
+
+    /** Every NBA game's projected stats for the week (one request, kept 15 minutes), scored for this league. */
+    private suspend fun nbaProjections(season: String, week: Int, scoring: Map<String, Double>): Map<String, SleeperParser.WeekProjection> {
+        val key = "$season-$week"
+        val now = System.currentTimeMillis()
+        val body = nbaCache[key]?.takeIf { now - it.first < 15 * 60_000L }?.second ?: run {
+            val root = bases.sleeperBase.removeSuffix("/").removeSuffix("/v1")
+            val res = http.get("$root/projections/nba/$season/$week?season_type=regular")
+            if (!res.status.isSuccess()) return emptyMap()
+            res.bodyAsText().also { nbaCache[key] = now to it }
+        }
+        // Sleeper dates games by US Eastern calendar day.
+        val today = LocalDate.now(ZoneId.of("America/New_York")).toString()
+        return withContext(Dispatchers.Default) { SleeperParser.parseGameProjections(body, scoring, today) }
     }
 
     private val projectionCache = mutableMapOf<String, Pair<Long, Map<String, Double>>>()
@@ -84,14 +112,14 @@ class SleeperFantasyProvider @Inject constructor(
     }
 }
 
-/** Player id → name/position/team. */
+/** Player id → name/position/team, per sport. */
 interface PlayerDirectory {
-    suspend fun get(): Map<String, FantasyPlayer>
+    suspend fun get(sport: League = League.NFL): Map<String, FantasyPlayer>
 }
 
 /**
- * Sleeper asks clients to fetch the 14 MB /players/nfl dump at most once a day.
- * We stream it to disk, trim it to the four fields we use, and keep that small copy.
+ * Sleeper asks clients to fetch the 14 MB /players/nfl dump (2.5 MB for NBA) at most once a day.
+ * We stream it to disk, trim it to the four fields we use, and keep that small copy, one per sport.
  */
 @Singleton
 class SleeperPlayerCache @Inject constructor(
@@ -100,33 +128,35 @@ class SleeperPlayerCache @Inject constructor(
     private val bases: ApiBases,
 ) : PlayerDirectory {
     private val mutex = Mutex()
-    private var memory: Map<String, FantasyPlayer>? = null
-    private var lastAttemptMs = 0L
-    // v2 adds injury status; the new name makes old caches refresh.
-    private val file get() = File(context.filesDir, "sleeper_players_trimmed_v2.json")
+    private val memory = mutableMapOf<League, Map<String, FantasyPlayer>>()
+    private val lastAttemptMs = mutableMapOf<League, Long>()
+    // v2 adds injury status; the new name makes old caches refresh. NFL keeps its old file name.
+    private fun file(sport: League) = File(context.filesDir, if (sport == League.NFL) "sleeper_players_trimmed_v2.json" else "sleeper_players_${sport.id}_v2.json")
 
     @OptIn(ExperimentalSerializationApi::class)
-    override suspend fun get(): Map<String, FantasyPlayer> = mutex.withLock {
+    override suspend fun get(sport: League): Map<String, FantasyPlayer> = mutex.withLock {
+        val file = file(sport)
         val fresh = file.exists() && System.currentTimeMillis() - file.lastModified() < ONE_DAY_MS
         val now = System.currentTimeMillis()
-        val mayDownload = !fresh && now - lastAttemptMs > RETRY_MS
-        memory?.takeIf { fresh || !mayDownload }?.let { return it }
+        val mayDownload = !fresh && now - (lastAttemptMs[sport] ?: 0L) > RETRY_MS
+        memory[sport]?.takeIf { fresh || !mayDownload }?.let { return it }
         withContext(Dispatchers.IO) {
             if (mayDownload) {
-                lastAttemptMs = now
-                runCatching { download() }
+                lastAttemptMs[sport] = now
+                runCatching { download(sport) }
             }
             // Even a stale cache beats "Player 4046".
             if (file.exists()) {
-                runCatching { SleeperParser.parsePlayers(file.readText()) }.getOrNull()
+                runCatching { SleeperParser.parsePlayers(file.readText(), sport) }.getOrNull()
             } else null
-        }.orEmpty().also { memory = it }
+        }.orEmpty().also { memory[sport] = it }
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    private suspend fun download() {
+    private suspend fun download(sport: League) {
+        val file = file(sport)
         val raw = File(context.cacheDir, "sleeper_players_raw.json")
-        http.prepareGet("${bases.sleeperBase}/players/nfl").execute { res ->
+        http.prepareGet("${bases.sleeperBase}/players/${sport.id}").execute { res ->
             if (!res.status.isSuccess()) return@execute
             res.bodyAsChannel().toInputStream().use { input -> raw.outputStream().use { input.copyTo(it) } }
         }

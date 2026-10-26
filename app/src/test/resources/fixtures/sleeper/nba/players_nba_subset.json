@@ -1,0 +1,130 @@
+{
+"1541": {
+"full_name": "Clint Capela",
+"first_name": "Clint",
+"last_name": "Capela",
+"position": "C",
+"team": "HOU",
+"injury_status": null
+},
+"1671": {
+"full_name": "Georges Niang",
+"first_name": "Georges",
+"last_name": "Niang",
+"position": "PF",
+"team": "GSW",
+"injury_status": null
+},
+"1728": {
+"full_name": "Dorian Finney-Smith",
+"first_name": "Dorian",
+"last_name": "Finney-Smith",
+"position": "PF",
+"team": "ATL",
+"injury_status": null
+},
+"1797": {
+"full_name": "Thomas Bryant",
+"first_name": "Thomas",
+"last_name": "Bryant",
+"position": "C",
+"team": "CLE",
+"injury_status": null
+},
+"1822": {
+"full_name": "Jayson Tatum",
+"first_name": "Jayson",
+"last_name": "Tatum",
+"position": "SF",
+"team": "BOS",
+"injury_status": null
+},
+"1830": {
+"full_name": "Derrick White",
+"first_name": "Derrick",
+"last_name": "White",
+"position": "SG",
+"team": "BOS",
+"injury_status": null
+},
+"1998": {
+"full_name": "Coby White",
+"first_name": "Coby",
+"last_name": "White",
+"position": "PG",
+"team": "CHA",
+"injury_status": "Out"
+},
+"2133": {
+"full_name": "Anthony Edwards",
+"first_name": "Anthony",
+"last_name": "Edwards",
+"position": "SG",
+"team": "MIN",
+"injury_status": "GTD"
+},
+"2136": {
+"full_name": "Onyeka Okongwu",
+"first_name": "Onyeka",
+"last_name": "Okongwu",
+"position": "C",
+"team": "ATL",
+"injury_status": null
+},
+"2179": {
+"full_name": "LaMelo Ball",
+"first_name": "LaMelo",
+"last_name": "Ball",
+"position": "PG",
+"team": "MIN",
+"injury_status": null
+},
+"2255": {
+"full_name": "Ayo Dosunmu",
+"first_name": "Ayo",
+"last_name": "Dosunmu",
+"position": "SG",
+"team": "MIN",
+"injury_status": null
+},
+"2284": {
+"full_name": "Jalen Johnson",
+"first_name": "Jalen",
+"last_name": "Johnson",
+"position": "PF",
+"team": "ATL",
+"injury_status": null
+},
+"2306": {
+"full_name": "Jonathan Kuminga",
+"first_name": "Jonathan",
+"last_name": "Kuminga",
+"position": "PF",
+"team": "MIN",
+"injury_status": null
+},
+"2317": {
+"full_name": "Jock Landale",
+"first_name": "Jock",
+"last_name": "Landale",
+"position": "C",
+"team": "ATL",
+"injury_status": null
+},
+"2445": {
+"full_name": "Jabari Smith Jr.",
+"first_name": "Jabari",
+"last_name": "Smith Jr.",
+"position": "PF",
+"team": "HOU",
+"injury_status": null
+},
+"2461": {
+"full_name": "Andrew Nembhard",
+"first_name": "Andrew",
+"last_name": "Nembhard",
+"position": "PG",
+"team": "IND",
+"injury_status": "GTD"
+}
+}

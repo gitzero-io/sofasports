@@ -49,7 +49,7 @@ class ProvidersTest {
     })
 
     private val players = object : PlayerDirectory {
-        override suspend fun get() = SleeperParser.parsePlayers(Fixtures.read("sleeper/players_nfl_subset.json"))
+        override suspend fun get(sport: com.sofasports.tv.domain.League) = SleeperParser.parsePlayers(Fixtures.read("sleeper/players_nfl_subset.json"))
     }
 
     @Test fun `espn scores provider hits scoreboard and parses`() = runTest {

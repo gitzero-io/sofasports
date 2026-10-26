@@ -73,15 +73,19 @@ class ScoresRepository @Inject constructor(
     private val config: ConfigRepository,
     settings: SettingsStore,
     picks: PicksStore,
+    demand: ScoreDemand,
     @AppScope scope: CoroutineScope,
 ) {
     private val refreshSignal = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    val state: StateFlow<ScoresState> = combine(settings.settings, config.config, picks.picks.map { it.isNotEmpty() }.distinctUntilChanged()) { s, c, hasPicks ->
-        // Fantasy and picks are NFL-only, so a linked Sleeper account or a tracked pick keeps the NFL
-        // scoreboard coming even if the user doesn't follow the NFL.
-        val needNfl = s.sleeperUserId != null || hasPicks
-        val leagues = (s.followedLeagues + listOfNotNull(League.NFL.takeIf { needNfl }))
+    val state: StateFlow<ScoresState> = combine(
+        settings.settings, config.config, picks.picks.map { it.isNotEmpty() }.distinctUntilChanged(), demand.fantasy,
+    ) { s, c, hasPicks, fantasySport ->
+        // Picks are NFL-only, and fantasy needs its sport's scores for live projections, so those keep
+        // a scoreboard coming even if the user doesn't follow that league. Until the fantasy league is
+        // known, a linked Sleeper account means NFL.
+        val needNfl = (s.sleeperUserId != null && fantasySport == null) || hasPicks
+        val leagues = (s.followedLeagues + listOfNotNull(League.NFL.takeIf { needNfl }, fantasySport))
             .distinct().filter(c::leagueEnabled)
         s.dataMode to leagues
     }

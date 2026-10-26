@@ -32,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FantasyViewModel @Inject constructor(private val fantasy: FantasyRepository, scores: ScoresRepository) : ViewModel() {
     val state: StateFlow<FantasyState> = fantasy.state
-    val games: StateFlow<List<Game>> = scores.state.map { it.nfl?.games.orEmpty() }
+    val games: StateFlow<List<Game>> = scores.state.map { it.games }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     fun selectLeague(id: String) = viewModelScope.launch { fantasy.selectLeague(id) }
 }
@@ -55,7 +55,7 @@ fun FantasyScreen(onLink: () -> Unit, vm: FantasyViewModel = hiltViewModel()) {
                 item(key = "leagues") {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp)) {
                         items(f.leagues, key = { it.id }) { league ->
-                            SofaButton("${league.source.label} · ${league.name}", onClick = { vm.selectLeague(league.id) }, selected = league.id == f.selectedLeagueId)
+                            SofaButton(league.switcherLabel, onClick = { vm.selectLeague(league.id) }, selected = league.id == f.selectedLeagueId)
                         }
                     }
                 }

@@ -1,0 +1,13 @@
+[
+ {
+  "user_id": "u1",
+  "display_name": "fixture_me",
+  "metadata": {
+   "team_name": "Fixture Splash"
+  }
+ },
+ {
+  "user_id": "u2",
+  "display_name": "fixture_them"
+ }
+]

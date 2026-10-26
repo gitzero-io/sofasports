@@ -47,12 +47,31 @@ class FixtureFantasyProvider @Inject constructor(
     override suspend fun findUser(username: String): FantasyUser? =
         FantasyUser(FIXTURE_USER_ID, username.ifBlank { "fixture" }, null)
 
+    private val nbaLeague by lazy { source.read("sleeper/nba/league.json")?.let(SleeperParser::parseLeagueDto) }
+
     override suspend fun leagues(userId: String): List<FantasyLeague> {
         val l = league ?: return emptyList()
-        return listOf(l, l.copy(id = SECOND_LEAGUE_ID, name = "${l.name} (2nd team)"))
+        return listOf(l, l.copy(id = SECOND_LEAGUE_ID, name = "${l.name} (2nd team)")) + listOfNotNull(nbaLeague?.let(SleeperParser::toLeague))
+    }
+
+    /** The made-up NBA league around real Sleeper players and week-2 projections; "today" is fixed inside that week. */
+    private fun nbaMatchup(): FantasyMatchup? {
+        val dto = nbaLeague ?: return null
+        return SleeperParser.buildMatchup(
+            SleeperParser.toLeague(dto), 2, "u1",
+            SleeperParser.parseLeagueUsers(source.read("sleeper/nba/league_users.json").orEmpty()),
+            SleeperParser.parseRosters(source.read("sleeper/nba/league_rosters.json").orEmpty()),
+            SleeperParser.parseMatchups(source.read("sleeper/nba/league_matchups_w2.json").orEmpty()),
+            SleeperParser.parsePlayers(source.read("sleeper/nba/players_nba_subset.json") ?: "{}", League.NBA),
+            rosterPositions = dto.rosterPositions.orEmpty(),
+            weekProjections = SleeperParser.parseGameProjections(
+                source.read("sleeper/nba/projections_nba_2026_w2.json").orEmpty(), dto.scoringSettings.orEmpty(), NBA_TODAY,
+            ),
+        )
     }
 
     override suspend fun currentMatchup(leagueId: String, userId: String): FantasyMatchup? {
+        if (leagueId == nbaLeague?.leagueId) return nbaMatchup()
         val l = league ?: throw FixtureUnavailableException("Sleeper league")
         val asUser = if (leagueId == SECOND_LEAGUE_ID) SECOND_LEAGUE_USER_ID else FIXTURE_USER_ID
         val m = SleeperParser.buildMatchup(
@@ -70,6 +89,7 @@ class FixtureFantasyProvider @Inject constructor(
     companion object {
         const val FIXTURE_USER_ID = "189140835533586432"
         const val SECOND_LEAGUE_ID = "fixture-second-league"
+        const val NBA_TODAY = "2026-10-28"
         /** Owner of roster 5 in the example league. */
         const val SECOND_LEAGUE_USER_ID = "720638189125632"
     }

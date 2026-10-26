@@ -181,7 +181,7 @@ private fun FantasySection(ui: HomeUi, vm: HomeViewModel, onAddEspnLeague: () ->
                 if (f.leagues.size > 1) {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp)) {
                         items(f.leagues, key = { it.id }) { league ->
-                            SofaButton("${league.source.label} · ${league.name}", onClick = { vm.selectLeague(league.id) }, selected = league.id == f.selectedLeagueId)
+                            SofaButton(league.switcherLabel, onClick = { vm.selectLeague(league.id) }, selected = league.id == f.selectedLeagueId)
                         }
                     }
                 }

@@ -154,4 +154,17 @@ One line per judgment call, with the reason.
 - A favorite fighter's bout is the one shown on their card's tile and counts as "your game" on Home and in the overlay. A favorite driver gets a blue line with their position on race cards and pages (even outside the top three).
 - Races can be pinned. With nothing pinned and no favorite game on, the overlay's "my game" page shows a favorite driver's race while a session is live or starts within 12 h.
 - Fixture mode replays one game each in the NHL, MLB and Premier League as well, and runs the UFC main event and the F1 race live for the first ten minutes.
-- Not done: fantasy for other sports (Sleeper has NBA leagues). It touches the player cache, projections, the live-projection model and the matchup card, all NFL-shaped today, and there's no NBA league to test against.
+- Fantasy for other sports wasn't in this round; see "Sleeper NBA fantasy" below.
+
+## Sleeper NBA fantasy (experimental, 2026-10-26, branch `nba-fantasy`)
+- Built without a real NBA league to test against: the user said "continue" after being offered that or a username. Treat it as experimental until a real league has been seen working.
+- Sleeper returns NBA leagues next to NFL ones (`/user/<id>/leagues/nba/<season>`); they show as "Sleeper NBA · …" in the switcher. An NBA failure never hides the NFL leagues.
+- Sleeper's NBA projections are per game and in raw stats ("pts", "reb", "ast"…), not fantasy points. Each game is scored with the league's own `scoring_settings` weights; if none of those keys name a projected stat, Sleeper's default points scoring is used rather than projecting everyone at zero (the key names are the one unverified assumption).
+- A basketball week has several games per player, so each starter carries `projectedToday` and `projectedLater` (split at today's US Eastern date, the calendar Sleeper dates games by). Live projection = points + later games + what's left of today's game (by 12-minute NBA quarters). Win probability's spread now uses each starter's remaining projected points, which is identical to the old formula for football.
+- "Yet to play" counts players with games later in the week, and a player without a game today reads "No game today" instead of "Bye".
+- Sleeper and ESPN disagree on six NBA abbreviations (GSW/GS, NOP/NO, NYK/NY, SAS/SA, UTA/UTAH, WAS/WSH); `FantasyTeams` maps them.
+- The NBA scoreboard is polled while an NBA fantasy league is selected, even if the user doesn't follow the NBA (`ScoreDemand`, which avoids a dependency cycle between the fantasy and scores repositories).
+- A "my player scored" overlay pop needs 10 fantasy points between polls in basketball (4 in football): NBA points pile up every possession.
+- Players are cached per sport (`sleeper_players_nba_v2.json`, ~2.5 MB download, at most daily); the NFL cache keeps its file name.
+- Fixture: real Sleeper NBA players and week-2 projections saved 2026-10-26, inside a made-up two-team league. Fixture mode shows it as a third league with "today" fixed at 2026-10-28.
+- ESPN Fantasy basketball isn't supported (its API is a different game code, `fba`).

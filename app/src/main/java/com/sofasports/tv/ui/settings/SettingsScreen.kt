@@ -200,7 +200,7 @@ private fun LazyListScope.teamItems(settings: UserSettings, onEditFavorites: () 
                 SofaButton("Edit", onClick = onEditLeagues)
             }
             Text(
-                "Fantasy and the picks tracker are NFL-only for now.",
+                "Fantasy covers NFL leagues, plus Sleeper NBA leagues (experimental). The picks tracker is NFL-only for now.",
                 style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted,
             )
         }

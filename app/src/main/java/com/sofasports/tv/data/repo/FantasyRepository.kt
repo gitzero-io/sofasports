@@ -11,6 +11,7 @@ import com.sofasports.tv.domain.FantasyLeague
 import com.sofasports.tv.domain.FantasyMatchup
 import com.sofasports.tv.domain.FantasySource
 import com.sofasports.tv.domain.GameState
+import com.sofasports.tv.domain.League
 import com.sofasports.tv.telemetry.UsageEvent
 import com.sofasports.tv.telemetry.UsageEvents
 import kotlinx.coroutines.CoroutineScope
@@ -56,6 +57,7 @@ class FantasyRepository @Inject constructor(
     private val settings: SettingsStore,
     private val config: ConfigRepository,
     private val scores: ScoresRepository,
+    private val demand: ScoreDemand,
     private val usage: UsageEvents,
     private val espn: EspnFantasyProvider,
     private val espnLeagues: EspnLeagueStore,
@@ -79,7 +81,7 @@ class FantasyRepository @Inject constructor(
     }
         .distinctUntilChanged()
         .flatMapLatest { key ->
-            if (key.userId == null && key.espn.isEmpty()) flowOf(FantasyState()) else poll(key)
+            if (key.userId == null && key.espn.isEmpty()) flow { demand.setFantasySport(null); emit(FantasyState()) } else poll(key)
         }
         .stateIn(scope, SharingStarted.WhileSubscribed(5_000), FantasyState())
 
@@ -151,8 +153,10 @@ class FantasyRepository @Inject constructor(
                     .onFailure { state = state.copy(error = it.message ?: "Couldn't load matchup") }
             }
             state = state.copy(loading = false)
+            val sport = state.matchup?.sport ?: state.selectedLeague?.sport ?: League.NFL
+            demand.setFantasySport(sport)
             emit(state)
-            val anyLive = scores.state.value.nfl?.games?.any { it.state == GameState.LIVE } == true
+            val anyLive = scores.state.value.board(sport)?.games?.any { it.state == GameState.LIVE } == true
             val cfg = config.config.value
             val wait = if (anyLive || state.error != null) cfg.pollIntervalLiveSec * 1000L else cfg.pollIntervalIdleSec * 1000L
             withTimeoutOrNull(wait) { refreshSignal.first() }

@@ -47,7 +47,7 @@ data class HomeUi(
     val showOdds: Boolean = false,
     val picks: List<PickProgress> = emptyList(),
     val watchApp: String? = null,
-    /** This week's NFL scoreboard, for fantasy live projections. */
+    /** Every polled league's games, for fantasy live projections (the matchup picks its sport's). */
     val games: List<Game> = emptyList(),
     /** Fight cards and races that are live or start within a day. */
     val fightCards: List<FightCard> = emptyList(),
@@ -98,7 +98,7 @@ class HomeViewModel @Inject constructor(
             showOdds = cfg.features.odds && prefs.showOdds,
             picks = if (cfg.features.picks) pk else emptyList(),
             watchApp = prefs.watchApp,
-            games = s.nfl?.games.orEmpty(),
+            games = s.games,
             fightCards = FightCards.group(games, prefs.favoriteTeams).filter { soon(it.state, it.startEpochMs) },
             races = s.races.filter { soon(it.state, it.startEpochMs) }.sortedBy { if (it.involvesAny(prefs.favoriteTeams)) 0 else 1 },
             multiLeague = s.leagues.size > 1,

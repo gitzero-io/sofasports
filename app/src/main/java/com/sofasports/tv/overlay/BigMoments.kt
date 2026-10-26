@@ -21,6 +21,8 @@ data class Moment(val kind: MomentKind, val text: String, val page: OverlayPage,
 object BigMoments {
     /** A starter gaining this many fantasy points between polls is "my player scored". */
     const val PLAYER_POINTS = 4.0
+    /** Basketball points pile up every possession; only a real burst counts. */
+    const val PLAYER_POINTS_NBA = 10.0
 
     fun detect(prev: OverlayState, cur: OverlayState, kinds: Set<MomentKind>): List<Moment> = buildList {
         if (MomentKind.MY_GAME_SCORE in kinds) myGameScore(prev, cur)?.let(::add)
@@ -55,7 +57,7 @@ object BigMoments {
         return m.me.starters.mapNotNull { st ->
             val was = before[st.player.id] ?: return@mapNotNull null
             val gain = st.points - was
-            if (gain < PLAYER_POINTS) return@mapNotNull null
+            if (gain < if (m.sport == League.NBA) PLAYER_POINTS_NBA else PLAYER_POINTS) return@mapNotNull null
             Moment(
                 MomentKind.PLAYER_SCORED,
                 "${st.player.name} +${formatPoints(gain)} pts",

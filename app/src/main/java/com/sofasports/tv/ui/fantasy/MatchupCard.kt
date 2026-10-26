@@ -35,7 +35,8 @@ import androidx.tv.material3.Text
 import coil3.compose.AsyncImage
 import com.sofasports.tv.domain.FantasyPlayer
 import com.sofasports.tv.domain.MatchupLive
-import com.sofasports.tv.domain.NflTeams
+import com.sofasports.tv.domain.FantasyTeams
+import com.sofasports.tv.domain.League
 import com.sofasports.tv.domain.PlayerGamePhase
 import com.sofasports.tv.domain.StarterLive
 import com.sofasports.tv.domain.TeamLive
@@ -173,7 +174,7 @@ private fun WinProbabilityBar(mine: Double) {
 @Composable
 private fun PlayCounts(t: TeamLive, modifier: Modifier, alignEnd: Boolean) {
     val parts = listOfNotNull(
-        t.count(PlayerGamePhase.PRE).takeIf { it > 0 }?.let { "$it yet to play" },
+        t.yetToPlay.takeIf { it > 0 }?.let { "$it yet to play" },
         t.count(PlayerGamePhase.LIVE).takeIf { it > 0 }?.let { "$it playing" },
     ).ifEmpty { listOf("All done") }
     Text(
@@ -225,7 +226,7 @@ private fun LineupRow(a: StarterLive?, b: StarterLive?, modifier: Modifier = Mod
 @Composable
 private fun PlayerCell(s: StarterLive, alignEnd: Boolean, small: Boolean = false) {
     val p = s.starter.player
-    val avatar = @Composable { PlayerAvatar(p, if (small) 40.dp else 48.dp, live = s.phase == PlayerGamePhase.LIVE) }
+    val avatar = @Composable { PlayerAvatar(p, s.sport, if (small) 40.dp else 48.dp, live = s.phase == PlayerGamePhase.LIVE) }
     val info = @Composable { mod: Modifier ->
         Column(mod, horizontalAlignment = if (alignEnd) Alignment.End else Alignment.Start) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -268,8 +269,8 @@ private fun PlayerCell(s: StarterLive, alignEnd: Boolean, small: Boolean = false
 
 /** Headshot in a circle; team logo for defenses or when there's no photo. A live dot when his game is on. */
 @Composable
-private fun PlayerAvatar(p: FantasyPlayer, size: Dp, live: Boolean) {
-    val logo = p.team?.let { NflTeams.find(NflTeams.scoreboardAbbr(it))?.logoUrl }
+private fun PlayerAvatar(p: FantasyPlayer, sport: League, size: Dp, live: Boolean) {
+    val logo = p.team?.let { FantasyTeams.logoUrl(sport, it) }
     Box {
         AsyncImage(
             model = p.headshotUrl ?: logo,
@@ -296,7 +297,7 @@ private fun gameLine(s: StarterLive): String {
     val p = s.starter.player
     val g = s.game
     val matchup = g?.let { game ->
-        val abbr = p.team?.let(NflTeams::scoreboardAbbr)
+        val abbr = p.team?.let { FantasyTeams.scoreboardAbbr(s.sport, it) }
         when (abbr) {
             game.home.abbr -> "vs ${game.away.abbr}"
             game.away.abbr -> "@ ${game.home.abbr}"
@@ -307,7 +308,8 @@ private fun gameLine(s: StarterLive): String {
         PlayerGamePhase.PRE -> g?.let { formatKickoff(it.startEpochMs) }
         PlayerGamePhase.LIVE -> g?.shortDetail
         PlayerGamePhase.DONE -> "Final"
-        PlayerGamePhase.NO_GAME -> if (p.team == null) null else "Bye"
+        // Basketball: no game today (he may still play later this week).
+        PlayerGamePhase.NO_GAME -> if (p.team == null) null else if (s.sport == League.NBA) "No game today" else "Bye"
     }
     return listOfNotNull(p.position, p.team, matchup, status).joinToString(" · ")
 }

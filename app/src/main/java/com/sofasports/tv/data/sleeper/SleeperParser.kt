@@ -7,6 +7,7 @@ import com.sofasports.tv.domain.FantasyPlayer
 import com.sofasports.tv.domain.FantasyStarter
 import com.sofasports.tv.domain.FantasyTeam
 import com.sofasports.tv.domain.FantasyUser
+import com.sofasports.tv.domain.League
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
@@ -43,6 +44,42 @@ object SleeperParser {
             .toMap()
     }
 
+    /** A basketball player's projected fantasy points this week, split at today. */
+    data class WeekProjection(val total: Double, val today: Double, val later: Double)
+
+    /**
+     * Basketball: Sleeper projects each game's stats, not fantasy points, so score them with the
+     * league's own [scoring] weights (keys match: "pts", "reb", "ast", "stl", "blk", "to", "dd"…).
+     * [today] is the US date ("2026-10-27") splitting games played from games to come.
+     */
+    fun parseGameProjections(json: String, scoring: Map<String, Double>, today: String): Map<String, WeekProjection> {
+        val rows = nullableList(json, SleeperProjectionDto.serializer())
+        // If none of the league's scoring keys name a projected stat (unverified: no real NBA league
+        // to check against), score with Sleeper's defaults rather than project everyone at zero.
+        val statKeys = rows.flatMapTo(mutableSetOf()) { it.stats.orEmpty().keys }
+        val weights = scoring.takeIf { s -> s.keys.any { it in statKeys } } ?: DEFAULT_NBA_SCORING
+        return rows
+            .mapNotNull { p ->
+                val id = p.playerId ?: return@mapNotNull null
+                val pts = p.stats.orEmpty().entries.sumOf { (k, v) -> v * (weights[k] ?: 0.0) }
+                Triple(id, p.date.orEmpty(), pts)
+            }
+            .groupBy { it.first }
+            .mapValues { (_, games) ->
+                WeekProjection(
+                    total = games.sumOf { it.third },
+                    today = games.filter { it.second == today }.sumOf { it.third },
+                    later = games.filter { it.second > today }.sumOf { it.third },
+                )
+            }
+    }
+
+    /** Sleeper's default points league scoring, used when a league doesn't send its own. */
+    private val DEFAULT_NBA_SCORING = mapOf(
+        "pts" to 1.0, "reb" to 1.2, "ast" to 1.5, "stl" to 3.0, "blk" to 3.0, "to" to -1.0,
+        "dd" to 1.5, "td" to 3.0, "tpm" to 0.5,
+    )
+
     /** Sleeper slot names → what a lineup shows. */
     fun slotLabel(slot: String): String = when (slot) {
         "FLEX" -> "FLEX"
@@ -51,6 +88,7 @@ object SleeperParser {
         "WRRB_FLEX" -> "W/R"
         "IDP_FLEX" -> "IDP"
         "DEF" -> "D/ST"
+        "UTIL" -> "UTIL"
         else -> slot
     }
 
@@ -65,8 +103,8 @@ object SleeperParser {
         else -> status.take(3).uppercase()
     }
 
-    fun headshot(playerId: String): String? =
-        if (playerId.all { it.isDigit() }) "https://sleepercdn.com/content/nfl/players/thumb/$playerId.jpg" else null
+    fun headshot(playerId: String, sport: League = League.NFL): String? =
+        if (playerId.all { it.isDigit() }) "https://sleepercdn.com/content/${sport.id}/players/thumb/$playerId.jpg" else null
 
     fun parseLeagues(json: String): List<FantasyLeague> =
         nullableList(json, SleeperLeagueDto.serializer()).map(::toLeague)
@@ -77,17 +115,17 @@ object SleeperParser {
 
     fun parseMatchups(json: String): List<SleeperMatchupDto> = nullableList(json, SleeperMatchupDto.serializer())
 
-    /** Accepts either the full /players/nfl dump or our trimmed cache (same shape). */
-    fun parsePlayers(json: String): Map<String, FantasyPlayer> =
+    /** Accepts either the full /players/<sport> dump or our trimmed cache (same shape). */
+    fun parsePlayers(json: String, sport: League = League.NFL): Map<String, FantasyPlayer> =
         SofaJson.decodeFromString(MapSerializer(String.serializer(), SleeperPlayerDto.serializer()), json)
-            .mapValues { (id, p) -> toPlayer(id, p) }
+            .mapValues { (id, p) -> toPlayer(id, p, sport) }
 
-    fun toPlayer(id: String, p: SleeperPlayerDto) = FantasyPlayer(
+    fun toPlayer(id: String, p: SleeperPlayerDto, sport: League = League.NFL) = FantasyPlayer(
         id = id,
         name = p.fullName ?: listOfNotNull(p.firstName, p.lastName).joinToString(" ").ifBlank { id },
         position = p.position,
         team = p.team,
-        headshotUrl = headshot(id),
+        headshotUrl = headshot(id, sport),
         injury = injuryTag(p.injuryStatus),
     )
 
@@ -105,6 +143,7 @@ object SleeperParser {
         players: Map<String, FantasyPlayer>,
         rosterPositions: List<String> = emptyList(),
         projections: Map<String, Double> = emptyMap(),
+        weekProjections: Map<String, WeekProjection> = emptyMap(),
     ): FantasyMatchup? {
         val slots = rosterPositions.filter { it != "BN" && it != "IR" && it != "TAXI" }
         val myRoster = rosters.firstOrNull { it.ownerId == myUserId || myUserId in it.coOwners.orEmpty() } ?: return null
@@ -121,11 +160,14 @@ object SleeperParser {
                 .withIndex()
                 .filter { it.value != "0" } // "0" marks an empty starting slot
                 .map { (i, id) ->
+                    val week = weekProjections[id]
                     FantasyStarter(
                         player = players[id] ?: defenseOrUnknown(id),
                         points = m.startersPoints?.getOrNull(i) ?: m.playersPoints?.get(id) ?: 0.0,
-                        projected = projections[id],
+                        projected = week?.total ?: projections[id],
                         slot = slots.getOrNull(i)?.let(::slotLabel),
+                        projectedToday = week?.today,
+                        projectedLater = week?.later,
                     )
                 }
             val record = rostersById[m.rosterId]?.settings?.let { s ->
@@ -147,6 +189,7 @@ object SleeperParser {
             week = week,
             me = team(mine),
             opponent = theirs?.let(::team),
+            sport = league.sport,
         )
     }
 
@@ -160,6 +203,7 @@ object SleeperParser {
         season = dto.season,
         totalRosters = dto.totalRosters,
         status = dto.status,
+        sport = if (dto.sport.equals("nba", ignoreCase = true)) League.NBA else League.NFL,
     )
 
     private fun <T> nullableList(json: String, s: kotlinx.serialization.KSerializer<T>): List<T> {

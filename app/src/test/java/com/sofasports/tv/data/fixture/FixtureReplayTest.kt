@@ -55,10 +55,14 @@ class FixtureReplayTest {
     @Test fun `fantasy fixture points grow with progress`() = runTest {
         val p = FixtureFantasyProvider(source, replay)
         val leagues = p.leagues("x")
-        assertEquals(2, leagues.size)
+        // Two NFL leagues, then the made-up NBA one.
+        assertEquals(listOf(com.sofasports.tv.domain.League.NFL, com.sofasports.tv.domain.League.NFL, com.sofasports.tv.domain.League.NBA), leagues.map { it.sport })
         val m1 = p.currentMatchup(leagues[0].id, "x")!!
         val m2 = p.currentMatchup(leagues[1].id, "x")!!
         assertTrue(m1.me.teamName != m2.me.teamName)
+        val nba = p.currentMatchup(leagues[2].id, "x")!!
+        assertEquals("Fixture Splash", nba.me.teamName)
+        assertTrue(nba.me.starters.any { it.projectedLater != null })
         assertTrue(replay.progress(t0) < replay.progress(t0 + 60_000))
     }
 
