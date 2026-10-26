@@ -104,6 +104,9 @@ fun FavoritesPicker(
         return
     }
     var tab by rememberSaveable { mutableStateOf(teamLeagues.first().id) }
+    // Start on the league tabs, not the app's top bar.
+    val tabFocus = remember { FocusRequester() }
+    LaunchedEffect(Unit) { runCatching { tabFocus.requestFocus() } }
     val league = teamLeagues.firstOrNull { it.id == tab } ?: teamLeagues.first()
     val loads by vm.teams.collectAsStateWithLifecycle()
     LaunchedEffect(league) { vm.load(league) }
@@ -114,7 +117,10 @@ fun FavoritesPicker(
             LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(vertical = 4.dp)) {
                 rowItems(teamLeagues, key = { it.id }) { l ->
                     val n = Favorites.inLeague(selected, l).size
-                    SofaButton(if (n > 0) "${l.label} ($n)" else l.label, onClick = { tab = l.id }, selected = l == league)
+                    SofaButton(
+                        if (n > 0) "${l.label} ($n)" else l.label, onClick = { tab = l.id }, selected = l == league,
+                        modifier = if (l == league) Modifier.focusRequester(tabFocus) else Modifier,
+                    )
                 }
             }
         }
@@ -175,7 +181,7 @@ private fun noun(league: League) = when (league.format) {
 private fun TeamGrid(teams: List<TeamInfo>, selected: List<String>, onToggle: (String) -> Unit, grouped: Boolean, modifier: Modifier) {
     val athletes = teams.firstOrNull()?.league?.hasTeams == false
     LazyVerticalGrid(
-        columns = GridCells.Fixed(if (athletes) 4 else 8),
+        columns = GridCells.Fixed(if (athletes) 3 else 8),
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),

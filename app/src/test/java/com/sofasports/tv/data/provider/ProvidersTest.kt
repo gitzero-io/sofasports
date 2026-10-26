@@ -15,7 +15,8 @@ import org.junit.Test
 
 class ProvidersTest {
 
-    private val requested = mutableListOf<String>()
+    /** Synchronized: boxing fetches its two lists concurrently. */
+    private val requested: MutableList<String> = java.util.Collections.synchronizedList(mutableListOf())
 
     /** Serves fixtures by URL path, the same files the debug fixture mode uses. */
     private val client = HttpClient(MockEngine { req ->

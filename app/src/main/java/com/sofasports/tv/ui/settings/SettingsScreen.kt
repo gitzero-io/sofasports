@@ -43,6 +43,7 @@ import com.sofasports.tv.BuildConfig
 import com.sofasports.tv.data.prefs.DataMode
 import com.sofasports.tv.data.prefs.OverlayCorner
 import com.sofasports.tv.data.prefs.OverlayTicker
+import com.sofasports.tv.domain.EventFormat
 import com.sofasports.tv.domain.League
 import com.sofasports.tv.domain.TeamKey
 import com.sofasports.tv.overlay.OverlayLayout
@@ -256,11 +257,12 @@ private fun LazyListScope.overlayItems(
             }
             if (settings.pinnedGameId != null) {
                 SpacedRow {
-                    Text("A game is pinned to the overlay.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary)
+                    val what = if (settings.pinnedGame?.league?.format == EventFormat.RACE) "race" else "game"
+                    Text("A $what is pinned to the overlay.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary)
                     SofaButton("Unpin", onClick = vm::clearPinnedGame)
                 }
             } else {
-                Text("Tip: open a game and choose \"Pin to overlay\". Otherwise it shows your team's game.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted)
+                Text("Tip: open a game, fight or race and choose \"Pin to overlay\". Otherwise it shows your team's game, or your driver's race.", style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextMuted)
             }
         }
     }

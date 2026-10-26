@@ -142,8 +142,11 @@ class EspnTeamsProvider @Inject constructor(
     private fun athletes(people: List<Triple<String, String, String?>>, league: League): List<TeamInfo> =
         people.filter { it.first.isNotBlank() && it.first != "TBA" }
             .distinctBy { it.first.lowercase() }
-            .map { (name, short, logo) -> TeamInfo(league, name, name, short, logo, sortName = name.substringAfterLast(' ')) }
+            .map { (name, short, logo) -> TeamInfo(league, name, name, short, logo, sortName = plain(name.substringAfterLast(' '))) }
             .sortedBy { it.sortName.lowercase() }
+
+    /** "Álvarez" → "Alvarez", so accented names sort and file under their letter. */
+    private fun plain(s: String): String = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "")
 
     private suspend fun espnTeams(league: League): List<TeamInfo> {
         if (league.espnPath == null) return emptyList()
