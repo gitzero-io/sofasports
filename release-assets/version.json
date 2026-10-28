@@ -1,8 +1,8 @@
 {
-  "latestVersionCode": 4,
-  "latestVersionName": "0.2.2",
+  "latestVersionCode": 5,
+  "latestVersionName": "0.3.0",
   "minSupportedVersionCode": 1,
-  "apkUrl": "https://github.com/gitzero-io/sofasports/releases/download/v0.2.2/sofasports.apk",
-  "apkSha256": "097fe8a80997bf06f17256ed8a66e0d69b2c8f7f9dc0da5a66e1741fbd46ba4b",
-  "notes": "New Fantasy tab with live projections, a win-probability bar and player photos; Watch buttons that open your TV app for a game; and a ticker with only player news that matters for bets and fantasy."
+  "apkUrl": "https://github.com/gitzero-io/sofasports/releases/download/v0.3.0/sofasports.apk",
+  "apkSha256": "d38c39dd33505616622d5b9109d0d12a3532b81ce440c62791deb52c36ee7b15",
+  "notes": "More sports: NBA, MLB, NHL, college, eight soccer leagues, UFC, boxing, F1, NASCAR and IndyCar, with favorites in every league, Game Center for every team sport, and Sleeper NBA fantasy (experimental)."
 }
