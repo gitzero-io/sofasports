@@ -46,6 +46,8 @@ data class OverlayState(
     val ticker: List<TickerItem> = emptyList(),
     /** This week's scoreboard, for "Around the league", "playing now" and close-game moments. */
     val games: List<Game> = emptyList(),
+    /** [games] plus leagues polled only for fantasy or picks, for the matchup and "anything live". */
+    val allGames: List<Game> = games,
     val prefs: OverlayPrefs = OverlayPrefs(),
 ) {
     val cornerTicker get() = (tickerMode == OverlayTicker.CORNER || tickerMode == OverlayTicker.BOTH) && ticker.isNotEmpty()
@@ -78,14 +80,14 @@ class OverlayFeed @Inject constructor(
                 if (m == OverlayTicker.OFF) flowOf(m to emptyList()) else ticker.items.map { m to it }
             }
             combine(fantasy.state, scores.state, settings.settings, config.config, combine(picks.progress, tickerFeed) { a, b -> a to b }) { f, s, prefs, cfg, (pk, tk) ->
-                val games = s.games
+                val games = s.followedGames
                 val pinned = prefs.pinnedGame?.let(s::game)
                 val pinnedRace = prefs.pinnedGame?.let(s::race)
                 val game = pinned ?: if (pinnedRace == null) pickGame(games, prefs.favoriteTeams) else null
                 OverlayState(
                     matchup = f.matchup.takeIf { cfg.features.fantasy },
                     game = game,
-                    race = pinnedRace ?: if (game == null) pickRace(s.races, prefs.favoriteTeams) else null,
+                    race = pinnedRace ?: if (game == null) pickRace(s.followedRaces, prefs.favoriteTeams) else null,
                     gamePinned = pinned != null || pinnedRace != null,
                     favorites = prefs.favoriteTeams,
                     closeRule = cfg.closeGame,
@@ -94,6 +96,7 @@ class OverlayFeed @Inject constructor(
                     tickerMode = tk.first,
                     ticker = tk.second,
                     games = games,
+                    allGames = s.games,
                     prefs = prefs.overlay,
                 )
             }.collect { _state.value = it }

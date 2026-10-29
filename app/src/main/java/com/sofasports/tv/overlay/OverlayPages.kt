@@ -59,7 +59,7 @@ object OverlayPages {
     /** My fantasy starters whose game (in the matchup's sport) is live right now, highest points first. */
     fun playingNow(s: OverlayState): List<FantasyStarter> {
         val m = s.matchup ?: return emptyList()
-        val liveTeams = s.games.filter { it.league == m.sport && it.state == GameState.LIVE }.flatMap { g -> g.teams.map { it.abbr } }.toSet()
+        val liveTeams = s.allGames.filter { it.league == m.sport && it.state == GameState.LIVE }.flatMap { g -> g.teams.map { it.abbr } }.toSet()
         if (liveTeams.isEmpty()) return emptyList()
         return m.me.starters.filter { st -> st.player.team?.let { FantasyTeams.scoreboardAbbr(m.sport, it) in liveTeams } == true }
             .sortedByDescending { it.points }

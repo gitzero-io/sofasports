@@ -47,7 +47,7 @@ class TickerRepository @Inject constructor(
     private var lastGames: List<Game>? = null
     private val events = MutableStateFlow<List<TickerItem>>(emptyList())
 
-    private val newsLeagues: Flow<List<League>> = scores.state.map { st -> st.leagues.filter { it.hasTeams } }.distinctUntilChanged()
+    private val newsLeagues: Flow<List<League>> = scores.state.map { st -> st.followed.filter { it.hasTeams } }.distinctUntilChanged()
 
     private val news: Flow<List<NewsItem>> = newsLeagues.flatMapLatest { leagues ->
         flow {
@@ -66,7 +66,7 @@ class TickerRepository @Inject constructor(
     private val games: Flow<List<Game>> = flow {
             scores.state.collect { st ->
                 if (st.loading) return@collect
-                val now = st.games
+                val now = st.followedGames
                 lastGames?.let { prev ->
                     val fresh = TickerBuilder.scoreEvents(prev, now, System.currentTimeMillis())
                     if (fresh.isNotEmpty()) {
