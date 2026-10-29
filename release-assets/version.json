@@ -1,8 +1,8 @@
 {
-  "latestVersionCode": 5,
-  "latestVersionName": "0.3.0",
+  "latestVersionCode": 6,
+  "latestVersionName": "0.3.1",
   "minSupportedVersionCode": 1,
-  "apkUrl": "https://github.com/gitzero-io/sofasports/releases/download/v0.3.0/sofasports.apk",
-  "apkSha256": "d38c39dd33505616622d5b9109d0d12a3532b81ce440c62791deb52c36ee7b15",
-  "notes": "More sports: NBA, MLB, NHL, college, eight soccer leagues, UFC, boxing, F1, NASCAR and IndyCar, with favorites in every league, Game Center for every team sport, and Sleeper NBA fantasy (experimental)."
+  "apkUrl": "https://github.com/gitzero-io/sofasports/releases/download/v0.3.1/sofasports.apk",
+  "apkSha256": "6fde4a85cab1b321a427446da9da0dca895ac77423f3c8e31dbf857afcb33d71",
+  "notes": "Fix: sports you unfollow no longer show up on Home, in the ticker or in the overlay."
 }
