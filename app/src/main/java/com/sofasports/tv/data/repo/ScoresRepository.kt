@@ -40,6 +40,8 @@ data class ScoresState(
     /** Leagues being polled, in the user's order. */
     val leagues: List<League> = emptyList(),
     val boards: Map<League, LeagueBoard> = emptyMap(),
+    /** The leagues the user follows. [leagues] can also hold ones polled only for fantasy or picks. */
+    val followed: List<League> = leagues,
 ) {
     fun board(league: League): Scoreboard? = boards[league]?.scoreboard
 
@@ -49,6 +51,10 @@ data class ScoresState(
     /** Every polled league's games, in league order. */
     val games: List<Game> get() = leagues.flatMap { board(it)?.games.orEmpty() }
     val races: List<Race> get() = leagues.flatMap { board(it)?.races.orEmpty() }
+
+    /** Games and races to show: unfollowed leagues polled for fantasy or picks stay out of sight. */
+    val followedGames: List<Game> get() = followed.flatMap { board(it)?.games.orEmpty() }
+    val followedRaces: List<Race> get() = followed.flatMap { board(it)?.races.orEmpty() }
 
     /** Nothing has come back yet from any league. */
     val loading: Boolean get() = leagues.isNotEmpty() && leagues.none { boards[it]?.scoreboard != null || boards[it]?.error != null }
@@ -85,22 +91,23 @@ class ScoresRepository @Inject constructor(
         // a scoreboard coming even if the user doesn't follow that league. Until the fantasy league is
         // known, a linked Sleeper account means NFL.
         val needNfl = (s.sleeperUserId != null && fantasySport == null) || hasPicks
-        val leagues = (s.followedLeagues + listOfNotNull(League.NFL.takeIf { needNfl }, fantasySport))
+        val followed = s.followedLeagues.filter(c::leagueEnabled)
+        val leagues = (followed + listOfNotNull(League.NFL.takeIf { needNfl }, fantasySport))
             .distinct().filter(c::leagueEnabled)
-        s.dataMode to leagues
+        Triple(s.dataMode, leagues, followed)
     }
         .distinctUntilChanged()
-        .flatMapLatest { (_, leagues) -> pollAll(leagues) }
+        .flatMapLatest { (_, leagues, followed) -> pollAll(leagues, followed) }
         .stateIn(scope, SharingStarted.WhileSubscribed(5_000), ScoresState())
 
     fun refreshNow() {
         refreshSignal.tryEmit(Unit)
     }
 
-    private fun pollAll(leagues: List<League>): Flow<ScoresState> {
+    private fun pollAll(leagues: List<League>, followed: List<League>): Flow<ScoresState> {
         if (leagues.isEmpty()) return flowOf(ScoresState())
         return combine(leagues.map { l -> poll(l).map { l to it } }) { boards ->
-            ScoresState(leagues, boards.toMap())
+            ScoresState(leagues, boards.toMap(), followed)
         }
     }
 

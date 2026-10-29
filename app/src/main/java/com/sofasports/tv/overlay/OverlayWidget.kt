@@ -88,7 +88,7 @@ fun OverlayWidget(state: OverlayState, display: RenderedDisplay) {
                 }
                 OverlayPage.MATCHUP -> state.matchup?.let { m ->
                     PageHeader(m.leagueName, display)
-                    MatchupRows(m, state.games)
+                    MatchupRows(m, state.allGames)
                     if (OverlayRow.PLAYING_NOW in prefs.rows) PlayingNowRows(OverlayPages.playingNow(state))
                 }
                 OverlayPage.MY_GAME -> {

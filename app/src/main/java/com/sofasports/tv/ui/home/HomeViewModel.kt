@@ -78,7 +78,7 @@ class HomeViewModel @Inject constructor(
     fun findOnGoogleTv(game: Game) { launcher.searchGoogleTv(WatchPlanner.searchQuery(game)) }
 
     val ui: StateFlow<HomeUi> = combine(fantasy.state, scores.state, settings.settings, config.config, picks.progress) { f, s, prefs, cfg, pk ->
-        val games = s.games
+        val games = s.followedGames
         val teamGames = games.filter { it.league.format == EventFormat.TEAMS }
         // Favorite fighters' bouts count as "your games" too.
         val mine = GameSorting.sorted(games.filter { Perspective.involvesFavorite(it, prefs.favoriteTeams) }, prefs.favoriteTeams)
@@ -98,11 +98,12 @@ class HomeViewModel @Inject constructor(
             showOdds = cfg.features.odds && prefs.showOdds,
             picks = if (cfg.features.picks) pk else emptyList(),
             watchApp = prefs.watchApp,
+            // Every polled league, for fantasy projections.
             games = s.games,
             fightCards = FightCards.group(games, prefs.favoriteTeams).filter { soon(it.state, it.startEpochMs) },
-            races = s.races.filter { soon(it.state, it.startEpochMs) }.sortedBy { if (it.involvesAny(prefs.favoriteTeams)) 0 else 1 },
-            multiLeague = s.leagues.size > 1,
-            weeklyOnly = s.leagues.all { it.weekly },
+            races = s.followedRaces.filter { soon(it.state, it.startEpochMs) }.sortedBy { if (it.involvesAny(prefs.favoriteTeams)) 0 else 1 },
+            multiLeague = s.followed.size > 1,
+            weeklyOnly = s.followed.all { it.weekly },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUi())
 

@@ -55,6 +55,13 @@ class OverlayPagesTest {
         assertEquals(listOf("B", "A"), OverlayPages.playingNow(s).map { it.player.name })
     }
 
+    @Test fun `playing now counts games from leagues the user doesn't follow`() {
+        val m = T.matchup(20.0, 10.0, listOf(T.starter("1", "A", "HOU", 4.0)))
+        val s = OverlayState(matchup = m, games = emptyList(), allGames = listOf(T.game("g", "HOU", "WSH")))
+        assertEquals(listOf("A"), OverlayPages.playingNow(s).map { it.player.name })
+        assertTrue(OverlayPages.leagueGames(s, T.NOW).isEmpty())
+    }
+
     @Test fun `quiet hours wrap past midnight`() {
         assertTrue(QuietHours.LATE.contains(23)); assertTrue(QuietHours.LATE.contains(3)); assertFalse(QuietHours.LATE.contains(8))
         assertTrue(QuietHours.OVERNIGHT.contains(1)); assertFalse(QuietHours.OVERNIGHT.contains(0))
