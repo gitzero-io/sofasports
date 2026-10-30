@@ -167,7 +167,8 @@ object Favorites {
     /** Toggle [key] in [current], keeping pick order and both caps. */
     fun toggle(current: List<String>, key: String): List<String> {
         val k = TeamKey.normalize(key)
-        if (k in current) return current - k
+        // Athlete names compare case-insensitively, as the picker highlights them.
+        current.firstOrNull { it.equals(k, ignoreCase = true) }?.let { return current - it }
         val league = TeamKey.league(k)
         if (current.size >= MAX_TOTAL) return current
         if (current.count { TeamKey.league(it) == league } >= MAX_PER_LEAGUE) return current
