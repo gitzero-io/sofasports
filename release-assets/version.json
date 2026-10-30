@@ -1,8 +1,8 @@
 {
-  "latestVersionCode": 6,
-  "latestVersionName": "0.3.1",
+  "latestVersionCode": 7,
+  "latestVersionName": "0.3.2",
   "minSupportedVersionCode": 1,
-  "apkUrl": "https://github.com/gitzero-io/sofasports/releases/download/v0.3.1/sofasports.apk",
-  "apkSha256": "6fde4a85cab1b321a427446da9da0dca895ac77423f3c8e31dbf857afcb33d71",
-  "notes": "Fix: sports you unfollow no longer show up on Home, in the ticker or in the overlay."
+  "apkUrl": "https://github.com/gitzero-io/sofasports/releases/download/v0.3.2/sofasports.apk",
+  "apkSha256": "5875619663d2ec8ee8db793a7046ab8cf6ca4e0bf3e55e636cc4fa768d6993f5",
+  "notes": "Fix: favorites in sports you've unfollowed can now be removed, and the picker says how to remove one."
 }
