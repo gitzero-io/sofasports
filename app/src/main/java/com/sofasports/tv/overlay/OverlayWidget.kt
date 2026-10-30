@@ -48,7 +48,9 @@ import com.sofasports.tv.domain.PickEvaluator
 import com.sofasports.tv.domain.PickProgress
 import com.sofasports.tv.domain.PickType
 import com.sofasports.tv.domain.Race
+import com.sofasports.tv.ui.picks.ProgressBar
 import com.sofasports.tv.ui.picks.bookColor
+import com.sofasports.tv.ui.picks.progressFraction
 import com.sofasports.tv.ui.picks.sortForDisplay
 import com.sofasports.tv.ui.picks.statusColor
 import com.sofasports.tv.ui.components.Badge
@@ -366,7 +368,7 @@ internal fun coverLabel(s: BetStatus): String? = when (s) {
     BetStatus.PENDING -> null
 }
 
-/** "PICKS 3/5 hitting" + up to 5 picks that are live (or next up). */
+/** "PICKS 3/5 hitting" + up to 5 picks that are live (or next up), each over/under with a bar toward its line. */
 @Composable
 private fun PicksRows(picks: List<PickProgress>) {
     Text("PICKS ${PickEvaluator.hitting(picks)}/${picks.size} HITTING", style = MaterialTheme.typography.labelSmall, color = SofaColors.TextMuted)
@@ -381,6 +383,8 @@ private fun PicksRows(picks: List<PickProgress>) {
                 modifier = Modifier.padding(start = 6.dp).scorePulse(p.current, statusColor(p.status), onlyIncrease = false).padding(horizontal = 4.dp),
             )
         }
+        // Lined up with the text, past the book stripe.
+        progressFraction(p)?.let { ProgressBar(it, statusColor(p.status), Modifier.padding(start = 12.dp, bottom = 2.dp), height = 3.dp) }
     }
 }
 

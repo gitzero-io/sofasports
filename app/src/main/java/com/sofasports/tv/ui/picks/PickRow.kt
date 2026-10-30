@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -81,15 +82,19 @@ fun PickRow(p: PickProgress, modifier: Modifier = Modifier) {
             }
             Text(statusText(p), style = MaterialTheme.typography.labelLarge, color = statusColor(p.status))
         }
-        if (p.pick.type.overUnder && p.current != null && p.pick.line > 0) {
-            ProgressBar((p.current / p.pick.line).toFloat(), statusColor(p.status), Modifier.padding(top = 8.dp))
-        }
+        progressFraction(p)?.let { ProgressBar(it, statusColor(p.status), Modifier.padding(top = 8.dp)) }
     }
 }
 
+/** How far an over/under pick's live number has climbed toward its line; null for spreads, moneylines and picks with no number yet. */
+fun progressFraction(p: PickProgress): Float? {
+    val c = p.current ?: return null
+    return if (p.pick.type.overUnder && p.pick.line > 0) (c / p.pick.line).toFloat() else null
+}
+
 @Composable
-fun ProgressBar(fraction: Float, color: Color, modifier: Modifier = Modifier) {
-    Box(modifier.fillMaxWidth().height(6.dp).background(SofaColors.SurfaceRaised, RoundedCornerShape(3.dp))) {
-        Box(Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f)).fillMaxHeight().background(color, RoundedCornerShape(3.dp)))
+fun ProgressBar(fraction: Float, color: Color, modifier: Modifier = Modifier, height: Dp = 6.dp) {
+    Box(modifier.fillMaxWidth().height(height).background(SofaColors.SurfaceRaised, RoundedCornerShape(height / 2))) {
+        Box(Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f)).fillMaxHeight().background(color, RoundedCornerShape(height / 2)))
     }
 }
