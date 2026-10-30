@@ -136,7 +136,7 @@ fun FavoritesPicker(
                 EventFormat.TEAMS -> "Your teams show first and are always blue."
                 EventFormat.FIGHT -> "Their fights show first, and in the overlay when they're on."
                 EventFormat.RACE -> "Their position shows on every race card."
-            },
+            } + " Select one again to remove it.",
             style = MaterialTheme.typography.bodyMedium, color = SofaColors.TextSecondary,
         )
         when (val load = loads[league]) {
@@ -152,7 +152,7 @@ fun FavoritesPicker(
                 }
                 val shown = when {
                     !useLetters -> all
-                    letter == null -> all.filter { it.key in selected }
+                    letter == null -> all.filter { t -> selected.any { it.equals(t.key, ignoreCase = true) } }
                     else -> all.filter { it.sortName.firstOrNull()?.uppercaseChar() == letter }
                 }
                 if (useLetters && letter == null && shown.isEmpty()) {

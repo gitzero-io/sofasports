@@ -55,6 +55,8 @@ class LeaguesTest {
         assertEquals("nba:LAL", f.last())
         f = Favorites.toggle(f, "nfl:BUF")
         assertFalse("nfl:BUF" in f)
+        // A fighter saved with different capitalization than ESPN's current name still toggles off.
+        assertEquals(emptyList<String>(), Favorites.toggle(listOf("ufc:alexander volkanovski"), "ufc:Alexander Volkanovski"))
         var many = emptyList<String>()
         listOf("nfl", "nba", "mlb", "nhl").forEach { l -> (1..4).forEach { many = Favorites.toggle(many, "$l:T$it") } }
         assertEquals(Favorites.MAX_TOTAL, many.size)

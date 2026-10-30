@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sofasports.tv.domain.Favorites
+import com.sofasports.tv.domain.TeamKey
 import com.sofasports.tv.ui.components.SofaButton
 import com.sofasports.tv.ui.onboarding.FavoritesPicker
 import com.sofasports.tv.ui.onboarding.LeaguePicker
@@ -22,7 +23,10 @@ import com.sofasports.tv.ui.onboarding.PickerHeader
 import com.sofasports.tv.ui.onboarding.ids
 import com.sofasports.tv.ui.onboarding.leagues
 
-/** Same picker as first run, pre-filled with the current favorites, one tab per followed league. */
+/**
+ * Same picker as first run, pre-filled with the current favorites: one tab per followed league,
+ * plus any league that still holds a saved favorite, so favorites left in an unfollowed league can be removed.
+ */
 @Composable
 fun EditFavoritesScreen(onDone: () -> Unit, settingsVm: SettingsViewModel = hiltViewModel(), vm: OnboardingViewModel = hiltViewModel()) {
     val settings by settingsVm.settings.collectAsStateWithLifecycle()
@@ -35,7 +39,7 @@ fun EditFavoritesScreen(onDone: () -> Unit, settingsVm: SettingsViewModel = hilt
             SofaButton("Cancel", onClick = onDone)
         }
         FavoritesPicker(
-            leagues = settings.followedLeagues,
+            leagues = (settings.followedLeagues + settings.favoriteTeams.mapNotNull(TeamKey::league)).distinct(),
             selected = current,
             onToggle = { selected = Favorites.toggle(current, it) },
             modifier = Modifier.weight(1f),
