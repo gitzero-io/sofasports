@@ -1,8 +1,8 @@
 {
-  "latestVersionCode": 7,
-  "latestVersionName": "0.3.2",
+  "latestVersionCode": 8,
+  "latestVersionName": "0.3.3",
   "minSupportedVersionCode": 1,
-  "apkUrl": "https://github.com/gitzero-io/sofasports/releases/download/v0.3.2/sofasports.apk",
-  "apkSha256": "5875619663d2ec8ee8db793a7046ab8cf6ca4e0bf3e55e636cc4fa768d6993f5",
-  "notes": "Fix: favorites in sports you've unfollowed can now be removed, and the picker says how to remove one."
+  "apkUrl": "https://github.com/gitzero-io/sofasports/releases/download/v0.3.3/sofasports.apk",
+  "apkSha256": "0869d1806be628f6de28a10dcff52949b452fded62ade541ee07b174eabf76a5",
+  "notes": "New: progress bars for props and totals on the overlay's Picks page."
 }
